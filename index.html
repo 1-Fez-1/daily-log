@@ -254,7 +254,7 @@ input,select,textarea,.ar td input.n,.tl select,.tl input,.fa input,.amtc input,
 .qr td{padding:2px 16px 10px}.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
 .qr .chips .qa{width:auto;min-height:34px;padding:4px 12px;border-radius:999px;background:var(--surface);border:1px solid var(--line);color:var(--ink);font-size:13px;font-weight:500;white-space:normal;text-align:left}
 .qr .chips .qa small{color:var(--muted);font-weight:400;margin-left:4px}
-.mtr td{padding:4px 16px 10px;text-align:left}.mtl{display:flex;gap:8px;align-items:center;margin-top:4px}.mtl input{width:auto;flex:0 0 132px}
+.mtr td{padding:4px 16px 10px;text-align:left}.mtl{display:flex;gap:8px;align-items:center;margin-top:4px}.mtl .tsel{flex:1 1 auto;max-width:190px;margin-top:0}.mtl .tsel select{min-height:42px}
 .mtr .mtl button{width:auto;min-height:34px;padding:4px 12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:13px}
 .ctr button.cr{display:grid;width:100%;background:transparent;border:0;border-radius:0;color:var(--ink);text-align:left;min-height:0;white-space:normal;padding:6px 0;font-size:13px;font-weight:400}
 .ctr .hint{font-size:12px;color:var(--muted);padding-top:4px}
@@ -315,7 +315,7 @@ input,select,textarea,.ar td input.n,.tl select,.tl input,.fa input,.amtc input,
       <p class="muted" id="slAvg" style="margin:8px 0 0"></p>
       <label>Notes<textarea id="noteTx" rows="5" maxlength="2000" placeholder="Mood, energy, training, anything worth remembering"></textarea></label>
     </section>
-    <p class="muted" style="text-align:center;font-size:11px;margin:14px 0 0">Version 11 · daily backup reminder, summary periods</p>
+    <p class="muted" style="text-align:center;font-size:11px;margin:14px 0 0">Version 12 · autosave amounts, time picker</p>
     <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
       <p class="muted" style="margin:8px 0">Data is stored only in this browser. Export a backup regularly, and before moving to a new version or device. <span id="lastBk"></span></p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
@@ -407,7 +407,8 @@ input,select,textarea,.ar td input.n,.tl select,.tl input,.fa input,.amtc input,
     <div class="amtc eac"><button type="button" class="st" data-d="-1" aria-label="Decrease amount">−</button><input id="eaIn" type="number" min="0" step="1" inputmode="decimal" aria-label="Amount"><button type="button" class="st" data-d="1" aria-label="Increase amount">+</button><span id="eaU" class="u"></span></div>
     <div class="eaq" id="eaQ"><button data-q="-10">−10</button><button data-q="10">+10</button><button data-q="50">+50</button></div>
     <p class="muted" id="eaPv" role="status"></p>
-    <div class="row"><button class="primary" id="eaSave">Save</button><button id="eaCancel">Cancel</button><button id="eaDel">Remove food</button></div>
+    <p class="muted" style="margin:0 0 4px;font-size:12px">Changes save automatically.</p>
+    <div class="row"><button class="primary" id="eaSave">Done</button><button id="eaDel">Remove food</button></div>
   </div>
 </div>
 <div id="nf" hidden>
@@ -492,12 +493,13 @@ function build(){
     if(quickList.length)h+=`<tr class="qr"><td colspan="6"><span class="tl2">Quick add</span><div class="chips">${quickList.map((q,qi)=>`<button class="qa" data-q="${qi}">${esc(q.food.n)}<small>${amtLabel({a:q.amt,ru:fref(q.food).u||'items'})}</small></button>`).join('')}</div></td></tr>`;
     h+=`<tr class="ar2" hidden><td colspan="6"><div class="amtc"><button type="button" class="st" data-d="-1" aria-label="Decrease amount">\u2212</button><input class="a" type="number" min="0" step="1" inputmode="decimal" placeholder="amount" aria-label="Amount"><button type="button" class="st" data-d="1" aria-label="Increase amount">+</button><span class="u">g</span><span class="pvt"></span><button class="ab" aria-label="Add food">Add</button></div></td></tr>`;
     h+=`<tr class="fl"><td colspan="6"><span class="tl2">How do you feel after ${name}? (1\u201310)</span><div class="fbtns">${[1,2,3,4,5,6,7,8,9,10].map(v=>`<button class="fb${fe[m]===v?' on':''}" data-v="${v}" aria-pressed="${fe[m]===v}">${v}</button>`).join('')}</div></td></tr>`;
-    h+=`<tr class="mtr"><td colspan="6"><span class="tl2">Time eaten (optional)</span><div class="mtl"><input type="time" class="mt" value="${mtm[m]||''}" aria-label="Time ${name} was eaten"><button class="mnow">Now</button>${mtm[m]?'<button class="mclr">Clear</button>':''}</div></td></tr>`;
+    h+=`<tr class="mtr"><td colspan="6"><span class="tl2">Time eaten (optional)</span><div class="mtl"><div class="tsel" data-mt="${mtm[m]||''}"><select data-p="h" aria-label="${name} hour">${hOpts}</select><span>:</span><select data-p="m" aria-label="${name} minutes">${mOpts}</select></div><button class="mnow">Now</button>${mtm[m]?'<button class="mclr">Clear</button>':''}</div></td></tr>`;
     h+=`<tr class="tl"><td colspan="6"><div><button class="cp">Copy yesterday</button><select class="sm" aria-label="Add a recipe">${opts}</select></div><div><input class="sn" placeholder="Recipe name"><button class="sv">Save as recipe</button></div>${m===3?'<div><button class="m4off">Remove Meal 4</button></div>':''}</td></tr>`;
     h+=`<tr class="dnrow"><td colspan="6"><button class="done">Done \u25b4</button></td></tr></tbody>`;
   });
   h+=`<tfoot><tr><th>Total</th>${F.map(f=>`<td data-t="${f}"></td>`).join('')}<td></td></tr><tr><th>Left</th>${F.map(f=>`<td data-l="${f}"></td>`).join('')}<td></td></tr></tfoot>`;
   $('sheet').innerHTML=h;
+  document.querySelectorAll('#sheet .tsel[data-mt]').forEach(ts=>{const v=ts.dataset.mt;if(!v)return;const q=r5(v).split(':');ts.querySelector('[data-p=h]').value=q[0];ts.querySelector('[data-p=m]').value=q[1]});
 }
 function totals(){
   const d=$('date').value,list=db.days[d]||[],g=goals(),t=sum(list);renderDash(t,g);
@@ -661,7 +663,7 @@ sheet.addEventListener('click',ev=>{
 });
 sheet.addEventListener('change',ev=>{
   const t=ev.target;
-  if(t.classList.contains('mt')){setMT(+t.closest('tbody').dataset.m,t.value);return}
+  if(t.dataset.p&&t.closest('.mtl')){const ts=t.closest('.tsel'),h=ts.querySelector('[data-p=h]').value,mi=ts.querySelector('[data-p=m]').value;setMT(+t.closest('tbody').dataset.m,h===''?'':h+':'+mi);return}
   if(t.classList.contains('sm')&&t.value!==''){const m=+t.closest('tbody').dataset.m,r=db.recipes[+t.value];recEntry(r,m,1,r.servings);openOnly(m);save();render();toast('Added '+r.n+' to '+MEALS[m]);return}
 });
 sheet.addEventListener('input',ev=>{
@@ -1036,24 +1038,26 @@ function openEA(i){
   $('eaName').textContent=base.n;$('eaU').textContent=mass?base.ru:(base.ru||'')[0]==='/'?'servings':base.ru;
   document.querySelectorAll('#ea .amtc .st').forEach(b=>b.dataset.d=(+b.dataset.d<0?-1:1)*st);
   $('eaQ').hidden=!mass;$('eaIn').step=st;$('eaIn').value=base.a;
-  $('ea').hidden=false;eaPv();setTimeout(()=>{$('eaIn').focus();$('eaIn').select()},60);
+  $('ea').hidden=false;eaPv();$('eaIn').focus();try{$('eaIn').select()}catch(e){}
 }
-function eaSave(){
-  if(!eaState)return;const v=num($('eaIn').value);if(!v){toast('Enter an amount above 0');return}
+let eaT=null;
+function eaApply(){
+  if(!eaState)return;const v=num($('eaIn').value);if(!v)return;
   const e=dayList()[eaState.i];if(!e)return;
-  e.n=eaState.n;e.ru=eaState.ru;e.pu=eaState.pu;applyAmt(e,v);
-  save();$('ea').hidden=true;eaState=null;render();toast('Updated to '+amtLabel({a:v,ru:e.ru}));
+  e.n=eaState.n;e.ru=eaState.ru;e.pu=eaState.pu;applyAmt(e,v);save();
+  clearTimeout(eaT);eaT=setTimeout(()=>{build();totals()},120);
 }
-$('eaIn').addEventListener('input',eaPv);
-$('eaIn').addEventListener('keydown',ev=>{if(ev.key==='Enter')eaSave()});
-$('eaSave').onclick=eaSave;
-$('eaCancel').onclick=()=>{$('ea').hidden=true;eaState=null};
+function eaDone(){if(!eaState)return;eaApply();clearTimeout(eaT);$('ea').hidden=true;eaState=null;render()}
+$('eaIn').addEventListener('input',()=>{eaPv();eaApply()});
+$('eaIn').addEventListener('keydown',ev=>{if(ev.key==='Enter'){ev.preventDefault();eaDone()}});
+document.addEventListener('keydown',ev=>{if(ev.key==='Escape'&&!$('ea').hidden)eaDone()});
+$('eaSave').onclick=eaDone;
 $('eaDel').onclick=()=>{if(!eaState)return;dayList().splice(eaState.i,1);save();$('ea').hidden=true;eaState=null;render();toast('Removed')};
 $('ea').addEventListener('click',ev=>{
-  if(ev.target===$('ea')){$('ea').hidden=true;eaState=null;return}
+  if(ev.target===$('ea')){eaDone();return}
   const b=ev.target.closest('button');if(!b)return;
   if(b.classList.contains('st')&&ev.detail===0)stepIt(b);
-  if(b.dataset.q){$('eaIn').value=Math.max(0,Math.round(((parseFloat($('eaIn').value)||0)+ +b.dataset.q)*100)/100);eaPv()}
+  if(b.dataset.q){$('eaIn').value=Math.max(0,Math.round(((parseFloat($('eaIn').value)||0)+ +b.dataset.q)*100)/100);eaPv();eaApply()}
 });
 sheet.addEventListener('keydown',ev=>{if(ev.key==='Enter'&&ev.target.matches('tr.it'))openEA(+ev.target.dataset.i)});
 $('copyAll').onclick=ev=>copyFrom(null,ev.target);
