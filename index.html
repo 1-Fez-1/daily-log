@@ -247,6 +247,21 @@ tfoot tr:last-child th,tfoot tr:last-child td{font-weight:500;color:var(--muted)
 .eaq{display:flex;gap:8px;margin-bottom:6px}.eaq button{flex:1;background:var(--soft);border:0}
 @media (min-width:560px){thead th:nth-child(n+2){width:64px}}
 input,select,textarea,.ar td input.n,.tl select,.tl input,.fa input,.amtc input,.ar2 .a,.wc input.wi{font-size:16px!important}
+
+.todayrow{display:flex;justify-content:center;margin:-2px 0 10px}.todayrow button{min-height:32px;font-size:13px;padding:4px 14px;border-radius:999px}
+.nudge{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--tint);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 10px;font-size:13px}
+.nudge button{min-height:34px;font-size:13px;padding:4px 12px}.nudge>div{display:flex;gap:8px}
+.qr td{padding:2px 16px 10px}.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.qr .chips .qa{width:auto;min-height:34px;padding:4px 12px;border-radius:999px;background:var(--surface);border:1px solid var(--line);color:var(--ink);font-size:13px;font-weight:500;white-space:normal;text-align:left}
+.qr .chips .qa small{color:var(--muted);font-weight:400;margin-left:4px}
+.mtr td{padding:4px 16px 10px;text-align:left}.mtl{display:flex;gap:8px;align-items:center;margin-top:4px}.mtl input{width:auto;flex:0 0 132px}
+.mtr .mtl button{width:auto;min-height:34px;padding:4px 12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:13px}
+.ctr button.cr{display:grid;width:100%;background:transparent;border:0;border-radius:0;color:var(--ink);text-align:left;min-height:0;white-space:normal;padding:6px 0;font-size:13px;font-weight:400}
+.ctr .hint{font-size:12px;color:var(--muted);padding-top:4px}
+.it.flash td{animation:flh 2s ease-out}@keyframes flh{0%,65%{background:rgba(255,200,60,.4)}100%{background:transparent}}
+.wk{display:grid;grid-template-columns:1fr 1fr;gap:10px}.wk>div{background:var(--soft);border-radius:10px;padding:10px 12px}
+.wk span{display:block;font-size:12px;color:var(--muted)}.wk strong{font-size:17px;font-weight:600}.wk em{display:block;font-style:normal;font-size:12px;color:var(--muted)}
+.wkn{font-size:13px;margin:10px 0 0}
 </style>
 </head>
 <body>
@@ -255,6 +270,7 @@ input,select,textarea,.ar td input.n,.tl select,.tl input,.fa input,.amtc input,
     <div class="dn"><button id="prevD" aria-label="Previous day">&lsaquo;</button><input type="date" id="date" aria-label="Date"><button id="nextD" aria-label="Next day">&rsaquo;</button></div>
     <button id="scanBtn">&#128247; Scan</button>
   </header>
+  <div id="todayRow" class="todayrow" hidden><button id="todayD">Back to today</button></div>
 
   <section class="card dash" aria-label="Today's totals">
     <div class="dk"><b id="dKv">0</b><span class="muted">/ <span id="dKg">0</span> kcal · <span id="dKl"></span></span><span class="pct" id="dKp">0%</span><button id="gEdit" class="sm" aria-expanded="false">Goals</button></div>
@@ -279,6 +295,7 @@ input,select,textarea,.ar td input.n,.tl select,.tl input,.fa input,.amtc input,
 <nav class="tabs" role="tablist"><button role="tab" data-t="log">Log</button><button role="tab" data-t="graphs">Graphs</button><button role="tab" data-t="nut">Vitamins</button><button role="tab" data-t="foods">Foods</button><button role="tab" data-t="rec">Recipes</button></nav>
 
   <div data-tab="log">
+    <div id="bkNudge" class="nudge" hidden><span id="bkNudgeT"></span><div><button id="bkNudgeGo" class="primary">Back up now</button><button id="bkNudgeLater">Later</button></div></div>
     <div class="wrap"><table id="sheet"></table></div>
     <div class="logfoot"><label>Weight <input id="wIn" type="number" step="0.1" min="0" inputmode="decimal" aria-label="Body weight in kg"> kg</label><button id="copyAll">Copy yesterday's log</button></div>
     <section class="card wc" id="waterCard" aria-label="Water intake">
@@ -298,18 +315,20 @@ input,select,textarea,.ar td input.n,.tl select,.tl input,.fa input,.amtc input,
       <p class="muted" id="slAvg" style="margin:8px 0 0"></p>
       <label>Notes<textarea id="noteTx" rows="5" maxlength="2000" placeholder="Mood, energy, training, anything worth remembering"></textarea></label>
     </section>
-    <p class="muted" style="text-align:center;font-size:11px;margin:14px 0 0">Version 9 · grouped contributors</p>
+    <p class="muted" style="text-align:center;font-size:11px;margin:14px 0 0">Version 10 · quick add, backups, summary</p>
     <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
       <p class="muted" style="margin:8px 0">Data is stored only in this browser. Export a backup regularly, and before moving to a new version or device. <span id="lastBk"></span></p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
       <div class="row"><select id="bkMode" aria-label="Import mode"><option value="merge">Import: merge with current data</option><option value="replace">Import: replace everything</option></select><button id="bkImport">Import</button></div>
       <textarea id="bk" rows="3" style="width:100%;font:12px monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px" placeholder="Backup text appears here after Export. To restore, choose a file or paste backup text, then press Import." aria-label="Backup text"></textarea>
       <p class="muted" id="bkMsg" role="status" style="margin:6px 0 0"></p>
+      <div class="row"><button id="tidyBtn">Tidy old entry names</button></div><p class="muted" id="tidyMsg" role="status" style="margin:6px 0 0">Removes amounts that older versions saved inside food names, such as "Oats 40g".</p>
     </details>
   </div>
   <datalist id="foodlist"></datalist><datalist id="ingredlist"></datalist>
 
   <div data-tab="graphs">
+    <section class="card" id="wkCard"><h2>Last 7 days</h2><p class="muted" id="wkT" style="margin:0 0 10px"></p><div id="wkBody"></div></section>
     <div class="row" style="margin-top:0"><select id="range" aria-label="Range"><option value="7">Last 7 days</option><option value="14" selected>Last 14 days</option><option value="30">Last 30 days</option><option value="90">Last 3 months</option><option value="180">Last 6 months</option><option value="365">Last year</option><option value="all">All time</option></select></div>
     <p class="muted" id="chNote" style="margin:0 0 8px"></p>
     <section class="card"><h2>Calories</h2><div id="chCal"></div></section>
@@ -342,6 +361,7 @@ input,select,textarea,.ar td input.n,.tl select,.tl input,.fa input,.amtc input,
       </div>
       <p class="muted" id="sfMsg" role="status" style="margin:8px 0 0"></p>
       <details class="micro"><summary>Water, vitamins &amp; minerals (optional)</summary><div id="sfMicro" class="mgrid"></div></details>
+      <input id="sfQ" type="search" placeholder="Search saved foods" aria-label="Search saved foods" hidden style="width:100%;margin:12px 0 0">
       <div id="sfList"></div>
     </section>
   </div>
@@ -410,8 +430,9 @@ input,select,textarea,.ar td input.n,.tl select,.tl input,.fa input,.amtc input,
 </div>
 <script>
 const KEY='dailylog.v1',MEALS=['Meal 1','Meal 2','Meal 3','Meal 4','Snacks'],F=['k','p','c','f'],LBL={k:'kcal',p:'P g',c:'C g',f:'F g'};
-let db={goals:{k:2000},split:{p:30,f:25},days:{},weights:{},foods:[],meals:[],m4:{},water:{},waterGoal:2000,recipes:[],sleep:{},notes:{},feel:{}};
+let db={goals:{k:2000},split:{p:30,f:25},days:{},weights:{},foods:[],meals:[],m4:{},water:{},waterGoal:2000,recipes:[],sleep:{},notes:{},feel:{},mt:{}};
 try{const s=localStorage.getItem(KEY);if(s)db=Object.assign(db,JSON.parse(s))}catch(e){}
+db.mt=db.mt||{};
 function migrateMeals(){
   (db.meals||[]).forEach(m=>{
     if(db.recipes.some(r=>r.n.toLowerCase()===m.n.toLowerCase()))return;
@@ -442,22 +463,36 @@ let toastT=null;
 function toast(t){const el=$('toast');el.textContent=t;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{el.hidden=true},2400)}
 const mkPU=(e,a)=>({k:e.k/a,p:e.p/a,c:e.c/a,f:e.f/a,w:(e.w||0)/a,u:e.u?Object.fromEntries(Object.entries(e.u).map(([k,v])=>[k,v/a])):undefined});
 function applyAmt(e,a){const q=e.pu;e.a=a;e.k=q.k*a;e.p=q.p*a;e.c=q.c*a;e.f=q.f*a;e.w=q.w?q.w*a:undefined;e.u=q.u?Object.fromEntries(Object.entries(q.u).map(([k,v])=>[k,v*a])):undefined}
+let quickList=[];
+const t12=v=>{const[h,m]=String(v).split(':').map(Number);return ((h+11)%12+1)+':'+String(m||0).padStart(2,'0')+(h<12?'am':'pm')};
+function calcQuick(){
+  const cut=new Date();cut.setDate(cut.getDate()-45);const cs=iso(cut),by={};
+  Object.keys(db.days).forEach(d=>{if(d<cs)return;(db.days[d]||[]).forEach(e=>{
+    const q=e.a?{n:e.n,a:e.a,ru:e.ru}:parseAmt(e);
+    const food=db.foods.find(x=>x.n.toLowerCase()===String(e.n).trim().toLowerCase())||db.foods.find(x=>x.n.toLowerCase()===baseName(q.n).toLowerCase());
+    if(!food)return;const rf=fref(food),k=food.n.toLowerCase(),o=by[k]||(by[k]={food,c:0,last:'',amt:0});o.c++;
+    if(d>=o.last){o.last=d;o.amt=(q.a>0&&(q.ru||'items')===(rf.u||'items'))?q.a:0}});});
+  quickList=Object.values(by).sort((a,b)=>b.c-a.c||(b.last>a.last?1:-1)).slice(0,8).map(o=>({food:o.food,amt:o.amt||fref(o.food).a}));
+}
 function build(){
-  const d=$('date').value,list=db.days[d]||[],fe=(db.feel||{})[d]||{};
+  calcQuick();
+  const d=$('date').value,list=db.days[d]||[],fe=(db.feel||{})[d]||{},mtm=(db.mt||{})[d]||{};
   const opts='<option value="">Add a recipe…</option>'+db.recipes.map((x,i)=>`<option value="${i}">${esc(x.n)}</option>`).join('');
   let h=`<thead><tr><th>Food</th>${F.map(f=>`<th>${SH[f]}</th>`).join('')}<th></th></tr></thead>`;
   MEALS.forEach((name,m)=>{
     if(m===3&&!showM4(d)){h+='<tbody><tr class="m4"><td colspan="6"><button class="m4on">+ Add Meal 4</button></td></tr></tbody>';return}
     const items=list.map((e,i)=>({e,i})).filter(x=>(x.e.m??0)===m),open=openM.has(m);
-    h+=`<tbody data-m="${m}"${open?' class="open"':''}><tr class="gh"><th><button class="tg" aria-expanded="${open}"><span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span><span class="nm">${name}</span><span class="cnt">${items.length?items.length+(items.length>1?' foods':' food'):'empty'}${fe[m]?' · feel '+fe[m]+'/10':''}</span></button></th>${F.map(f=>`<td data-s="${f}"></td>`).join('')}<td><button class="cp" aria-label="Copy ${name} from yesterday" title="Copy ${name} from yesterday">\u21ba</button></td></tr>`;
+    h+=`<tbody data-m="${m}"${open?' class="open"':''}><tr class="gh"><th><button class="tg" aria-expanded="${open}"><span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span><span class="nm">${name}</span><span class="cnt">${items.length?items.length+(items.length>1?' foods':' food'):'empty'}${mtm[m]?' · '+t12(mtm[m]):''}${fe[m]?' · feel '+fe[m]+'/10':''}</span></button></th>${F.map(f=>`<td data-s="${f}"></td>`).join('')}<td><button class="cp" aria-label="Copy ${name} from yesterday" title="Copy ${name} from yesterday">\u21ba</button></td></tr>`;
     items.forEach(({e,i})=>{
       const q=e.a?{n:e.n,a:e.a,ru:e.ru}:parseAmt(e);
       h+=`<tr class="it" data-i="${i}" tabindex="0" role="button" aria-label="Change amount of ${esc(q.n)}"><td><div class="fn">${esc(q.n)}</div><div class="fa2"><span class="amtv">${amtLabel(q)}</span><span class="tapn" aria-hidden="true">✎</span></div></td>`
         +F.map(f=>`<td data-v="${f}">${fmtV(f,e[f])}</td>`).join('')
         +`<td><button class="del" data-i="${i}" aria-label="Remove ${esc(q.n)}">×</button></td></tr>`});
     h+=`<tr class="ar"><td colspan="4"><input class="n" list="foodlist" placeholder="Add food\u2026" aria-label="Food to add to ${name}"></td><td colspan="2" class="pv"><button class="nfb">New food</button></td></tr>`;
+    if(quickList.length)h+=`<tr class="qr"><td colspan="6"><span class="tl2">Quick add</span><div class="chips">${quickList.map((q,qi)=>`<button class="qa" data-q="${qi}">${esc(q.food.n)}<small>${amtLabel({a:q.amt,ru:fref(q.food).u||'items'})}</small></button>`).join('')}</div></td></tr>`;
     h+=`<tr class="ar2" hidden><td colspan="6"><div class="amtc"><button type="button" class="st" data-d="-1" aria-label="Decrease amount">\u2212</button><input class="a" type="number" min="0" step="1" inputmode="decimal" placeholder="amount" aria-label="Amount"><button type="button" class="st" data-d="1" aria-label="Increase amount">+</button><span class="u">g</span><span class="pvt"></span><button class="ab" aria-label="Add food">Add</button></div></td></tr>`;
     h+=`<tr class="fl"><td colspan="6"><span class="tl2">How do you feel after ${name}? (1\u201310)</span><div class="fbtns">${[1,2,3,4,5,6,7,8,9,10].map(v=>`<button class="fb${fe[m]===v?' on':''}" data-v="${v}" aria-pressed="${fe[m]===v}">${v}</button>`).join('')}</div></td></tr>`;
+    h+=`<tr class="mtr"><td colspan="6"><span class="tl2">Time eaten (optional)</span><div class="mtl"><input type="time" class="mt" value="${mtm[m]||''}" aria-label="Time ${name} was eaten"><button class="mnow">Now</button>${mtm[m]?'<button class="mclr">Clear</button>':''}</div></td></tr>`;
     h+=`<tr class="tl"><td colspan="6"><div><button class="cp">Copy yesterday</button><select class="sm" aria-label="Add a recipe">${opts}</select></div><div><input class="sn" placeholder="Recipe name"><button class="sv">Save as recipe</button></div>${m===3?'<div><button class="m4off">Remove Meal 4</button></div>':''}</td></tr>`;
     h+=`<tr class="dnrow"><td colspan="6"><button class="done">Done \u25b4</button></td></tr></tbody>`;
   });
@@ -482,7 +517,7 @@ function renderGoals(){
 function render(){
   build();totals();
   {const fo=db.foods.map(f=>`<option value="${esc(f.n)}">`).join('');$('ingredlist').innerHTML=fo;$('foodlist').innerHTML=fo+db.recipes.map(r=>`<option value="${esc(r.n)}">`).join('')}
-  renderFoods();renderNut();renderGoals();renderWater();renderRecipes();renderSleep();
+  renderFoods();renderNut();renderGoals();renderWater();renderRecipes();renderSleep();renderNudge();renderWeek();updToday();
   $('wIn').value=db.weights[$('date').value]??'';
 }
 const G={W:600,H:190,l:42,r:8,t:10,b:24},CW=G.W-G.l-G.r,CH=G.H-G.t-G.b;
@@ -593,6 +628,7 @@ function copyFrom(m,btn){
   save();render();toast('Copied '+src.length+(src.length>1?' foods':' food')+(m===null?'':' to '+MEALS[m]));
 }
 const sheet=$('sheet');
+function setMT(m,v){const d=$('date').value,o=(db.mt[d]=db.mt[d]||{});if(v)o[m]=v;else delete o[m];if(!Object.keys(o).length)delete db.mt[d];save();build();totals()}
 sheet.addEventListener('click',ev=>{
   const gh=ev.target.closest('tr.gh');
   if(gh){const tb0=gh.closest('tbody'),m0=+tb0.dataset.m;if(ev.target.closest('button.cp')){copyFrom(m0);return}openM.has(m0)?openM.delete(m0):openOnly(m0);build();totals();return}
@@ -600,6 +636,9 @@ sheet.addEventListener('click',ev=>{
   if(it&&!ev.target.closest('button.del')){openEA(+it.dataset.i);return}
   const b=ev.target.closest('button');if(!b)return;
   const tb=b.closest('tbody'),m=tb&&tb.dataset.m!==undefined?+tb.dataset.m:null,d=$('date').value;
+  if(b.classList.contains('qa')){const q=quickList[+b.dataset.q];if(q&&m!==null){addScaled(q.food,m,q.amt);save();render();toast('Added '+q.food.n+' ('+amtLabel({a:q.amt,ru:fref(q.food).u||'items'})+')')}return}
+  if(b.classList.contains('mnow')){const n=new Date(),mm=Math.round(n.getMinutes()/5)*5;n.setMinutes(mm);setMT(m,String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0'));return}
+  if(b.classList.contains('mclr')){setMT(m,'');return}
   if(b.classList.contains('st')){if(ev.detail===0)stepIt(b);return}
   if(b.classList.contains('nfb')){const t2=b.closest('tbody');openNF(m,t2.querySelector('.n').value.trim(),num(t2.querySelector('.a').value));return}
   if(b.classList.contains('done')){openM.delete(m);build();totals();return}
@@ -622,6 +661,7 @@ sheet.addEventListener('click',ev=>{
 });
 sheet.addEventListener('change',ev=>{
   const t=ev.target;
+  if(t.classList.contains('mt')){setMT(+t.closest('tbody').dataset.m,t.value);return}
   if(t.classList.contains('sm')&&t.value!==''){const m=+t.closest('tbody').dataset.m,r=db.recipes[+t.value];recEntry(r,m,1,r.servings);openOnly(m);save();render();toast('Added '+r.n+' to '+MEALS[m]);return}
 });
 sheet.addEventListener('input',ev=>{
@@ -631,11 +671,15 @@ sheet.addEventListener('keydown',ev=>{
   if(ev.key==='Enter'&&ev.target.closest('.ar,.ar2'))addFood(ev.target.closest('tbody'));
 });
 function renderFoods(){
+  const q=($('sfQ').value||'').trim().toLowerCase();$('sfQ').hidden=db.foods.length<6&&!q;
   const r1=x=>Math.round((x||0)*10)/10;
   $('sfList').innerHTML=db.foods.length?db.foods.map((f,i)=>{
+    if(q&&!f.n.toLowerCase().includes(q))return'';
     const rf=fref(f),per=rf.u?`per ${rf.a} ${rf.u}`:'per item',d=rf.u?1:0.5;
     return `<div class="sf"><strong>${esc(f.n)}</strong><span class="muted">${Math.round(f.k)} kcal · P ${r1(f.p)} · C ${r1(f.c)} · F ${r1(f.f)} ${per}${f.u&&Object.keys(f.u).length?' · +vitamins/minerals':''}${f.w?' · water '+Math.round(f.w)+' ml':''}</span><div class="amt"><button type="button" class="st" data-d="${-d}" aria-label="Decrease amount">\u2212</button><input type="number" min="0" step="${d}" inputmode="decimal" value="${rf.a}" aria-label="Amount of ${esc(f.n)}"><button type="button" class="st" data-d="${d}" aria-label="Increase amount">+</button><span>${rf.u||'items'}</span></div><select data-sf="${i}" aria-label="Add ${esc(f.n)} to this day"><option value="">Add to…</option>${MEALS.map((n,m)=>`<option value="${m}">${n}</option>`).join('')}</select><button data-sfedit="${i}" aria-label="Edit ${esc(f.n)}">Edit</button><button data-sfdel="${i}" aria-label="Delete ${esc(f.n)}">Delete</button></div>`}).join(''):'<p class="muted" style="margin:10px 0 0">No saved foods yet. Add one above, or use New food in the Log tab.</p>';
+  if(q&&db.foods.length&&!$('sfList').innerHTML.trim())$('sfList').innerHTML='<p class="muted">No saved food matches.</p>';
 }
+$('sfQ').addEventListener('input',renderFoods);
 $('sfSave').onclick=()=>{
   const n=$('sfN').value.trim();if(!n)return;
   const ru=$('sfRU').value,ra=ru?num($('sfRA').value):1;
@@ -667,11 +711,11 @@ function editFood(i){
   clearMicro();NUTS.forEach(([k])=>{if(f.u&&f.u[k])$('sfu_'+k).value=f.u[k]});
   $('sfW').value=f.w||'';document.querySelector('details.micro').open=true;$('sfSave').textContent='Update food';$('sfN').focus();
 }
-const openN=new Set();
+const openN=new Set();let cgroups={};
 const AMT='\\d+(?:[.,]\\d+)?\\s*(?:kg|g|mg|ml|l|oz|lb|cups?|tbsp|tsp|serv(?:ing)?s?|pcs?|x)';
 const baseName=n=>{let t=String(n).replace(/\s+/g,' ').trim(),o;do{o=t;t=t.replace(new RegExp('\\s*[\\(\\[\\-\\u2013\\u00b7,:]*\\s*(?:'+AMT+'|[x\\u00d7]\\s*\\d+)\\s*[\\)\\]]?\\s*$','i'),'').trim();t=t.replace(new RegExp('^(?:'+AMT+')\\s+','i'),'').trim()}while(t!==o&&t);return t||String(n).trim()};
 function renderNut(){
-  const list=db.days[$('date').value]||[],tot={},g=goals();let withData=0;
+  cgroups={};const list=db.days[$('date').value]||[],tot={},g=goals();let withData=0;
   const MAC=[['k','Calories','kcal',g.k],['p','Protein','g',g.p],['c','Carbs','g',g.c],['f','Fat','g',g.f]];
   const val=(e,k)=>(k==='k'||k==='p'||k==='c'||k==='f')?(e[k]||0):((e.u&&e.u[k])||0);
   list.forEach(e=>{if(e.u)withData++;[...MAC.map(m=>m[0]),...NUTS.map(n=>n[0])].forEach(k=>{tot[k]=(tot[k]||0)+val(e,k)})});
@@ -680,15 +724,22 @@ function renderNut(){
     const v=tot[k]||0,pc=t?v/t*100:0,open=openN.has(k);
     let ct='';
     if(open){
-      const by={};list.forEach(e=>{const x=val(e,k);if(x<=0)return;const cn=baseName(e.n),key=cn.toLowerCase(),o=by[key]||(by[key]={nm:cn,x:0,c:0});o.x+=x;o.c++});
-      const arr=Object.values(by).sort((a,b)=>b.x-a.x).map(o=>[o.nm+(o.c>1?' \u00d7'+o.c:''),o.x]);
-      ct='<div class="ctr">'+(arr.length?arr.map(([nm,x])=>{const sh=v?x/v*100:0;return `<div class="cr"><b>${esc(nm)}</b><span>${+x.toFixed(1)} ${u} · ${Math.round(sh)}%</span><div class="cb"><i style="width:${sh}%"></i></div></div>`}).join(''):'<div class="none">No logged food has this yet.</div>')+'</div>';
+      const by={};list.forEach((e,i)=>{const x=val(e,k);if(x<=0)return;const cn=baseName(e.n),key=cn.toLowerCase(),o=by[key]||(by[key]={nm:cn,x:0,c:0,ix:[]});o.x+=x;o.c++;o.ix.push({i,x})});
+      const arr=Object.values(by).sort((a,b)=>b.x-a.x);
+      ct='<div class="ctr">'+(arr.length?arr.map((o,j)=>{cgroups[k+'|'+j]=o.ix;const sh=v?o.x/v*100:0;return `<button class="cr" data-cg="${k}|${j}"><b>${esc(o.nm)}${o.c>1?' ×'+o.c:''}</b><span>${+o.x.toFixed(1)} ${u} · ${Math.round(sh)}%</span><div class="cb"><i style="width:${sh}%"></i></div></button>`}).join('')+'<div class="hint">Tap a food to edit or remove it.</div>':'<div class="none">No logged food has this yet.</div>')+'</div>';
     }
     return `<div class="ni"><button class="nr" data-nk="${k}" aria-expanded="${open}"><span class="nm">${n}</span><div class="nb"><i style="width:${Math.min(100,pc)}%"></i></div><span class="muted">${+v.toFixed(1)} / ${+(+t).toFixed(1)} ${u} (${Math.round(pc)}%)</span></button>${ct}</div>`;
   };
   $('nutList').innerHTML='<h3 class="nsub">Calories &amp; macros</h3>'+MAC.map(row).join('')+'<h3 class="nsub">Vitamins &amp; minerals</h3>'+NUTS.map(row).join('');
 }
-$('nutList').addEventListener('click',ev=>{const b=ev.target.closest('button[data-nk]');if(!b)return;const k=b.dataset.nk;openN.has(k)?openN.delete(k):openN.add(k);renderNut()});
+function jumpTo(ix){
+  const big=ix.slice().sort((a,b)=>b.x-a.x)[0],e=dayList()[big.i];if(!e)return;
+  setTab('log');openOnly(e.m??0);build();totals();
+  if(ix.length===1){openEA(big.i);return}
+  const rows=ix.map(o=>document.querySelector('tr.it[data-i="'+o.i+'"]')).filter(Boolean);
+  if(rows[0])rows[0].scrollIntoView({block:'center'});rows.forEach(r=>{r.classList.add('flash');setTimeout(()=>r.classList.remove('flash'),2000)});
+}
+$('nutList').addEventListener('click',ev=>{const c=ev.target.closest('button.cr');if(c){const ix=cgroups[c.dataset.cg];if(ix&&ix.length)jumpTo(ix);return}const b=ev.target.closest('button[data-nk]');if(!b)return;const k=b.dataset.nk;openN.has(k)?openN.delete(k):openN.add(k);renderNut()});
 function setTab(t){document.querySelectorAll('[data-tab]').forEach(el=>el.hidden=el.dataset.tab!==t);document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t))}
 document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
 setTab('log');
@@ -917,6 +968,33 @@ renderRB();
 function r5(v){if(!v)return v;let [h,m]=v.split(':').map(Number);m=Math.round(m/5)*5;if(m===60){m=0;h=(h+1)%24}return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')}
 const sleepMin=s=>{if(!s||!s.bed||!s.wake)return null;const t=x=>{const[h,m]=x.split(':').map(Number);return h*60+m};let d=t(s.wake)-t(s.bed);if(d<0)d+=1440;return d};
 const fmtDur=m=>Math.floor(m/60)+'h '+String(m%60).padStart(2,'0')+'m';
+function renderWeek(){
+  const end=$('date').value,days=[];let t=end;for(let i=0;i<7;i++,t=prev(t))days.push(t);
+  const logged=days.filter(d=>(db.days[d]||[]).length),n=logged.length,body=$('wkBody');
+  $('wkT').textContent=days[6]+' to '+end;
+  if(!n){body.innerHTML='<p class="muted" style="margin:0">Nothing logged in this period yet.</p>';return}
+  const g=goals(),tot=logged.map(d=>sum(db.days[d])),avg=k=>tot.reduce((a,x)=>a+x[k],0)/n;
+  const tiles=[['Days logged',n+' / 7',''],['Calories',Math.round(avg('k'))+' kcal','goal '+g.k],['Protein',Math.round(avg('p'))+' g','goal '+g.p],['Carbs',Math.round(avg('c'))+' g','goal '+g.c],['Fat',Math.round(avg('f'))+' g','goal '+g.f],['Water',Math.round(logged.reduce((a,d)=>a+waterTotal(d),0)/n)+' ml','goal '+(db.waterGoal||2000)]];
+  const nights=days.map(d=>sleepMin(db.sleep[d])).filter(x=>x!=null);
+  if(nights.length)tiles.push(['Sleep',fmtDur(Math.round(nights.reduce((a,b)=>a+b,0)/nights.length)),nights.length+' nights']);
+  const fv=[];days.forEach(d=>Object.values(db.feel[d]||{}).forEach(v=>fv.push(v)));
+  if(fv.length)tiles.push(['Feel after meals',(fv.reduce((a,b)=>a+b,0)/fv.length).toFixed(1)+' / 10',fv.length+' ratings']);
+  const ws=days.filter(d=>db.weights[d]!=null).reverse();
+  if(ws.length>1){const df=db.weights[ws[ws.length-1]]-db.weights[ws[0]];tiles.push(['Weight',db.weights[ws[ws.length-1]]+' kg',(df>0?'+':'')+df.toFixed(1)+' kg']);}
+  let h='<div class="wk">'+tiles.map(([a,b,c])=>`<div><span>${a}</span><strong>${b}</strong>${c?`<em>${c}</em>`:''}</div>`).join('')+'</div>';
+  const vd=logged.filter(d=>db.days[d].some(e=>e.u));
+  if(vd.length>=2){
+    const low=NUTS.map(([k,nm,u,tg])=>{const tt=vd.reduce((a,d)=>a+db.days[d].reduce((b,e)=>b+((e.u&&e.u[k])||0),0),0);return{nm,has:tt>0,p:tt/vd.length/tg*100}}).filter(x=>x.has&&x.p<50).sort((a,b)=>a.p-b.p).slice(0,6);
+    h+=`<p class="wkn"><strong>Often low:</strong> ${low.length?low.map(x=>esc(x.nm)+' '+Math.round(x.p)+'%').join(', '):'nothing under 50% of target (among nutrients you have entered).'}</p>`;
+  }else h+='<p class="wkn muted">Add vitamin and mineral values to your foods to see which nutrients run low.</p>';
+  const bk={Morning:[],Midday:[],Evening:[]};
+  days.forEach(d=>{const mt=db.mt[d]||{},fe=db.feel[d]||{};Object.keys(mt).forEach(m=>{const v=fe[m];if(!v)return;const hh=parseInt(mt[m]);bk[hh<11?'Morning':hh<15?'Midday':'Evening'].push(v)})});
+  const parts=Object.entries(bk).filter(([,a])=>a.length).map(([k,a])=>k+' '+(a.reduce((x,y)=>x+y,0)/a.length).toFixed(1)+' ('+a.length+')');
+  if(parts.reduce((a,p)=>a+1,0)&&Object.values(bk).reduce((a,x)=>a+x.length,0)>=3)h+=`<p class="wkn"><strong>Feel by meal time:</strong> ${parts.join(' · ')}</p>`;
+  body.innerHTML=h;
+}
+function updToday(){$('todayRow').hidden=$('date').value===iso(new Date())}
+$('todayD').onclick=()=>{$('date').value=iso(new Date());render()};
 function renderSleep(){
   const d=$('date').value,s=db.sleep[d]||{},m=sleepMin(s);
   setT('slBed',s.bed);setT('slWake',s.wake);$('slDur').textContent=m==null?'':fmtDur(m);
@@ -989,19 +1067,58 @@ $('gF').onchange=()=>{goals();db.mg.f=num($('gF').value);save();render()};
 $('date').onchange=render;
 const bkMsg=t=>$('bkMsg').textContent=t;
 const lastBk=()=>{$('lastBk').textContent=db.lastBackup?'Last backup: '+db.lastBackup+'.':'No backup yet.'};
-$('bkExport').onclick=async()=>{
-  db.lastBackup=iso(new Date());save();
-  const txt=JSON.stringify({app:'daily-log',version:1,exported:new Date().toISOString(),data:db},null,1);
-  $('bk').value=txt;
-  try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'application/json'}));a.download='daily-log-backup-'+iso(new Date())+'.json';document.body.appendChild(a);a.click();a.remove()}catch(e){}
+async function doBackup(){
+  const txt=JSON.stringify({app:'daily-log',version:1,exported:new Date().toISOString(),data:db},null,1),name='daily-log-backup-'+iso(new Date())+'.json';
+  $('bk').value=txt;let done=false,msg='';
+  try{const f=new File([txt],name,{type:'application/json'});
+    if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Daily log backup'});done=true;msg='Backup shared. Choose Save to Files or Drive so it is stored outside this browser.'}
+  }catch(e){if(e&&e.name==='AbortError'){bkMsg('Backup cancelled, nothing saved.');return}}
+  if(!done){
+    try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'application/json'}));a.download=name;document.body.appendChild(a);a.click();a.remove();done=true}catch(e){}
+    msg='Backup created. A file download was started. The full text is also in the box below: if no file appeared, copy it and save it as a .json file.'
+  }
   try{await navigator.clipboard.writeText(txt)}catch(e){}
-  bkMsg('Backup created. A file download was started and the text was copied if your browser allowed it. The full text is also in the box below: if no file appeared, copy it and save it as a .json file.');lastBk();
+  db.lastBackup=iso(new Date());save();bkMsg(msg);lastBk();renderNudge();
+}
+$('bkExport').onclick=doBackup;
+const daysSince=d=>Math.round((new Date(iso(new Date())+'T00:00:00')-new Date(d+'T00:00:00'))/864e5);
+function renderNudge(){
+  let sn='';try{sn=localStorage.getItem('dailylog.nudge')||''}catch(e){}
+  const has=Object.values(db.days).some(l=>l&&l.length),n=db.lastBackup?daysSince(db.lastBackup):null,show=has&&(n===null||n>=7)&&sn!==iso(new Date());
+  $('bkNudge').hidden=!show;
+  if(show)$('bkNudgeT').textContent=n===null?'No backup yet. Your data lives only on this phone.':'Last backup was '+n+' days ago.';
+}
+$('bkNudgeGo').onclick=doBackup;
+$('bkNudgeLater').onclick=()=>{try{localStorage.setItem('dailylog.nudge',iso(new Date()))}catch(e){}renderNudge()};
+let tidyArmed=null;
+function tidyPlan(){
+  const plan=[];
+  Object.keys(db.days).forEach(d=>(db.days[d]||[]).forEach(e=>{
+    const low=String(e.n).trim().toLowerCase();if(db.foods.some(x=>x.n.toLowerCase()===low))return;
+    const q=e.a?{n:e.n,a:e.a,ru:e.ru}:parseAmt(e);let nn=baseName(q.n);
+    const f=db.foods.find(x=>x.n.toLowerCase()===nn.toLowerCase());if(f)nn=f.n;
+    if(nn&&nn!==e.n)plan.push({e,nn,q,fix:!e.a});
+  }));
+  return plan;
+}
+$('tidyBtn').onclick=()=>{
+  const b=$('tidyBtn'),m=$('tidyMsg');
+  if(tidyArmed){
+    const plan=tidyPlan();try{localStorage.setItem(KEY+'.pretidy',JSON.stringify(db))}catch(e){}
+    plan.forEach(({e,nn,q,fix})=>{if(fix){e.a=q.a;e.ru=q.ru;e.pu=mkPU(e,q.a)}e.n=nn});
+    clearTimeout(tidyArmed);tidyArmed=null;b.textContent='Tidy old entry names';save();render();m.textContent='Renamed '+plan.length+' entries. A copy of your data from before was kept in this browser.';return;
+  }
+  const plan=tidyPlan();
+  if(!plan.length){m.textContent='Nothing to tidy.';return}
+  m.textContent=plan.length+' entries will be renamed, for example "'+plan[0].e.n+'" becomes "'+plan[0].nn+'". Amounts are kept. Tap again to apply.';
+  b.textContent='Apply '+plan.length+' renames';
+  tidyArmed=setTimeout(()=>{tidyArmed=null;b.textContent='Tidy old entry names';m.textContent='Cancelled.'},10000);
 };
 $('bkFile').onchange=async()=>{const f=$('bkFile').files[0];if(f){$('bk').value=await f.text();bkMsg('File loaded. Choose an import mode, then press Import.')}};
 $('bkImport').onclick=()=>{
   let o;try{o=JSON.parse($('bk').value)}catch(e){return bkMsg('That is not valid backup text.')}
   const d=o&&o.app==='daily-log'&&o.data;if(!d||typeof d!=='object')return bkMsg('That does not look like a Daily log backup.');
-  if($('bkMode').value==='replace'){db=Object.assign({goals:{k:2000},split:{p:30,f:25},days:{},weights:{},foods:[],meals:[],m4:{},water:{},waterGoal:2000,recipes:[],sleep:{},notes:{},feel:{}},d)}
+  if($('bkMode').value==='replace'){db=Object.assign({goals:{k:2000},split:{p:30,f:25},days:{},weights:{},foods:[],meals:[],m4:{},water:{},waterGoal:2000,recipes:[],sleep:{},notes:{},feel:{},mt:{}},d)}
   else{
     if(!Object.keys(db.days).length)['goals','split','mg'].forEach(k=>{if(d[k])db[k]=d[k]});
     Object.keys(d.days||{}).forEach(k=>{if(!(db.days[k]||[]).length)db.days[k]=d.days[k]});
@@ -1009,11 +1126,11 @@ $('bkImport').onclick=()=>{
     Object.assign(db.m4,d.m4||{},db.m4);
     Object.keys(d.water||{}).forEach(k=>{if(!(db.water[k]||[]).length)db.water[k]=d.water[k]});
     (d.recipes||[]).forEach(r=>{if(!db.recipes.some(x=>x.n.toLowerCase()===r.n.toLowerCase()))db.recipes.push(r)});
-    Object.keys(d.sleep||{}).forEach(k=>{if(!db.sleep[k])db.sleep[k]=d.sleep[k]});Object.keys(d.notes||{}).forEach(k=>{if(!db.notes[k])db.notes[k]=d.notes[k]});Object.keys(d.feel||{}).forEach(k=>{if(!db.feel[k])db.feel[k]=d.feel[k]});
+    Object.keys(d.sleep||{}).forEach(k=>{if(!db.sleep[k])db.sleep[k]=d.sleep[k]});Object.keys(d.notes||{}).forEach(k=>{if(!db.notes[k])db.notes[k]=d.notes[k]});Object.keys(d.feel||{}).forEach(k=>{if(!db.feel[k])db.feel[k]=d.feel[k]});Object.keys(d.mt||{}).forEach(k=>{if(!db.mt[k])db.mt[k]=d.mt[k]});
     (d.foods||[]).forEach(f=>{if(!db.foods.some(x=>x.n.toLowerCase()===f.n.toLowerCase()))db.foods.push(f)});
     (d.meals||[]).forEach(m=>{if(!db.meals.some(x=>x.n.toLowerCase()===m.n.toLowerCase()))db.meals.push(m)});
   }
-  migrateMeals();save();render();lastBk();bkMsg('Backup imported.');
+  db.mt=db.mt||{};migrateMeals();save();render();lastBk();bkMsg('Backup imported.');
 };
 try{if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
