@@ -298,7 +298,7 @@ input,select,textarea,.ar td input.n,.tl select,.tl input,.fa input,.amtc input,
       <p class="muted" id="slAvg" style="margin:8px 0 0"></p>
       <label>Notes<textarea id="noteTx" rows="5" maxlength="2000" placeholder="Mood, energy, training, anything worth remembering"></textarea></label>
     </section>
-    <p class="muted" style="text-align:center;font-size:11px;margin:14px 0 0">Version 8 · grouped contributors</p>
+    <p class="muted" style="text-align:center;font-size:11px;margin:14px 0 0">Version 9 · grouped contributors</p>
     <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
       <p class="muted" style="margin:8px 0">Data is stored only in this browser. Export a backup regularly, and before moving to a new version or device. <span id="lastBk"></span></p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
@@ -436,7 +436,7 @@ const dayList=()=>{const d=$('date').value;return db.days[d]||(db.days[d]=[])};
 const clone=(e,m)=>({n:e.n,k:e.k,p:e.p,c:e.c,f:e.f,m,u:e.u?{...e.u}:undefined,w:e.w,a:e.a,ru:e.ru,pu:e.pu?JSON.parse(JSON.stringify(e.pu)):undefined});
 const showM4=d=>db.m4[d]||(db.days[d]||[]).some(e=>e.m===3);
 
-const SH={k:'kcal',p:'P',c:'C',f:'F'},openM=new Set();
+const SH={k:'kcal',p:'P',c:'C',f:'F'},openM=new Set(),openOnly=m=>{openM.clear();openM.add(m)};
 const fmtV=(f,x)=>f==='k'?Math.round(x):Math.round(x*10)/10;
 let toastT=null;
 function toast(t){const el=$('toast');el.textContent=t;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{el.hidden=true},2400)}
@@ -589,13 +589,13 @@ function renderDash(t,g){
 function copyFrom(m,btn){
   const src=(db.days[prev($('date').value)]||[]).filter(e=>m===null||(e.m??0)===m);
   if(!src.length){toast('Nothing logged yesterday'+(m===null?'':' in '+MEALS[m]));return}
-  src.forEach(e=>dayList().push(clone(e,e.m??0)));if(m!==null)openM.add(m);
+  src.forEach(e=>dayList().push(clone(e,e.m??0)));if(m!==null)openOnly(m);
   save();render();toast('Copied '+src.length+(src.length>1?' foods':' food')+(m===null?'':' to '+MEALS[m]));
 }
 const sheet=$('sheet');
 sheet.addEventListener('click',ev=>{
   const gh=ev.target.closest('tr.gh');
-  if(gh){const tb0=gh.closest('tbody'),m0=+tb0.dataset.m;if(ev.target.closest('button.cp')){copyFrom(m0);return}openM.has(m0)?openM.delete(m0):openM.add(m0);build();totals();return}
+  if(gh){const tb0=gh.closest('tbody'),m0=+tb0.dataset.m;if(ev.target.closest('button.cp')){copyFrom(m0);return}openM.has(m0)?openM.delete(m0):openOnly(m0);build();totals();return}
   const it=ev.target.closest('tr.it');
   if(it&&!ev.target.closest('button.del')){openEA(+it.dataset.i);return}
   const b=ev.target.closest('button');if(!b)return;
@@ -622,7 +622,7 @@ sheet.addEventListener('click',ev=>{
 });
 sheet.addEventListener('change',ev=>{
   const t=ev.target;
-  if(t.classList.contains('sm')&&t.value!==''){const m=+t.closest('tbody').dataset.m,r=db.recipes[+t.value];recEntry(r,m,1,r.servings);openM.add(m);save();render();toast('Added '+r.n+' to '+MEALS[m]);return}
+  if(t.classList.contains('sm')&&t.value!==''){const m=+t.closest('tbody').dataset.m,r=db.recipes[+t.value];recEntry(r,m,1,r.servings);openOnly(m);save();render();toast('Added '+r.n+' to '+MEALS[m]);return}
 });
 sheet.addEventListener('input',ev=>{
   const c=ev.target.classList;if(c.contains('n')||c.contains('a'))updAdd(ev.target.closest('tbody'));
