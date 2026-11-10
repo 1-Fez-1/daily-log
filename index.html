@@ -298,7 +298,7 @@ input,select,textarea,.ar td input.n,.tl select,.tl input,.fa input,.amtc input,
       <p class="muted" id="slAvg" style="margin:8px 0 0"></p>
       <label>Notes<textarea id="noteTx" rows="5" maxlength="2000" placeholder="Mood, energy, training, anything worth remembering"></textarea></label>
     </section>
-    <p class="muted" style="text-align:center;font-size:11px;margin:14px 0 0">Version 6 · grouped contributors</p>
+    <p class="muted" style="text-align:center;font-size:11px;margin:14px 0 0">Version 7 · grouped contributors</p>
     <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
       <p class="muted" style="margin:8px 0">Data is stored only in this browser. Export a backup regularly, and before moving to a new version or device. <span id="lastBk"></span></p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
@@ -668,6 +668,8 @@ function editFood(i){
   $('sfW').value=f.w||'';document.querySelector('details.micro').open=true;$('sfSave').textContent='Update food';$('sfN').focus();
 }
 const openN=new Set();
+const AMT='\\d+(?:[.,]\\d+)?\\s*(?:kg|g|mg|ml|l|oz|lb|cups?|tbsp|tsp|serv(?:ing)?s?|pcs?|x)';
+const baseName=n=>{let t=String(n).replace(/\s+/g,' ').trim(),o;do{o=t;t=t.replace(new RegExp('\\s*[\\(\\[\\-\\u2013\\u00b7,:]*\\s*(?:'+AMT+'|[x\\u00d7]\\s*\\d+)\\s*[\\)\\]]?\\s*$','i'),'').trim();t=t.replace(new RegExp('^(?:'+AMT+')\\s+','i'),'').trim()}while(t!==o&&t);return t||String(n).trim()};
 function renderNut(){
   const list=db.days[$('date').value]||[],tot={},g=goals();let withData=0;
   const MAC=[['k','Calories','kcal',g.k],['p','Protein','g',g.p],['c','Carbs','g',g.c],['f','Fat','g',g.f]];
@@ -678,7 +680,7 @@ function renderNut(){
     const v=tot[k]||0,pc=t?v/t*100:0,open=openN.has(k);
     let ct='';
     if(open){
-      const by={};list.forEach(e=>{const x=val(e,k);if(x<=0)return;const key=String(e.n).replace(/\s+/g,' ').trim().toLowerCase(),o=by[key]||(by[key]={nm:String(e.n).replace(/\s+/g,' ').trim(),x:0,c:0});o.x+=x;o.c++});
+      const by={};list.forEach(e=>{const x=val(e,k);if(x<=0)return;const cn=baseName(e.n),key=cn.toLowerCase(),o=by[key]||(by[key]={nm:cn,x:0,c:0});o.x+=x;o.c++});
       const arr=Object.values(by).sort((a,b)=>b.x-a.x).map(o=>[o.nm+(o.c>1?' \u00d7'+o.c:''),o.x]);
       ct='<div class="ctr">'+(arr.length?arr.map(([nm,x])=>{const sh=v?x/v*100:0;return `<div class="cr"><b>${esc(nm)}</b><span>${+x.toFixed(1)} ${u} · ${Math.round(sh)}%</span><div class="cb"><i style="width:${sh}%"></i></div></div>`}).join(''):'<div class="none">No logged food has this yet.</div>')+'</div>';
     }
