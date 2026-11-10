@@ -220,6 +220,7 @@ td button.del{color:var(--muted);font-size:18px;min-height:36px;vertical-align:t
 .tl select,.tl input{font-size:14px;padding:6px 10px;flex:1 1 120px}
 .tl div+div{margin-top:6px}
 .dnrow td{padding:2px 16px 14px}
+.dnw{display:flex;gap:8px}.dnrow .dnw .done{flex:1}.dnrow .dnw .clx{flex:0 0 44px;width:44px;padding:0;font-size:15px}.dnrow .dnw .clx.arm{flex:0 0 auto;width:auto;padding:0 14px;background:var(--ink);color:var(--bg);font-size:13px}
 .dnrow button{width:100%;background:var(--soft);border:0;color:var(--muted);font-weight:600;min-height:40px}
 .m4 td{padding:2px 16px;text-align:left}
 .m4 button{color:var(--muted);border:0;background:transparent;width:auto;font-size:13px;min-height:40px;padding:0}
@@ -321,7 +322,7 @@ body.kp-open{padding-bottom:var(--kp-h,0px)}body.kp-open #ea{padding-bottom:var(
       <div class="wbtns"><button class="wq" data-w="150">+150</button><button class="wq" data-w="250">+250</button><button class="wq" data-w="500">+500</button><span class="muted">ml</span></div>
       <div class="wbtns"><div class="amtc"><button type="button" class="st" data-d="-10" aria-label="Decrease">&minus;</button><input class="wi" id="wIn2" type="number" min="0" step="1" inputmode="numeric" placeholder="ml" aria-label="Custom water amount in ml"><button type="button" class="st" data-d="10" aria-label="Increase">+</button></div><button class="primary" id="wAdd">Add</button><button id="wUndo">Undo last</button></div>
     </section>
-    <p class="muted" style="text-align:center;font-size:11px;margin:14px 0 0">Version 18 · clear meal</p>
+    <p class="muted" style="text-align:center;font-size:11px;margin:14px 0 0">Version 19 · recipes in add food</p>
     <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
       <p class="muted" style="margin:8px 0">Data is stored only in this browser. Export a backup regularly, and before moving to a new version or device. <span id="lastBk"></span></p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
@@ -520,8 +521,8 @@ function build(){
     h+=`<tr class="ar2" hidden><td colspan="6"><div class="amtc"><button type="button" class="st" data-d="-1" aria-label="Decrease amount">\u2212</button><input class="a" type="text" inputmode="${KPM}" autocomplete="off" placeholder="amount" aria-label="Amount"><button type="button" class="st" data-d="1" aria-label="Increase amount">+</button><span class="u">g</span><span class="pvt"></span><button class="ab" aria-label="Add food">Add</button></div></td></tr>`;
     h+=`<tr class="fl"><td colspan="6"><span class="tl2">How do you feel after ${name}? (1\u201310)${/snack/i.test(name)?' \u00b7 optional':''}</span><div class="fbtns">${[1,2,3,4,5,6,7,8,9,10].map(v=>`<button class="fb${fe[m]===v?' on':''}" data-v="${v}" aria-pressed="${fe[m]===v}">${v}</button>`).join('')}</div></td></tr>`;
     h+=`<tr class="mtr"><td colspan="6"><span class="tl2">Time eaten (optional)</span><div class="mtl"><div class="tsel" data-mt="${mtm[m]||''}"><select data-p="h" aria-label="${name} hour">${hOpts}</select><span>:</span><select data-p="m" aria-label="${name} minutes">${mOpts}</select></div><button class="mnow">Now</button>${mtm[m]?'<button class="mclr">Clear</button>':''}</div></td></tr>`;
-    h+=`<tr class="tl"><td colspan="6"><div>${items.length?`<button class="clm">Clear meal</button>`:''}<select class="sm" aria-label="Add a recipe">${opts}</select></div>${m===3?'<div><button class="m4off">Remove Meal 4</button></div>':''}</td></tr>`;
-    h+=`<tr class="dnrow"><td colspan="6"><button class="done">Done \u25b4</button></td></tr></tbody>`;
+    if(m===3)h+=`<tr class="tl"><td colspan="6"><div><button class="m4off">Remove Meal 4</button></div></td></tr>`;
+    h+=`<tr class="dnrow"><td colspan="6"><div class="dnw"><button class="done">Done \u25b4</button>${items.length?`<button class="clx" aria-label="Clear all foods in ${name}" title="Clear all foods">\u2715</button>`:''}</div></td></tr></tbody>`;
   });
   h+=`<tfoot><tr><th>Total</th>${F.map(f=>`<td data-t="${f}"></td>`).join('')}<td></td></tr><tr><th>Left</th>${F.map(f=>`<td data-l="${f}"></td>`).join('')}<td></td></tr></tfoot>`;
   $('sheet').innerHTML=h;
@@ -679,10 +680,10 @@ sheet.addEventListener('click',ev=>{
     db.days[d]=dayList().filter(e=>e.m!==3);delete db.m4[d];save();render()}
   else if(b.classList.contains('del')){dayList().splice(+b.dataset.i,1);save();render()}
   else if(b.classList.contains('ab'))addFood(tb);
-  else if(b.classList.contains('clm')){
+  else if(b.classList.contains('clx')){
     if(b.dataset.arm){const d=$('date').value;db.days[d]=(db.days[d]||[]).filter(e=>(e.m??0)!==m);save();render();toast('Cleared '+MEALS[m]);return}
-    b.dataset.arm='1';b.textContent='Tap again to clear '+MEALS[m];
-    setTimeout(()=>{if(b.isConnected){delete b.dataset.arm;b.textContent='Clear meal'}},4000);
+    b.dataset.arm='1';b.textContent='Clear all?';b.classList.add('arm');
+    setTimeout(()=>{if(b.isConnected){delete b.dataset.arm;b.textContent='\u2715';b.classList.remove('arm')}},4000);
   }
   else if(b.classList.contains('cp'))copyFrom(m,b);
 });
