@@ -298,7 +298,7 @@ input,select,textarea,.ar td input.n,.tl select,.tl input,.fa input,.amtc input,
       <p class="muted" id="slAvg" style="margin:8px 0 0"></p>
       <label>Notes<textarea id="noteTx" rows="5" maxlength="2000" placeholder="Mood, energy, training, anything worth remembering"></textarea></label>
     </section>
-    <p class="muted" style="text-align:center;font-size:11px;margin:14px 0 0">Version 7 · grouped contributors</p>
+    <p class="muted" style="text-align:center;font-size:11px;margin:14px 0 0">Version 8 · grouped contributors</p>
     <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
       <p class="muted" style="margin:8px 0">Data is stored only in this browser. Export a backup regularly, and before moving to a new version or device. <span id="lastBk"></span></p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
@@ -574,11 +574,11 @@ function addFood(tb){
   const row=tb.querySelector('.ar'),rb=tb.querySelector('.ar2'),txt=row.querySelector('.n').value.trim(),m=+tb.dataset.m;
   if(!txt){row.querySelector('.n').focus();return}
   const a=num(rb.querySelector('.a').value),exact=db.foods.find(x=>x.n.toLowerCase()===txt.toLowerCase()),r=exact?null:resolveFood(txt),food=exact||(r&&r.food);
-  if(!food){const rc=findRec(txt);if(rc){recEntry(rc,m,a||1,rc.servings);save();render();document.querySelector(`tbody[data-m="${m}"] .ar .n`).focus();return}toast('Not a saved food: '+txt+'. Tap New food to add it.');return}
+  if(!food){const rc=findRec(txt);if(rc){recEntry(rc,m,a||1,rc.servings);save();render();return}toast('Not a saved food: '+txt+'. Tap New food to add it.');return}
   const rf=fref(food);let amt=a||(r?r.amt:0);
   if(!amt&&!rf.u)amt=1;
   if(!amt){updAdd(tb);rb.querySelector('.a').focus();return}
-  addScaled(food,m,amt);save();render();document.querySelector(`tbody[data-m="${m}"] .ar .n`).focus();
+  addScaled(food,m,amt);save();render();
 }
 function renderDash(t,g){
   const set=(id,v,goal)=>{const pc=goal?Math.round(v/goal*100):0,bar=$(id+'b'),pb=bar.parentElement;bar.style.width=Math.min(100,pc)+'%';pb.setAttribute('aria-valuenow',Math.min(100,pc));$(id+'p').textContent=pc+'%';};
