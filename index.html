@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Daily log</title>
+<meta name="theme-color" content="#2f6f5a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Daily log">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{--bg:#f3f5f0;--surface:#fff;--ink:#1e2a22;--muted:#6a776e;--line:#d8dfd5;--head:#e9efe6;--p:#2f6f5a;--c:#d9a441;--f:#c4624a;--k:#4a6fa5;--band:#2f6f5a;--w:#3b8fd6;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121815;--surface:#1b241f;--ink:#e8eee9;--muted:#8fa096;--line:#33443a;--head:#243029;--p:#5fb596;--c:#e3b55a;--f:#e07f66;--k:#86a8d8;--band:#2d5e4d;--w:#6bb0ea}}
+:root[data-theme="dark"]{--bg:#121815;--surface:#1b241f;--ink:#e8eee9;--muted:#8fa096;--line:#33443a;--head:#243029;--p:#5fb596;--c:#e3b55a;--f:#e07f66;--k:#86a8d8;--band:#2d5e4d;--w:#6bb0ea}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 "Avenir Next","Segoe UI",system-ui,sans-serif}
+main{max-width:680px;margin:0 auto;padding:10px 10px 40px}
+[hidden]{display:none!important}
+input,button,select{font:inherit;color:inherit}
+input,select{font-size:16px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-width:0}
+button{cursor:pointer;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 12px;min-height:36px;white-space:nowrap}
+button.primary{background:var(--p);border-color:var(--p);color:#fff;font-weight:600}
+:focus-visible{outline:2px solid var(--p);outline-offset:-2px}
+.muted{color:var(--muted);font-size:13px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
+.card h2{font:600 16px/1.3 Georgia,serif;margin:0 0 8px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+.dn{display:flex;gap:4px;align-items:center}.dn input{width:auto}
+.gsum{display:flex;justify-content:space-between;align-items:center;gap:8px}
+#gSum{font-weight:600;font-variant-numeric:tabular-nums}
+.settings{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.settings label,.row label{font-size:12px;color:var(--muted);display:block}
+.settings input{width:100%}
+.tabs{display:flex;border-bottom:1px solid var(--line);margin-bottom:10px}
+.tabs button{flex:1;border:0;border-bottom:3px solid transparent;border-radius:0;background:transparent;padding:6px 4px;font-weight:600;color:var(--muted)}
+.tabs button[aria-selected=true]{color:var(--ink);border-bottom-color:var(--p)}
+.wrap{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+table{border-collapse:collapse;width:100%;table-layout:fixed;font-variant-numeric:tabular-nums}
+th,td{border-top:1px solid var(--line);padding:0;text-align:right;font-weight:400}
+th:first-child,td:first-child{text-align:left}
+thead th{border-top:0;padding:6px 4px;font-size:12px;color:var(--muted);font-weight:600}
+thead th:first-child{padding-left:10px}
+thead th:nth-child(n+2){width:50px}thead th:last-child{width:32px}
+td input{width:100%;border:0;border-radius:0;background:transparent;padding:9px 4px;text-align:inherit}
+td:first-child input{padding-left:10px}
+td input[type=number]{-moz-appearance:textfield}
+td input::-webkit-outer-spin-button,td input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+td input::placeholder{color:var(--muted);opacity:.6}
+td button{border:0;background:transparent;color:var(--muted);padding:0;width:100%}
+.gh th,.gh td{background:var(--band);color:#fff;font-weight:600;padding:10px 4px;font-size:14px}
+.gh th{padding-left:10px;font:700 17px Georgia,serif;letter-spacing:.2px;white-space:nowrap}
+.gh .mt{border:0;background:transparent;min-height:0;padding:0 8px;color:#fff;font-size:18px;line-height:1;width:auto;vertical-align:middle}.gh td button{color:#fff}
+.ar td button{color:var(--p);font-weight:700;font-size:20px}
+tbody[data-m] tr:not(.gh) td:first-child{border-left:5px solid var(--band)}
+tbody[data-m] tr:not(.gh):not(.tl) td:first-child input{padding-left:8px}
+.amtc{display:flex;align-items:center}.amtc input{flex:1;min-width:0}.amtc .u{padding:0 8px 0 2px;color:var(--muted);font-size:13px}
+.amtc2{display:flex;align-items:center;gap:6px}.amtc2 input{flex:1;min-width:0}
+.pv{text-align:left;padding:0 6px}.pvt{font-size:13px}
+.ar td .nfb{color:var(--p);font-weight:600;font-size:13px;width:auto;min-height:32px;padding:0 2px;line-height:1.1;text-align:left}
+.tl{display:none}tbody.open .tl{display:table-row}
+.tl td{padding:8px 10px;text-align:left}
+.tl div{display:flex;gap:6px;flex-wrap:wrap}
+.tl button{border:1px solid var(--line);width:auto;color:var(--ink);font-size:13px;min-height:32px;padding:4px 10px}
+.tl select,.tl input{font-size:14px;padding:5px 8px;flex:1 1 120px;width:auto}
+.m4 td{padding:4px 10px;text-align:left}.m4 button{color:var(--p);width:auto;padding:4px 0;min-height:32px}
+tfoot th,tfoot td{padding:7px 4px;background:var(--head);font-weight:600}
+tfoot th{padding-left:10px}
+.neg{color:var(--f)}
+.logfoot{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:10px 0}
+.logfoot label{display:flex;gap:6px;align-items:center;font-size:14px}.logfoot input{width:84px}
+details.card summary{cursor:pointer;font-weight:600}
+.row{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin:8px 0}
+.row input,.row select{flex:1 1 140px}
+.lg{display:flex;gap:12px;font-size:13px;color:var(--muted);margin-bottom:4px}
+.lg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px}
+svg{width:100%;height:auto;display:block}
+.sfadd{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.sfadd #sfEn,.sfadd #nfEn{grid-column:1/-1}.enrow{display:flex;align-items:center;gap:8px}.sfadd .enrow input{flex:1 1 120px;width:auto}.sfadd .enrow select{width:auto}.enrow .muted{white-space:nowrap}
+.sfadd #sfN,.sfadd #sfRef,.sfadd #sfSave,.sfadd #nfN,.sfadd #nfRef{grid-column:1/-1}.refrow{display:flex;align-items:center;gap:8px;font-size:14px}.sfadd .refrow input{width:90px}.sfadd .refrow select{width:auto}.refrow span{white-space:nowrap}.sfadd input{width:100%}
+.sf{display:flex;gap:6px 8px;align-items:center;flex-wrap:wrap;padding:8px 0;border-top:1px solid var(--line)}
+.sf strong{flex:1 1 100%}.sf .amt{display:flex;align-items:center;gap:4px;flex:0 0 auto}.sf .amt input{width:70px;padding:6px 6px;text-align:center}.sf .st{min-height:34px;min-width:34px;padding:0;font-size:18px;touch-action:manipulation;user-select:none;-webkit-user-select:none}.sf select{width:auto;flex:1 1 110px}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin:10px 0}
+.mgrid label{font-size:12px;color:var(--muted);display:block}.mgrid input{width:100%}
+details.micro summary{cursor:pointer;margin-top:10px;color:var(--p);font-weight:600}
+.nr{display:grid;grid-template-columns:84px 1fr 118px;gap:8px;align-items:center;padding:6px 0;border-top:1px solid var(--line)}
+.nr .muted{text-align:right}
+.nb{height:8px;background:var(--line);border-radius:4px;overflow:hidden}.nb i{display:block;height:100%;background:var(--p)}
+#scan,#nf{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:12px;z-index:50}
+#scan>div,#nf>div{background:var(--surface);border-radius:12px;padding:16px;max-width:460px;width:100%;max-height:100%;overflow:auto}
+#scan video{width:100%;border-radius:8px;background:#000;margin:8px 0}
+.dash{padding:10px 12px}
+@media (min-height:650px){.dash{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;box-shadow:0 2px 10px rgba(0,0,0,.1)}}
+.dk{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.dk b{font:700 28px/1 Georgia,serif;font-variant-numeric:tabular-nums}
+.dk .pct{margin-left:auto;font-weight:700}
+.dk button.sm{align-self:center;min-height:30px;padding:2px 10px;font-size:13px}
+.pb{height:8px;background:var(--line);border-radius:4px;overflow:hidden}.pb.th{height:6px}
+.pb i{display:block;height:100%;width:0;border-radius:4px;transition:width .25s}
+.pb.over i{background:#c0392b!important}
+.mac3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:8px}
+.ml{display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:3px}
+.mv{font-size:12px;color:var(--muted);margin-top:2px;font-variant-numeric:tabular-nums}
+.ar2 td{padding:6px 10px}
+.ar2 .amtc{gap:6px}
+.ar2 .st{border:1px solid var(--line);background:var(--surface);color:var(--ink);width:38px;min-width:38px;min-height:38px;font-size:20px;border-radius:8px;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.ar2 .a{flex:0 0 84px;width:84px;border:1px solid var(--line);border-radius:8px;background:var(--bg);text-align:center;padding:8px 4px!important}
+.ar2 .u{padding:0 2px;color:var(--muted);font-size:13px}
+.amtc .pvt{flex:1;padding:0 4px;line-height:1.2;color:var(--ink)}
+.ar2 td .ab{border:0;background:var(--p);color:#fff;font-weight:600;font-size:15px;width:auto;padding:0 16px;min-height:38px;border-radius:8px}
+.wc .wbtns{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}
+.wc .wq{min-width:64px;min-height:38px;font-weight:600}
+.wc .amtc{gap:6px}.wc input.wi{width:84px;text-align:center;border:1px solid var(--line);border-radius:8px;background:var(--bg);padding:8px 4px}
+.wc .st{border:1px solid var(--line);background:var(--surface);color:var(--ink);width:38px;min-width:38px;min-height:38px;font-size:20px;border-radius:8px;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.rcrow{display:flex;align-items:center;gap:8px;margin:10px 0;font-size:14px}.rcrow input{width:76px;text-align:center}
+#rcN,#rcF,#rcA{width:100%}
+.rcadd{display:grid;grid-template-columns:1fr 84px auto auto;gap:6px;align-items:center}
+.rci{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--line)}
+.rci .nm2{flex:1 1 auto;font-weight:600;min-width:0;overflow-wrap:anywhere}.rci input{width:84px;padding:6px 8px}.rci .kc{min-width:56px;text-align:right}
+.rci button{border:0;background:transparent;color:var(--muted);min-height:32px;padding:0 6px}
+.portion{display:flex;align-items:center;gap:6px;flex:1 1 100%}.portion input{width:70px;text-align:center;padding:6px 4px}
+.sl .slh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}.sl .slh h2{margin:0}
+#slDur{font:700 22px/1 Georgia,serif;font-variant-numeric:tabular-nums}
+.slrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sl label{display:block;font-size:12px;color:var(--muted)}.sl>label{margin-top:12px}
+.sl input[type=time]{width:100%;margin-top:3px;color:var(--ink)}
+.sl textarea{display:block;width:100%;margin-top:3px;margin-top:8px;font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;resize:vertical;min-height:56px}
+@media (min-width:560px){thead th:nth-child(n+2){width:64px}}
+</style>
+</head>
+<body>
+<main>
+  <header class="top">
+    <div class="dn"><button id="prevD" aria-label="Previous day">&lsaquo;</button><input type="date" id="date" aria-label="Date"><button id="nextD" aria-label="Next day">&rsaquo;</button></div>
+    <button id="scanBtn">&#128247; Scan</button>
+  </header>
+
+  <section class="card dash" aria-label="Today's totals">
+    <div class="dk"><b id="dKv">0</b><span class="muted">/ <span id="dKg">0</span> kcal · <span id="dKl"></span></span><span class="pct" id="dKp">0%</span><button id="gEdit" class="sm" aria-expanded="false">Goals</button></div>
+    <div class="pb" role="progressbar" aria-label="Calories" aria-valuemin="0" aria-valuemax="100"><i id="dKb" style="background:var(--k)"></i></div>
+    <div class="mac3">
+      <div><div class="ml"><span>Protein</span><span id="dPp">0%</span></div><div class="pb th" role="progressbar" aria-label="Protein" aria-valuemin="0" aria-valuemax="100"><i id="dPb" style="background:var(--p)"></i></div><div class="mv" id="dPv"></div></div>
+      <div><div class="ml"><span>Carbs</span><span id="dCp">0%</span></div><div class="pb th" role="progressbar" aria-label="Carbs" aria-valuemin="0" aria-valuemax="100"><i id="dCb" style="background:var(--c)"></i></div><div class="mv" id="dCv"></div></div>
+      <div><div class="ml"><span>Fat</span><span id="dFp">0%</span></div><div class="pb th" role="progressbar" aria-label="Fat" aria-valuemin="0" aria-valuemax="100"><i id="dFb" style="background:var(--f)"></i></div><div class="mv" id="dFv"></div></div>
+    </div>
+  </section>
+  <section class="card" id="gForm" hidden>
+    <div class="settings" style="margin-top:0">
+      <div><label for="gK">Calories</label><input id="gK" type="number" min="0" inputmode="numeric"></div>
+      <div><label for="gP">Protein g</label><input id="gP" type="number" min="0" inputmode="numeric"></div>
+      <div><label for="gF">Fat g</label><input id="gF" type="number" min="0" inputmode="numeric"></div>
+      <div><label for="gC">Carbs g</label><input id="gC" type="number" readonly></div>
+    </div>
+    <p class="muted" id="gNote" style="margin:8px 0 0"></p>
+  </section>
+
+  
+<nav class="tabs" role="tablist"><button role="tab" data-t="log">Log</button><button role="tab" data-t="graphs">Graphs</button><button role="tab" data-t="nut">Vitamins</button><button role="tab" data-t="foods">Foods</button><button role="tab" data-t="rec">Recipes</button></nav>
+
+  <div data-tab="log">
+    <div class="wrap"><table id="sheet"></table></div>
+    <div class="logfoot"><label>Weight <input id="wIn" type="number" step="0.1" min="0" inputmode="decimal" aria-label="Body weight in kg"> kg</label><button id="copyAll">Copy yesterday's log</button></div>
+    <section class="card wc" id="waterCard" aria-label="Water intake">
+      <div class="dk"><b id="wTot">0</b><span class="muted">/ <span id="wGoal">2000</span> ml</span><span class="pct" id="wPct">0%</span><button id="wEdit" class="sm">Goal</button></div>
+      <div class="pb" role="progressbar" aria-label="Water" aria-valuemin="0" aria-valuemax="100"><i id="wBar" style="background:var(--w)"></i></div>
+      <div class="muted" id="wBreak" style="margin-top:4px"></div>
+      <div id="wGoalRow" hidden class="row"><div><label for="wGoalIn">Daily water goal (ml)</label><input id="wGoalIn" type="number" min="0" inputmode="numeric"></div></div>
+      <div class="wbtns"><button class="wq" data-w="150">+150</button><button class="wq" data-w="250">+250</button><button class="wq" data-w="500">+500</button><span class="muted">ml</span></div>
+      <div class="wbtns"><div class="amtc"><button type="button" class="st" data-d="-10" aria-label="Decrease">&minus;</button><input class="wi" id="wIn2" type="number" min="0" step="1" inputmode="numeric" placeholder="ml" aria-label="Custom water amount in ml"><button type="button" class="st" data-d="10" aria-label="Increase">+</button></div><button class="primary" id="wAdd">Add</button><button id="wUndo">Undo last</button></div>
+    </section>
+    <section class="card sl" id="sleepCard" aria-label="Sleep and notes">
+      <div class="slh"><h2>Sleep</h2><span id="slDur" aria-live="polite"></span></div>
+      <div class="slrow">
+        <label>Bedtime (night before)<input type="time" id="slBed"></label>
+        <label>Wake-up time<input type="time" id="slWake"></label>
+      </div>
+      <p class="muted" id="slAvg" style="margin:8px 0 0"></p>
+      <label>Notes<textarea id="noteTx" rows="2" maxlength="2000" placeholder="Mood, energy, training, anything worth remembering"></textarea></label>
+    </section>
+    <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
+      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Export a backup regularly, and before moving to a new version or device. <span id="lastBk"></span></p>
+      <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
+      <div class="row"><select id="bkMode" aria-label="Import mode"><option value="merge">Import: merge with current data</option><option value="replace">Import: replace everything</option></select><button id="bkImport">Import</button></div>
+      <textarea id="bk" rows="3" style="width:100%;font:12px monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px" placeholder="Backup text appears here after Export. To restore, choose a file or paste backup text, then press Import." aria-label="Backup text"></textarea>
+      <p class="muted" id="bkMsg" role="status" style="margin:6px 0 0"></p>
+    </details>
+  </div>
+  <datalist id="foodlist"></datalist><datalist id="ingredlist"></datalist>
+
+  <div data-tab="graphs">
+    <div class="row" style="margin-top:0"><select id="range" aria-label="Range"><option value="7">Last 7 days</option><option value="14" selected>Last 14 days</option><option value="30">Last 30 days</option><option value="90">Last 3 months</option><option value="180">Last 6 months</option><option value="365">Last year</option><option value="all">All time</option></select></div>
+    <p class="muted" id="chNote" style="margin:0 0 8px"></p>
+    <section class="card"><h2>Calories</h2><div id="chCal"></div></section>
+    <section class="card"><h2>Macros (g)</h2><div class="lg"><span><i style="background:var(--p)"></i>Protein</span><span><i style="background:var(--c)"></i>Carbs</span><span><i style="background:var(--f)"></i>Fat</span></div><div id="chMac"></div></section>
+    <section class="card"><h2>Water (ml)</h2><div id="chWat"></div></section>
+    <section class="card"><h2>Weight (kg)</h2><div id="chWt"></div></section>
+  </div>
+
+  <div data-tab="nut">
+    <section class="card">
+      <h2>Vitamins &amp; minerals</h2>
+      <p class="muted" id="nutNote" style="margin:0 0 8px"></p>
+      <div id="nutList"></div>
+      <p class="muted" style="margin:10px 0 0">Add vitamin and mineral values to a food in the Foods tab. Foods without them count as zero. ORAC has no official daily requirement: 5,000 µmol TE is only a commonly quoted reference figure.</p>
+    </section>
+  </div>
+
+  <div data-tab="foods">
+    <section class="card">
+      <h2>Saved foods</h2>
+      <div class="sfadd">
+        <input id="sfN" placeholder="Food name" aria-label="Saved food name">
+        <div class="refrow" id="sfRef"><span>Label values are for</span><input id="sfRA" type="number" min="0" step="any" inputmode="decimal" value="100" aria-label="Amount the label values are for"><select id="sfRU" aria-label="Unit"><option value="g">g</option><option value="ml">ml</option><option value="">item</option></select></div>
+        <div class="enrow" id="sfEn"><input id="sfk" type="number" min="0" step="any" inputmode="decimal" placeholder="Energy" aria-label="Energy"><select id="sfEU" aria-label="Energy unit"><option value="kcal">kcal</option><option value="kj">kJ</option></select><span class="muted" id="sfEc"></span></div>
+        <input id="sfp" type="number" min="0" inputmode="decimal" placeholder="P g" aria-label="Protein g">
+        <input id="sfc" type="number" min="0" inputmode="decimal" placeholder="C g" aria-label="Carbs g">
+        <input id="sff" type="number" min="0" inputmode="decimal" placeholder="F g" aria-label="Fat g">
+        <button class="primary" id="sfSave">Save food</button>
+      </div>
+      <p class="muted" id="sfMsg" role="status" style="margin:8px 0 0"></p>
+      <details class="micro"><summary>Water, vitamins &amp; minerals (optional)</summary><div id="sfMicro" class="mgrid"></div></details>
+      <div id="sfList"></div>
+    </section>
+  </div>
+<div data-tab="rec">
+    <section class="card">
+      <h2>Recipe builder</h2>
+      <input id="rcN" placeholder="Recipe name, e.g. Pasta bake" aria-label="Recipe name" style="width:100%">
+      <div class="rcrow"><span>Makes</span><input id="rcS" type="number" min="1" step="1" inputmode="numeric" value="4" aria-label="Number of servings"><span>servings (people)</span></div>
+      <div class="rcadd"><input id="rcF" list="ingredlist" placeholder="Ingredient (a saved food)" aria-label="Ingredient"><input id="rcA" type="number" min="0" step="any" inputmode="decimal" placeholder="amount" aria-label="Ingredient amount"><span class="muted" id="rcU">g</span><button class="primary" id="rcAdd">Add</button></div>
+      <p class="muted" id="rcMsg" role="status" style="margin:6px 0"></p>
+      <div id="rcItems"></div>
+      <p class="muted" id="rcTot" style="margin:8px 0"></p>
+      <div class="row"><button class="primary" id="rcSave">Save recipe</button><button id="rcNew">New food</button><button id="rcClear">Clear</button></div>
+    </section>
+    <section class="card">
+      <h2>Saved recipes</h2>
+      <p class="muted" id="rcStat" role="status" style="margin:0 0 4px"></p>
+      <div id="rcList"></div>
+    </section>
+  </div>
+</main>
+<div id="scan" hidden>
+  <div role="dialog" aria-modal="true" aria-label="Scan food">
+    <h2 style="font:600 16px Georgia,serif;margin:0 0 6px">Scan food</h2>
+    <p class="muted" style="margin:0 0 8px">Scan a barcode to look the food up, or photograph a nutrition label. You can check and edit the values before saving.</p>
+    <div class="row"><button class="primary" id="scBar">Scan barcode</button><button id="scPhoto">Photograph label</button><input type="file" id="scFile" accept="image/*" hidden></div>
+    <video id="scVid" playsinline muted hidden></video>
+    <div class="row"><input id="scCode" inputmode="numeric" placeholder="Or type the barcode number" aria-label="Barcode number"><button id="scLook">Look up</button></div>
+    <div class="row"><select id="scBasis" aria-label="Barcode values basis"><option value="serving">Barcode values: per serving</option><option value="100g">Barcode values: per 100 g</option></select></div>
+    <div class="row"><select id="scCol" aria-label="Label column"><option value="0">Label with two columns: use the first (per serving)</option><option value="1">Label with two columns: use the second (per 100 g)</option></select></div>
+    <p class="muted" style="margin:0 0 6px">Tip for photos: lay the label flat, fill the frame, use good light and avoid glare. Labels with kJ only are converted to calories.</p>
+    <textarea id="scTxt" rows="6" hidden style="width:100%;font:12px monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px" aria-label="Text read from the label"></textarea>
+    <div class="row"><button id="scReparse" hidden>Use this text</button></div>
+    <p class="muted" id="scMsg" role="status"></p>
+    <button id="scClose">Close</button>
+  </div>
+</div>
+<div id="nf" hidden>
+  <div role="dialog" aria-modal="true" aria-label="New food">
+    <h2 style="font:600 16px Georgia,serif;margin:0 0 6px">New food</h2>
+    <p class="muted" style="margin:0 0 8px">Enter the values as printed on the pack, for the serving size shown there (for example 23 g, or 100 ml). After saving you can add it by any weight or volume.</p>
+    <div class="sfadd">
+      <input id="nfN" placeholder="Food name" aria-label="Food name">
+      <div class="refrow" id="nfRef"><span>Label values are for</span><input id="nfRA" type="number" min="0" step="any" inputmode="decimal" value="100" aria-label="Amount the label values are for"><select id="nfRU" aria-label="Unit"><option value="g">g</option><option value="ml">ml</option><option value="">item</option></select></div>
+      <div class="enrow" id="nfEn"><input id="nfk" type="number" min="0" step="any" inputmode="decimal" placeholder="Energy" aria-label="Energy"><select id="nfEU" aria-label="Energy unit"><option value="kcal">kcal</option><option value="kj">kJ</option></select><span class="muted" id="nfEc"></span></div>
+      <input id="nfp" type="number" min="0" inputmode="decimal" placeholder="P g" aria-label="Protein g">
+      <input id="nfc" type="number" min="0" inputmode="decimal" placeholder="C g" aria-label="Carbs g">
+      <input id="nff" type="number" min="0" inputmode="decimal" placeholder="F g" aria-label="Fat g">
+    </div>
+    <details class="micro"><summary>Water, vitamins &amp; minerals (optional)</summary><div id="nfMicro" class="mgrid"></div></details>
+    <div class="row"><div style="flex:1 1 140px"><label for="nfAmt">Amount to add now</label><div class="amtc2"><input id="nfAmt" type="number" min="0" step="1" inputmode="decimal"><span id="nfUnit">g</span></div></div><div style="flex:1 1 120px"><label for="nfM">To meal</label><select id="nfM" style="width:100%"><option value="0">Meal 1</option><option value="1">Meal 2</option><option value="2">Meal 3</option><option value="3">Meal 4</option><option value="4">Snacks</option></select></div></div>
+    <p class="muted" id="nfMsg" role="status"></p>
+    <div class="row"><button class="primary" id="nfAdd">Save &amp; add</button><button id="nfOnly">Save only</button><button id="nfCancel">Cancel</button></div>
+  </div>
+</div>
+<script>
+const KEY='dailylog.v1',MEALS=['Meal 1','Meal 2','Meal 3','Meal 4','Snacks'],F=['k','p','c','f'],LBL={k:'kcal',p:'P g',c:'C g',f:'F g'};
+let db={goals:{k:2000},split:{p:30,f:25},days:{},weights:{},foods:[],meals:[],m4:{},water:{},waterGoal:2000,recipes:[],sleep:{},notes:{}};
+try{const s=localStorage.getItem(KEY);if(s)db=Object.assign(db,JSON.parse(s))}catch(e){}
+db.foods.forEach(f=>{if(!f.ra){const r=fref(f);f.ra=r.a;f.ru=r.u;delete f.b}});
+let view='cal';
+const $=id=>document.getElementById(id);
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}};
+const iso=t=>new Date(t-t.getTimezoneOffset()*6e4).toISOString().slice(0,10);
+const prev=d=>{const t=new Date(d+'T00:00:00');t.setDate(t.getDate()-1);return iso(t)};
+$('date').value=iso(new Date());
+const num=v=>Math.max(0,parseFloat(v)||0);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const sum=a=>a.reduce((t,e)=>({k:t.k+e.k,p:t.p+e.p,c:t.c+e.c,f:t.f+e.f}),{k:0,p:0,c:0,f:0});
+function goals(){const k=db.goals.k;if(!db.mg){const s=db.split;db.mg={p:Math.round(k*s.p/400),f:Math.round(k*s.f/900)}}const p=db.mg.p,f=db.mg.f;return{k,p,f,c:Math.max(0,Math.round((k-4*p-9*f)/4))}}
+const dayList=()=>{const d=$('date').value;return db.days[d]||(db.days[d]=[])};
+const clone=(e,m)=>({n:e.n,k:e.k,p:e.p,c:e.c,f:e.f,m,u:e.u?{...e.u}:undefined,w:e.w});
+const showM4=d=>db.m4[d]||(db.days[d]||[]).some(e=>e.m===3);
+
+const SH={k:'kcal',p:'P',c:'C',f:'F'},openT=new Set();
+function build(){
+  const d=$('date').value,list=db.days[d]||[];
+  const opts='<option value="">Add saved meal…</option>'+db.meals.map((x,i)=>`<option value="${i}">${esc(x.n)}</option>`).join('');
+  let h=`<thead><tr><th>Food</th>${F.map(f=>`<th>${SH[f]}</th>`).join('')}<th></th></tr></thead>`;
+  MEALS.forEach((name,m)=>{
+    if(m===3&&!showM4(d)){h+='<tbody><tr class="m4"><td colspan="6"><button class="m4on">+ Add Meal 4</button></td></tr></tbody>';return}
+    const items=list.map((e,i)=>({e,i})).filter(x=>(x.e.m??0)===m);
+    h+=`<tbody data-m="${m}"${openT.has(m)?' class="open"':''}><tr class="gh"><th><span class="nm">${name}</span><button class="mt" aria-label="${name} options">⋯</button></th>${F.map(f=>`<td data-s="${f}"></td>`).join('')}<td>${m===3?'<button class="m4off" aria-label="Remove Meal 4 from this day">×</button>':''}</td></tr>`;
+    items.forEach(({e,i})=>{h+=`<tr><td><input data-i="${i}" data-f="n" value="${esc(e.n)}" aria-label="Food"></td>${F.map(f=>`<td><input type="number" min="0" inputmode="decimal" data-i="${i}" data-f="${f}" value="${Math.round(e[f]*10)/10}" aria-label="${LBL[f]}"></td>`).join('')}<td><button class="del" data-i="${i}" aria-label="Remove ${esc(e.n)}">×</button></td></tr>`});
+    h+=`<tr class="ar"><td colspan="4"><input class="n" list="foodlist" placeholder="Add food…" aria-label="Food to add to ${name}"></td><td colspan="2" class="pv"><button class="nfb">New food</button></td></tr>`;
+    h+=`<tr class="ar2" hidden><td colspan="6"><div class="amtc"><button type="button" class="st" data-d="-1" aria-label="Decrease amount">−</button><input class="a" type="number" min="0" step="1" inputmode="decimal" placeholder="amount" aria-label="Amount"><button type="button" class="st" data-d="1" aria-label="Increase amount">+</button><span class="u">g</span><span class="pvt"></span><button class="ab" aria-label="Add food">Add</button></div></td></tr>`;
+    h+=`<tr class="tl"><td colspan="6"><div><button class="cp">Copy from yesterday</button><select class="sm" aria-label="Add a saved meal">${opts}</select><input class="sn" placeholder="Name to save as meal"><button class="sv">Save as meal</button></div></td></tr></tbody>`;
+  });
+  h+=`<tfoot><tr><th>Total</th>${F.map(f=>`<td data-t="${f}"></td>`).join('')}<td></td></tr><tr><th>Left</th>${F.map(f=>`<td data-l="${f}"></td>`).join('')}<td></td></tr></tfoot>`;
+  $('sheet').innerHTML=h;
+}
+function totals(){
+  const d=$('date').value,list=db.days[d]||[],g=goals(),t=sum(list);renderDash(t,g);
+  document.querySelectorAll('tbody[data-m]').forEach(tb=>{const s=sum(list.filter(e=>(e.m??0)===+tb.dataset.m));tb.querySelectorAll('[data-s]').forEach(c=>c.textContent=Math.round(s[c.dataset.s]))});
+  F.forEach(f=>{
+    document.querySelector(`[data-t="${f}"]`).textContent=Math.round(t[f]);
+    const l=document.querySelector(`[data-l="${f}"]`),v=Math.round(g[f]-t[f]);l.textContent=v;l.classList.toggle('neg',v<0);
+  });
+  charts();
+}
+function renderGoals(){
+  const g=goals();
+
+  $('gK').value=g.k;$('gP').value=g.p;$('gF').value=g.f;$('gC').value=g.c;
+  $('gNote').textContent=4*g.p+9*g.f>g.k?'Protein and fat already exceed your calorie goal, so carbs are 0g.':'Carbs fill the calories left after protein and fat. Changing calories rescales all three.';
+}
+function render(){
+  build();totals();
+  {const fo=db.foods.map(f=>`<option value="${esc(f.n)}">`).join('');$('ingredlist').innerHTML=fo;$('foodlist').innerHTML=fo+db.recipes.map(r=>`<option value="${esc(r.n)}">`).join('')}
+  renderFoods();renderNut();renderGoals();renderWater();renderRecipes();renderSleep();
+  $('wIn').value=db.weights[$('date').value]??'';
+}
+const G={W:600,H:190,l:42,r:8,t:10,b:24},CW=G.W-G.l-G.r,CH=G.H-G.t-G.b;
+const cy=(v,lo,hi)=>G.t+CH-(v-lo)/((hi-lo)||1)*CH,cx=(i,N)=>G.l+(i+.5)*CW/N;
+const txt=(x,y,s,a)=>`<text x="${x}" y="${y}" font-size="11" fill="var(--muted)" text-anchor="${a||'end'}">${s}</text>`;
+const frame=(l0,l1,hi,lo,body,name)=>`<svg viewBox="0 0 ${G.W} ${G.H}" role="img" aria-label="${name}"><line x1="${G.l}" x2="${G.W-G.r}" y1="${G.t+CH}" y2="${G.t+CH}" stroke="var(--line)"/>${txt(G.l-4,G.t+4,hi)}${txt(G.l-4,G.t+CH,lo)}${txt(G.l,G.H-6,l0,'start')}${txt(G.W-G.r,G.H-6,l1)}${body}</svg>`;
+const NONE=t=>`<p class="muted" style="margin:4px 0">${t}</p>`;
+const series=(pts,col,N,lo,hi,ds,unit)=>pts.length?`<path d="${pts.map((p,j)=>(j?'L':'M')+cx(p[0],N).toFixed(1)+' '+cy(p[1],lo,hi).toFixed(1)).join('')}" fill="none" stroke="${col}" stroke-width="2.5" stroke-linejoin="round"/>`+pts.map(p=>`<circle cx="${cx(p[0],N)}" cy="${cy(p[1],lo,hi)}" r="3" fill="${col}"><title>${ds[p[0]]}: ${+p[1].toFixed(1)} ${unit}</title></circle>`).join(''):'';
+function rangeDays(){
+  const v=$('range').value,end=$('date').value;let N;
+  if(v==='all'){
+    const keys=[...Object.keys(db.days).filter(d=>(db.days[d]||[]).length),...Object.keys(db.weights)].filter(d=>d<=end).sort();
+    N=keys.length?Math.round((new Date(end+'T00:00:00')-new Date(keys[0]+'T00:00:00'))/864e5)+1:14;N=Math.max(N,7);
+  }else N=+v;
+  const ds=[];for(let t=end,i=0;i<N;i++,t=prev(t))ds.unshift(t);return ds;
+}
+function charts(){
+  const end=$('date').value,ds=rangeDays(),N=ds.length,size=N<=31?1:N<=200?7:30,g=goals();
+  const bk=[];for(let i=N;i>0;i-=size)bk.unshift(ds.slice(Math.max(0,i-size),i));
+  const B=bk.length,lab=d=>N>180?d.slice(0,7):d.slice(5),dayInfo=d=>{const l=db.days[d]||[];return l.length?sum(l):null};
+  const A=bk.map(days=>{
+    const inf=days.map(dayInfo).filter(Boolean),n=inf.length,t=sum(inf),w=days.map(d=>db.weights[d]).filter(v=>v>0);
+    const wv=days.map(waterTotal).filter(v=>v>0);
+    return{n,wn:wv.length,wa:wv.length?wv.reduce((a,b)=>a+b,0)/wv.length:0,k:n?t.k/n:0,p:n?t.p/n:0,c:n?t.c/n:0,f:n?t.f/n:0,w:w.length?w.reduce((a,b)=>a+b,0)/w.length:null,name:days[0]===days[days.length-1]?days[0]:days[0]+' to '+days[days.length-1]};
+  });
+  const names=A.map(x=>x.name),logged=A.reduce((a,x)=>a+x.n,0),per=size>1?' per day (avg)':'';
+  $('chNote').textContent=(size===1?'Daily values':size===7?'Weekly averages':'Monthly averages')+(logged?` · ${logged} days logged · average ${Math.round(A.reduce((a,x)=>a+x.k*x.n,0)/logged)} kcal/day`:'');
+  if(!logged){$('chCal').innerHTML=NONE('Log some food to see this graph.');$('chMac').innerHTML=NONE('Log some food to see this graph.')}
+  else{
+    const mx=Math.max(g.k,...A.map(x=>x.k))*1.1,bw=CW/B,gy=cy(g.k,0,mx);
+    $('chCal').innerHTML=frame(lab(ds[0]),lab(end),Math.round(mx),0,A.map((x,i)=>x.n?`<rect x="${G.l+i*bw+bw*.12}" y="${cy(x.k,0,mx)}" width="${bw*.76}" height="${Math.max(0,G.t+CH-cy(x.k,0,mx))}" rx="2" fill="var(--k)" opacity="${i===B-1?1:.55}"><title>${x.name}: ${Math.round(x.k)} kcal${per}</title></rect>`:'').join('')+`<line x1="${G.l}" x2="${G.W-G.r}" y1="${gy}" y2="${gy}" stroke="var(--ink)" stroke-dasharray="5 4"/>`+txt(G.W-G.r,gy-4,'goal '+g.k),'Calories');
+    const hi=Math.max(...A.map(x=>Math.max(x.p,x.c,x.f)))*1.1||1,pts=k=>A.map((x,i)=>x.n?[i,x[k]]:null).filter(Boolean);
+    $('chMac').innerHTML=frame(lab(ds[0]),lab(end),Math.round(hi),0,series(pts('p'),'var(--p)',B,0,hi,names,'g'+per)+series(pts('c'),'var(--c)',B,0,hi,names,'g'+per)+series(pts('f'),'var(--f)',B,0,hi,names,'g'+per),'Macros in grams');
+  }
+  if(!A.some(x=>x.wn))$('chWat').innerHTML=NONE('Log some water to see this graph.');
+  else{
+    const wg=db.waterGoal||2000,mx=Math.max(wg,...A.map(x=>x.wa))*1.1,bw=CW/B,gy=cy(wg,0,mx);
+    $('chWat').innerHTML=frame(lab(ds[0]),lab(end),Math.round(mx),0,A.map((x,i)=>x.wn?`<rect x="${G.l+i*bw+bw*.12}" y="${cy(x.wa,0,mx)}" width="${bw*.76}" height="${Math.max(0,G.t+CH-cy(x.wa,0,mx))}" rx="2" fill="var(--w)" opacity="${i===B-1?1:.6}"><title>${x.name}: ${Math.round(x.wa)} ml${per}</title></rect>`:'').join('')+`<line x1="${G.l}" x2="${G.W-G.r}" y1="${gy}" y2="${gy}" stroke="var(--ink)" stroke-dasharray="5 4"/>`+txt(G.W-G.r,gy-4,'goal '+wg),'Water');
+  }
+  const wp=A.map((x,i)=>x.w!=null?[i,x.w]:null).filter(Boolean);
+  if(wp.length<2)$('chWt').innerHTML=NONE('Enter your weight on two or more days in this range.');
+  else{
+    const v=wp.map(p=>p[1]),lo=Math.min(...v)-.5,hi=Math.max(...v)+.5,ch=v[v.length-1]-v[0];
+    $('chWt').innerHTML=`<p class="muted" style="margin:0 0 4px">Change over this period: ${ch>0?'+':''}${ch.toFixed(1)} kg</p>`+frame(lab(ds[0]),lab(end),hi.toFixed(1),lo.toFixed(1),series(wp,'var(--ink)',B,lo,hi,names,'kg'+per),'Body weight');
+  }
+}
+const scaleU=(u,s)=>Object.fromEntries(Object.entries(u).map(([k,v])=>[k,Math.round(v*s*100)/100]));
+function fref(f){
+  if(f.ra)return{a:f.ra,u:f.ru||''};
+  const b=f.b||'serving';return b==='100g'?{a:100,u:'g'}:b==='100ml'?{a:100,u:'ml'}:{a:1,u:''};
+}
+function resolveFood(txt){
+  txt=(txt||'').trim();if(!txt)return null;
+  const by=n=>db.foods.find(x=>x.n.toLowerCase()===n.toLowerCase());
+  let food=by(txt),amt=null,kind='',unit='',m=null;
+  if(!food){
+    if(m=txt.match(/^(.*\S)\s+(\d+(?:[.,]\d+)?)\s*(g|ml)$/i)){kind='u';unit=m[3].toLowerCase();amt=parseFloat(m[2].replace(',','.'))}
+    else if(m=txt.match(/^(.*\S)\s+(?:x\s*(\d+(?:[.,]\d+)?)|(\d+(?:[.,]\d+)?)\s*x)$/i)){kind='x';amt=parseFloat((m[2]||m[3]).replace(',','.'))}
+    if(!m)return null;food=by(m[1]);if(!food)return null;
+  }
+  const rf=fref(food);
+  if(!rf.u){if(kind==='u')return null;return{food,amt:amt??1}}
+  if(kind==='x'||(kind==='u'&&unit!==rf.u))return null;
+  return{food,amt:amt??rf.a};
+}
+function addScaled(f,m,amt){
+  const rf=fref(f),sc=amt/rf.a;
+  if(m===3)db.m4[$('date').value]=true;
+  const e=clone(f,m);e.k=f.k*sc;e.p=f.p*sc;e.c=f.c*sc;e.f=f.f*sc;if(f.u)e.u=scaleU(f.u,sc);if(f.w)e.w=f.w*sc;
+  e.n=rf.u?`${f.n} ${amt}${rf.u}`:(amt===1?f.n:`${f.n} x${amt}`);
+  dayList().push(e);return e;
+}
+function updAdd(tb){
+  const ra=tb.querySelector('.ar'),rb=tb.querySelector('.ar2'),txt=ra.querySelector('.n').value.trim(),pv=ra.querySelector('.pv');
+  const food=txt&&db.foods.find(x=>x.n.toLowerCase()===txt.toLowerCase()),a=num(rb.querySelector('.a').value),r1=x=>Math.round(x*10)/10;
+  if(!food){
+    const rc=findRec(txt);
+    if(rc){const t=recTot(rc.items),sc=(a||1)/rc.servings;rb.hidden=false;rb.querySelector('.u').textContent='serv';rb.querySelectorAll('.st').forEach(x=>{x.dataset.d=(+x.dataset.d<0?-1:1)*0.5});rb.querySelector('.pvt').textContent=`${Math.round(t.k*sc)} kcal · P ${r1(t.p*sc)} · C ${r1(t.c*sc)} · F ${r1(t.f*sc)}`;pv.innerHTML=`<span class="pvt muted">recipe · ${rc.servings} servings</span>`;return}
+    rb.hidden=true;pv.innerHTML='<button class="nfb">New food</button>';return}
+  const rf=fref(food),sc=a?a/rf.a:(rf.u?0:1);
+  rb.hidden=false;rb.querySelector('.u').textContent=rf.u||'items';
+  rb.querySelectorAll('.st').forEach(x=>{x.dataset.d=(+x.dataset.d<0?-1:1)*(rf.u?1:0.5)});
+  rb.querySelector('.pvt').textContent=sc?`${Math.round(food.k*sc)} kcal · P ${r1(food.p*sc)} · C ${r1(food.c*sc)} · F ${r1(food.f*sc)}`:'enter amount';
+  pv.innerHTML=`<span class="pvt muted">${rf.u?'label: '+rf.a+' '+rf.u:'per item'}</span>`;
+}
+function addFood(tb){
+  const row=tb.querySelector('.ar'),rb=tb.querySelector('.ar2'),txt=row.querySelector('.n').value.trim(),m=+tb.dataset.m;
+  if(!txt){row.querySelector('.n').focus();return}
+  const a=num(rb.querySelector('.a').value),exact=db.foods.find(x=>x.n.toLowerCase()===txt.toLowerCase()),r=exact?null:resolveFood(txt),food=exact||(r&&r.food);
+  if(!food){const rc=findRec(txt);if(rc){recEntry(rc,m,a||1,rc.servings);save();render();document.querySelector(`tbody[data-m="${m}"] .ar .n`).focus();return}openNF(m,txt,a);return}
+  const rf=fref(food);let amt=a||(r?r.amt:0);
+  if(!amt&&!rf.u)amt=1;
+  if(!amt){updAdd(tb);rb.querySelector('.a').focus();return}
+  addScaled(food,m,amt);save();render();document.querySelector(`tbody[data-m="${m}"] .ar .n`).focus();
+}
+function renderDash(t,g){
+  const set=(id,v,goal)=>{const pc=goal?Math.round(v/goal*100):0,bar=$(id+'b'),pb=bar.parentElement;bar.style.width=Math.min(100,pc)+'%';pb.classList.toggle('over',pc>100);pb.setAttribute('aria-valuenow',Math.min(100,pc));$(id+'p').textContent=pc+'%';$(id+'p').classList.toggle('neg',pc>100)};
+  set('dK',t.k,g.k);set('dP',t.p,g.p);set('dC',t.c,g.c);set('dF',t.f,g.f);
+  $('dKv').textContent=Math.round(t.k);$('dKg').textContent=g.k;const l=Math.round(g.k-t.k);$('dKl').textContent=l>=0?l+' left':(-l)+' over';
+  ['P','C','F'].forEach(L=>{const k=L.toLowerCase();$('d'+L+'v').textContent=Math.round(t[k])+' / '+g[k]+' g'});
+}
+function copyFrom(m,btn){
+  const src=(db.days[prev($('date').value)]||[]).filter(e=>m===null||(e.m??0)===m);
+  if(!src.length){const o=btn.textContent;btn.textContent='Nothing yesterday';setTimeout(()=>btn.textContent=o,1500);return}
+  src.forEach(e=>dayList().push(clone(e,e.m??0)));save();render();
+}
+
+const sheet=$('sheet');
+sheet.addEventListener('click',ev=>{
+  const b=ev.target.closest('button');if(!b)return;
+  const tb=b.closest('tbody'),m=tb&&tb.dataset.m!==undefined?+tb.dataset.m:null,d=$('date').value;
+  if(b.classList.contains('st')){if(ev.detail===0)stepIt(b);return}
+  if(b.classList.contains('nfb')){const t2=b.closest('tbody');openNF(m,t2.querySelector('.n').value.trim(),num(t2.querySelector('.a').value));return}
+  if(b.classList.contains('mt')){openT.has(m)?openT.delete(m):openT.add(m);tb.classList.toggle('open');return}
+  if(b.classList.contains('m4on')){db.m4[d]=true;save();render()}
+  else if(b.classList.contains('m4off')){
+    const th=b.closest('tr').querySelector('.nm');
+    if(dayList().some(e=>e.m===3)&&!b.dataset.armed){b.dataset.armed=1;th.textContent='Delete Meal 4 foods? Tap × again';setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;th.textContent='Meal 4'}},3000);return}
+    db.days[d]=dayList().filter(e=>e.m!==3);delete db.m4[d];save();render()}
+  else if(b.classList.contains('del')){dayList().splice(+b.dataset.i,1);save();render()}
+  else if(b.classList.contains('ab'))addFood(tb);
+  else if(b.classList.contains('cp'))copyFrom(m,b);
+  else if(b.classList.contains('sv')){
+    const items=dayList().filter(e=>(e.m??0)===m).map(e=>clone(e,0));
+    if(!items.length){b.textContent='Add foods first';setTimeout(()=>b.textContent='Save as meal',1500);return}
+    const name=tb.querySelector('.sn').value.trim()||MEALS[m],i=db.meals.findIndex(x=>x.n.toLowerCase()===name.toLowerCase());
+    if(i<0)db.meals.push({n:name,items});else db.meals[i]={n:name,items};
+    save();render();
+  }
+});
+sheet.addEventListener('change',ev=>{
+  const t=ev.target;
+  if(t.classList.contains('sm')&&t.value!==''){const m=+t.closest('tbody').dataset.m;db.meals[+t.value].items.forEach(e=>dayList().push(clone(e,m)));save();render();return}
+  if(t.dataset.f){const e=dayList()[+t.dataset.i];if(!e)return;e[t.dataset.f]=t.dataset.f==='n'?t.value.trim()||'Food':num(t.value);save();totals()}
+});
+sheet.addEventListener('input',ev=>{
+  const c=ev.target.classList;if(c.contains('n')||c.contains('a'))updAdd(ev.target.closest('tbody'));
+});
+sheet.addEventListener('keydown',ev=>{
+  if(ev.key==='Enter'&&ev.target.closest('.ar,.ar2'))addFood(ev.target.closest('tbody'));
+});
+function renderFoods(){
+  const r1=x=>Math.round((x||0)*10)/10;
+  $('sfList').innerHTML=db.foods.length?db.foods.map((f,i)=>{
+    const rf=fref(f),per=rf.u?`per ${rf.a} ${rf.u}`:'per item',d=rf.u?1:0.5;
+    return `<div class="sf"><strong>${esc(f.n)}</strong><span class="muted">${Math.round(f.k)} kcal · P ${r1(f.p)} · C ${r1(f.c)} · F ${r1(f.f)} ${per}${f.u&&Object.keys(f.u).length?' · +vitamins/minerals':''}${f.w?' · water '+Math.round(f.w)+' ml':''}</span><div class="amt"><button type="button" class="st" data-d="${-d}" aria-label="Decrease amount">\u2212</button><input type="number" min="0" step="${d}" inputmode="decimal" value="${rf.a}" aria-label="Amount of ${esc(f.n)}"><button type="button" class="st" data-d="${d}" aria-label="Increase amount">+</button><span>${rf.u||'items'}</span></div><select data-sf="${i}" aria-label="Add ${esc(f.n)} to this day"><option value="">Add to…</option>${MEALS.map((n,m)=>`<option value="${m}">${n}</option>`).join('')}</select><button data-sfedit="${i}" aria-label="Edit ${esc(f.n)}">Edit</button><button data-sfdel="${i}" aria-label="Delete ${esc(f.n)}">Delete</button></div>`}).join(''):'<p class="muted" style="margin:10px 0 0">No saved foods yet. Add one above, or use New food in the Log tab.</p>';
+}
+$('sfSave').onclick=()=>{
+  const n=$('sfN').value.trim();if(!n)return;
+  const ru=$('sfRU').value,ra=ru?num($('sfRA').value):1;
+  if(!ra){$('sfMsg').textContent='Enter the amount the label values are for, for example 23 or 100.';return}
+  const e={n,p:num($('sfp').value),c:num($('sfc').value),f:num($('sff').value),k:eKcal('sf'),ra,ru};
+  if(!e.k)e.k=e.p*4+e.c*4+e.f*9;
+  const u=readMicro();if(Object.keys(u).length)e.u=u;{const w=num($('sfW').value);if(w>0)e.w=w}
+  const i=db.foods.findIndex(x=>x.n.toLowerCase()===n.toLowerCase());if(i<0)db.foods.push(e);else db.foods[i]=e;
+  ['sfN','sfk','sfp','sfc','sff'].forEach(id=>$(id).value='');$('sfEU').value='kcal';$('sfEc').textContent='';clearMicro();$('sfRU').value='g';$('sfRA').value=100;$('sfRA').hidden=false;
+  $('sfSave').textContent='Save food';$('sfMsg').textContent='Saved '+n+'.';save();render();$('sfN').focus();
+};
+document.querySelector('.sfadd').addEventListener('keydown',ev=>{if(ev.key==='Enter')$('sfSave').click()});
+let hold=null;
+const stepIt=b=>{const i=b.parentElement.querySelector('input'),v=(parseFloat(i.value)||0)+(+b.dataset.d);i.value=Math.max(0,Math.round(v*100)/100);i.dispatchEvent(new Event('input',{bubbles:true}))};
+document.addEventListener('pointerdown',ev=>{const b=ev.target.closest('button.st');if(!b)return;ev.preventDefault();stepIt(b);clearTimeout(hold);hold=setTimeout(function rep(){stepIt(b);hold=setTimeout(rep,70)},400)});
+['pointerup','pointercancel'].forEach(t=>document.addEventListener(t,()=>clearTimeout(hold)));
+$('sfList').addEventListener('click',ev=>{const b=ev.target.closest('button');if(b&&b.dataset.d!==undefined){if(ev.detail===0)stepIt(b);return}if(b&&b.dataset.sfedit!==undefined){editFood(+b.dataset.sfedit);return}if(!b||b.dataset.sfdel===undefined)return;db.foods.splice(+b.dataset.sfdel,1);save();render()});
+$('sfList').addEventListener('change',ev=>{
+  const t=ev.target;if(t.dataset.sf===undefined||t.value==='')return;
+  const f=db.foods[+t.dataset.sf],amt=num(t.closest('.sf').querySelector('.amt input').value)||fref(f).a,m=+t.value;
+  const e=addScaled(f,m,amt);save();render();$('sfMsg').textContent='Added '+e.n+' to '+MEALS[m]+'.';
+});
+const NUTS=[['fiber','Fiber','g',28],['vitA','Vitamin A','mcg',900],['vitC','Vitamin C','mg',90],['vitD','Vitamin D','mcg',20],['vitE','Vitamin E','mg',15],['vitK','Vitamin K','mcg',120],['b6','Vitamin B6','mg',1.7],['b12','Vitamin B12','mcg',2.4],['folate','Folate','mcg',400],['calcium','Calcium','mg',1300],['iron','Iron','mg',18],['magnesium','Magnesium','mg',420],['potassium','Potassium','mg',4700],['zinc','Zinc','mg',11],['sodium','Sodium','mg',2300],['orac','ORAC antioxidants','µmol TE',5000]];
+$('sfMicro').innerHTML='<div><label for="sfW">Water content (ml)</label><input id="sfW" type="number" min="0" step="any" inputmode="decimal"></div>'+NUTS.map(([k,n,u])=>`<div><label for="sfu_${k}">${n} (${u})</label><input id="sfu_${k}" type="number" min="0" step="any"></div>`).join('');
+function readMicro(){const u={};NUTS.forEach(([k])=>{const v=num($('sfu_'+k).value);if(v>0)u[k]=v});return u}
+function clearMicro(){$('sfW').value='';NUTS.forEach(([k])=>$('sfu_'+k).value='')}
+function editFood(i){
+  const f=db.foods[i];const rf=fref(f);$('sfN').value=f.n;$('sfRU').value=rf.u;$('sfRA').value=rf.a;$('sfRA').hidden=!rf.u;$('sfk').value=f.k;$('sfEU').value='kcal';$('sfEc').textContent='';$('sfp').value=f.p;$('sfc').value=f.c;$('sff').value=f.f;
+  clearMicro();NUTS.forEach(([k])=>{if(f.u&&f.u[k])$('sfu_'+k).value=f.u[k]});
+  $('sfW').value=f.w||'';document.querySelector('details.micro').open=true;$('sfSave').textContent='Update food';$('sfN').focus();
+}
+function renderNut(){
+  const list=db.days[$('date').value]||[],tot={};let withData=0;
+  list.forEach(e=>{if(e.u){withData++;for(const k in e.u)tot[k]=(tot[k]||0)+e.u[k]}});
+  $('nutNote').textContent=list.length?`${withData} of ${list.length} logged foods have vitamin or mineral data. Targets are FDA Daily Values.`:'Nothing logged for this day.';
+  $('nutList').innerHTML=NUTS.map(([k,n,u,t])=>{const v=tot[k]||0,pc=v/t*100;return `<div class="nr"><span>${n}</span><div class="nb"><i style="width:${Math.min(100,pc)}%"></i></div><span class="muted">${+v.toFixed(1)} / ${t} ${u} (${Math.round(pc)}%)</span></div>`}).join('');
+}
+function setTab(t){document.querySelectorAll('[data-tab]').forEach(el=>el.hidden=el.dataset.tab!==t);document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t))}
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
+setTab('log');
+let scStream=null,scReader=null,scRun=false;
+const scMsg=t=>$('scMsg').textContent=t;
+function scStop(){scRun=false;if(scStream){scStream.getTracks().forEach(t=>t.stop());scStream=null}if(scReader){try{scReader.reset()}catch(e){}scReader=null}$('scVid').hidden=true;$('scVid').srcObject=null}
+function scClose(){scStop();$('scan').hidden=true}
+const loadJs=src=>new Promise((ok,no)=>{const e=document.createElement('script');e.src=src;e.onload=ok;e.onerror=()=>no(new Error('load'));document.head.appendChild(e)});
+function setForm(f,note){
+  scClose();setTab('foods');
+  $('sfN').value=f.n||'';$('sfk').value=f.k?Math.round(f.k):'';$('sfEU').value='kcal';$('sfEc').textContent='';$('sfp').value=f.p||'';$('sfc').value=f.c||'';$('sff').value=f.f||'';
+  clearMicro();let has=false;NUTS.forEach(([k])=>{if(f.u&&f.u[k]){$('sfu_'+k).value=f.u[k];has=true}});
+  document.querySelector('details.micro').open=has;$('sfSave').textContent='Save food';$('sfMsg').textContent=note;{const rf=fref(f);$('sfRU').value=rf.u;$('sfRA').value=rf.a;$('sfRA').hidden=!rf.u}$('sfN').focus();
+}
+const OFF={fiber:'fiber',vitA:'vitamin-a',vitC:'vitamin-c',vitD:'vitamin-d',vitE:'vitamin-e',vitK:'vitamin-k',b6:'vitamin-b6',b12:'vitamin-b12',folate:'vitamin-b9',calcium:'calcium',iron:'iron',magnesium:'magnesium',potassium:'potassium',zinc:'zinc',sodium:'sodium'};
+const LRE={fiber:'fi[bp](?:er|re)',vitA:'vitamin\\s*a',vitC:'vitamin\\s*c',vitD:'vitamin\\s*d',vitE:'vitamin\\s*e',vitK:'vitamin\\s*k',b6:'vitamin\\s*b-?6',b12:'vitamin\\s*b-?12',folate:'(?:folate|folic acid)',calcium:'calcium',iron:'iron',magnesium:'magnesium',potassium:'potassium',zinc:'zinc',sodium:'sodium'};
+const UNIT={g:1,mg:1e-3,mcg:1e-6};
+async function lookup(code){
+  scMsg('Looking up '+code+'\u2026');
+  try{
+    const r=await fetch('https://world.openfoodfacts.org/api/v2/product/'+encodeURIComponent(code)+'.json?fields=product_name,brands,serving_size,nutriments');
+    const j=await r.json();
+    if(j.status!==1||!j.product)return scMsg('Barcode '+code+' was not found in Open Food Facts. Try photographing the label instead.');
+    const p=j.product,n=p.nutriments||{},useServing=$('scBasis').value==='serving'&&n['energy-kcal_serving']!=null,sx=useServing?'_serving':'_100g';
+    const kcal=n['energy-kcal'+sx]??(n['energy-kj'+sx]!=null?n['energy-kj'+sx]/4.184:0),u={},r1=x=>Math.round((x||0)*10)/10;
+    NUTS.forEach(([k,,unit])=>{const v=n[OFF[k]+sx];if(v>0)u[k]=Math.round(v/UNIT[unit]*100)/100});
+    const isMl=/ml/i.test(p.serving_size||''),sq=+p.serving_quantity||0,ra0=useServing?(sq||1):100,ru0=useServing?(sq?(isMl?'ml':'g'):''):(isMl?'ml':'g');
+    setForm({n:[p.brands&&p.brands.split(',')[0],p.product_name].filter(Boolean).join(' '),k:kcal,p:r1(n['proteins'+sx]),c:r1(n['carbohydrates'+sx]),f:r1(n['fat'+sx]),u,ra:ra0,ru:ru0},
+      'Found in Open Food Facts, values '+(useServing?'per serving'+(p.serving_size?' ('+p.serving_size+')':''):'per 100 '+ru0)+'. Community data can be wrong, so check it, then press Save food.');
+  }catch(e){scMsg('Lookup failed. Check your internet connection.')}
+}
+function parseLabel(t,col=0){
+  t=t.replace(/[|]/g,' ').replace(/\u03bc/g,'\u00b5').replace(/(\d)[Oo](?=\d)/g,(m,a)=>a+'0');
+  const vals=(m,needUnit)=>{
+    const rest=t.slice(m.index+m[0].length).split('\n');
+    const get=ln=>{const out=[],re=/(\d+(?:[.,]\d+)?)\s*(kj|kcal|cal|mcg|\u00b5g|ug|mg|g)?/gi;let x;
+      while((x=re.exec(ln))&&out.length<4){
+        if(/^\s*%/.test(ln.slice(re.lastIndex))||(needUnit&&!x[2]))continue;
+        out.push({v:parseFloat(x[1].replace(',','.')),u:(x[2]||'').toLowerCase()});
+      }return out};
+    let o=get(rest[0].slice(0,70));if(!o.length)o=get((rest[1]||'').slice(0,70));return o;
+  };
+  const first=(src,needUnit)=>{const g=new RegExp(src,'gi');let m;
+    while((m=g.exec(t))){
+      if(/satur|trans|poly|mono|unsat/i.test(t.slice(Math.max(0,m.index-14),m.index)))continue;
+      const o=vals(m,needUnit);if(o.length)return o;
+    }return[]};
+  const pick=o=>o.length?o[Math.min(col,o.length-1)]:null;
+  const g1=src=>{const x=pick(first(src,false));return x?x.v:0};
+  const r={k:0,p:g1('protein'),c:g1('carbohydrates?'),f:g1('total\\s*fat|fat,?\\s*total|\\bfat\\b'),u:{}};
+  const cal=pick(first('calor[a-z]{1,5}(?!\\s*from)',false));if(cal)r.k=cal.v;
+  if(!r.k){
+    const en=first('energy|kilojoules?',false),kc=en.filter(x=>x.u==='kcal'||x.u==='cal'),kj=en.filter(x=>x.u==='kj');
+    if(kc.length)r.k=kc[Math.min(col,kc.length-1)].v;else if(kj.length)r.k=kj[Math.min(col,kj.length-1)].v/4.184;
+  }
+  NUTS.forEach(([k,,unit])=>{
+    if(!LRE[k])return;
+    const x=pick(first(LRE[k],true).filter(y=>UNIT[y.u]));
+    if(x){const v=x.v*UNIT[x.u]/UNIT[unit];if(v>0)r.u[k]=Math.round(v*100)/100}
+  });
+  if(!r.u.sodium){const s=pick(first('salt',true).filter(y=>UNIT[y.u]));if(s)r.u.sodium=Math.round(s.v*UNIT[s.u]/UNIT.g*400)}
+  if(col===1){r.ra=100;r.ru=/per\s*100\s*ml/i.test(t)?'ml':'g'}
+  else{const sl=t.match(/serv(?:ing|e)\s*size([^\n]*)/i)||t.match(/per\s*serv(?:ing|e)([^\n]*)/i),sm=sl&&sl[1].match(/(\d+(?:[.,]\d+)?)\s*(g|ml)\b/i);if(sm){r.ra=parseFloat(sm[1].replace(',','.'));r.ru=sm[2].toLowerCase()}}
+  return r;
+}
+async function prep(file){
+  const url=URL.createObjectURL(file),img=new Image();img.src=url;await img.decode();
+  const sc=Math.min(2200/Math.max(img.width,img.height),2.5),w=Math.round(img.width*sc),h=Math.round(img.height*sc);
+  const c=document.createElement('canvas');c.width=w;c.height=h;
+  const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(img,0,0,w,h);URL.revokeObjectURL(url);
+  const id=x.getImageData(0,0,w,h),d=id.data,hist=new Uint32Array(256),n=w*h;
+  for(let i=0;i<d.length;i+=4){const g=(d[i]*.3+d[i+1]*.59+d[i+2]*.11)|0;d[i]=g;hist[g]++}
+  let lo=0,hi=255,acc=0;while(lo<255&&(acc+=hist[lo])<n*.02)lo++;acc=0;while(hi>0&&(acc+=hist[hi])<n*.02)hi--;
+  const k=255/Math.max(1,hi-lo);
+  for(let i=0;i<d.length;i+=4){const v=Math.max(0,Math.min(255,(d[i]-lo)*k));d[i]=d[i+1]=d[i+2]=v}
+  x.putImageData(id,0,0);return c;
+}
+const score=r=>(r.k>0)+(r.p>0)+(r.c>0)+(r.f>0);
+function finish(text){
+  const col=+$('scCol').value,r=parseLabel(text,col);
+  if(!score(r)){
+    $('scTxt').value=text;$('scTxt').hidden=false;$('scReparse').hidden=false;
+    return scMsg('No nutrition values found in the text I read (shown below). Fix any mistakes in the text and press "Use this text", or retake the photo with the label flat, in good light and in focus.');
+  }
+  const miss=[['protein',r.p],['carbs',r.c],['fat',r.f]].filter(x=>!x[1]).map(x=>x[0]);
+  setForm(r,'Read from the label ('+(col?'second':'first')+' column'+(r.ra?', values for '+r.ra+' '+r.ru:', serving size not found: check "Label values are for"')+'). '+(miss.length?'Could not find: '+miss.join(', ')+'. ':'')+'Check every number against the label, add a name, then press Save food.');
+}
+$('scanBtn').onclick=()=>{$('scan').hidden=false;scMsg('')};
+$('scClose').onclick=scClose;
+$('scLook').onclick=()=>{const c=$('scCode').value.replace(/\D/g,'');if(c){scStop();lookup(c)}};
+$('scBar').onclick=async()=>{
+  scStop();const vid=$('scVid');
+  try{
+    if('BarcodeDetector' in window){
+      scStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});
+      vid.srcObject=scStream;vid.hidden=false;await vid.play();
+      const det=new BarcodeDetector({formats:['ean_13','ean_8','upc_a','upc_e']});scRun=true;scMsg('Point the camera at the barcode.');
+      (async()=>{while(scRun){try{const r=await det.detect(vid);if(r.length){const c=r[0].rawValue;scStop();return lookup(c)}}catch(e){}await new Promise(x=>setTimeout(x,250))}})();
+    }else{
+      scMsg('Loading scanner\u2026');await loadJs('https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js');
+      vid.hidden=false;scReader=new ZXing.BrowserMultiFormatReader();scMsg('Point the camera at the barcode.');
+      scReader.decodeFromConstraints({video:{facingMode:'environment'}},vid,r=>{if(r){const c=r.getText();scStop();lookup(c)}});
+    }
+  }catch(e){scStop();scMsg('Could not open the camera. Allow camera access, or type the barcode number, or photograph the label instead.')}
+};
+$('scPhoto').onclick=()=>$('scFile').click();
+$('scFile').onchange=async()=>{
+  const f=$('scFile').files[0];if(!f)return;scStop();$('scTxt').hidden=true;$('scReparse').hidden=true;let w;
+  try{
+    scMsg('Preparing photo\u2026');const cv=await prep(f);
+    scMsg('Loading text reader\u2026 the first time this downloads data and needs internet.');
+    if(!window.Tesseract)await loadJs('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js');
+    w=await Tesseract.createWorker('eng',1,{logger:m=>{if(m.status==='recognizing text')scMsg('Reading label\u2026 '+Math.round(m.progress*100)+'%')}});
+    let best='',bs=-1;
+    for(const psm of ['6','4','11']){
+      await w.setParameters({tessedit_pageseg_mode:psm,preserve_interword_spaces:'1'});
+      const {data}=await w.recognize(cv),s=score(parseLabel(data.text,+$('scCol').value));
+      if(s>bs){best=data.text;bs=s}
+      if(s>=4)break;
+    }
+    await w.terminate();finish(best);
+  }catch(e){try{if(w)await w.terminate()}catch(_){}scMsg('Could not read the label ('+((e&&e.message)||'error')+'). Check your internet connection and try again, or type the barcode number.')}
+  $('scFile').value='';
+};
+$('scReparse').onclick=()=>finish($('scTxt').value);
+$('nfMicro').innerHTML='<div><label for="nfW">Water content (ml)</label><input id="nfW" type="number" min="0" step="any" inputmode="decimal"></div>'+NUTS.map(([k,n,u])=>`<div><label for="nfu_${k}">${n} (${u})</label><input id="nfu_${k}" type="number" min="0" step="any" inputmode="decimal"></div>`).join('');
+const eKcal=pre=>{const v=num($(pre+'k').value);return $(pre+'EU').value==='kj'?Math.round(v/4.184*10)/10:v};
+const enHint=pre=>{const v=num($(pre+'k').value);$(pre+'Ec').textContent=$(pre+'EU').value==='kj'&&v?'= '+Math.round(v/4.184)+' kcal':''};
+['sf','nf'].forEach(pre=>{$(pre+'k').addEventListener('input',()=>enHint(pre));$(pre+'EU').addEventListener('change',()=>enHint(pre))});
+const nfUnit=()=>{const u=$('nfRU').value;$('nfRA').hidden=!u;if(!u)$('nfRA').value=1;$('nfUnit').textContent=u||'items';$('nfAmt').placeholder=String($('nfRA').value||'')};
+function openNF(m,name,amt){
+  ['nfk','nfp','nfc','nff'].forEach(i=>$(i).value='');$('nfEU').value='kcal';$('nfEc').textContent='';NUTS.forEach(([k])=>$('nfu_'+k).value='');$('nfW').value='';
+  $('nfN').value=name||'';$('nfRU').value='g';$('nfRA').value=100;$('nfAmt').value=amt||'';$('nfM').value=m;$('nfMsg').textContent='';
+  document.querySelector('#nf details.micro').open=false;nfUnit();$('nf').hidden=false;($('nfN').value?$('nfk'):$('nfN')).focus();
+}
+function nfSave(add){
+  const n=$('nfN').value.trim(),ru=$('nfRU').value,ra=ru?num($('nfRA').value):1,msg=t=>{$('nfMsg').textContent=t};
+  const e={n,p:num($('nfp').value),c:num($('nfc').value),f:num($('nff').value),k:eKcal('nf'),ra,ru};
+  if(!n)return msg('Enter a name.');
+  if(!ra)return msg('Enter the amount the label values are for, for example 23 or 100.');
+  if(!e.k)e.k=e.p*4+e.c*4+e.f*9;
+  if(!e.k)return msg('Enter the calories or macros from the label.');
+  const amt=num($('nfAmt').value);if(add&&!amt)return msg('Enter the amount to add now, or press Save only.');
+  const u={};NUTS.forEach(([k])=>{const v=num($('nfu_'+k).value);if(v>0)u[k]=v});if(Object.keys(u).length)e.u=u;{const w=num($('nfW').value);if(w>0)e.w=w}
+  const i=db.foods.findIndex(x=>x.n.toLowerCase()===n.toLowerCase());if(i<0)db.foods.push(e);else db.foods[i]=e;
+  if(add)addScaled(e,+$('nfM').value,amt);
+  save();$('nf').hidden=true;render();
+}
+$('nfRU').onchange=()=>{if($('nfRU').value&&+$('nfRA').value===1)$('nfRA').value=100;nfUnit()};$('nfRA').oninput=nfUnit;
+$('sfRU').onchange=()=>{const u=$('sfRU').value;$('sfRA').hidden=!u;if(!u)$('sfRA').value=1;else if(+$('sfRA').value===1)$('sfRA').value=100};
+$('nfAdd').onclick=()=>nfSave(true);$('nfOnly').onclick=()=>nfSave(false);$('nfCancel').onclick=()=>{$('nf').hidden=true};
+function waterTotal(d){return (db.water[d]||[]).reduce((a,b)=>a+b,0)+(db.days[d]||[]).reduce((a,e)=>a+(e.w||0),0)}
+function renderWater(){
+  const d=$('date').value,man=(db.water[d]||[]).reduce((a,b)=>a+b,0),tot=waterTotal(d),goal=db.waterGoal||2000,pc=Math.round(tot/goal*100);
+  $('wTot').textContent=Math.round(tot);$('wGoal').textContent=goal;$('wPct').textContent=pc+'%';
+  $('wBreak').textContent=`drinks ${Math.round(man)} · food ${Math.round(tot-man)}`;
+  $('wBar').style.width=Math.min(100,pc)+'%';$('wBar').parentElement.setAttribute('aria-valuenow',Math.min(100,pc));$('wGoalIn').value=goal;
+}
+function addWater(v){const d=$('date').value;(db.water[d]=db.water[d]||[]).push(v);save();renderWater();charts()}
+document.querySelectorAll('.wq').forEach(b=>b.onclick=()=>addWater(+b.dataset.w));
+$('wAdd').onclick=()=>{const v=num($('wIn2').value);if(v){addWater(v);$('wIn2').value=''}};
+$('wIn2').addEventListener('keydown',ev=>{if(ev.key==='Enter')$('wAdd').click()});
+$('wUndo').onclick=()=>{const a=db.water[$('date').value];if(a&&a.length){a.pop();save();renderWater();charts()}};
+$('wEdit').onclick=()=>{$('wGoalRow').hidden=!$('wGoalRow').hidden};
+$('wGoalIn').onchange=()=>{db.waterGoal=num($('wGoalIn').value)||2000;save();renderWater();charts()};
+$('waterCard').addEventListener('click',ev=>{const b=ev.target.closest('button.st');if(b&&ev.detail===0)stepIt(b)});
+const R1=x=>Math.round((x||0)*10)/10;
+const recTot=items=>items.reduce((t,it)=>{t.k+=it.k;t.p+=it.p;t.c+=it.c;t.f+=it.f;t.w+=it.w||0;for(const k in it.u||{})t.u[k]=(t.u[k]||0)+it.u[k];return t},{k:0,p:0,c:0,f:0,w:0,u:{}});
+const findRec=n=>db.recipes.find(x=>x.n.toLowerCase()===(n||'').trim().toLowerCase());
+function recEntry(r,m,n,d){
+  const t=recTot(r.items),sc=n/d;
+  const e={n:`${r.n} ${+n.toFixed(2)}/${+d.toFixed(2)}`,k:t.k*sc,p:t.p*sc,c:t.c*sc,f:t.f*sc,m};
+  if(Object.keys(t.u).length)e.u=scaleU(t.u,sc);if(t.w)e.w=t.w*sc;
+  if(m===3)db.m4[$('date').value]=true;dayList().push(e);return e;
+}
+const rb={items:[]};
+const scaleIt=(it,r)=>{['k','p','c','f'].forEach(x=>it[x]*=r);if(it.u)it.u=scaleU(it.u,r);if(it.w)it.w*=r};
+function renderRB(){
+  $('rcItems').innerHTML=rb.items.map((it,i)=>`<div class="rci"><span class="nm2">${esc(it.n)}</span><input type="number" min="0" step="any" inputmode="decimal" value="${it.a}" data-ri="${i}" aria-label="Amount of ${esc(it.n)}"><span class="muted">${it.ru||'items'}</span><span class="muted kc">${Math.round(it.k)} kcal</span><button data-rd="${i}" aria-label="Remove ${esc(it.n)}">\u00d7</button></div>`).join('')||'<p class="muted" style="margin:4px 0">No ingredients yet.</p>';
+  const t=recTot(rb.items),n=Math.max(1,num($('rcS').value)||1);
+  $('rcTot').textContent=rb.items.length?`Whole recipe: ${Math.round(t.k)} kcal \u00b7 P ${R1(t.p)} \u00b7 C ${R1(t.c)} \u00b7 F ${R1(t.f)}. Per serving (1/${n}): ${Math.round(t.k/n)} kcal \u00b7 P ${R1(t.p/n)} \u00b7 C ${R1(t.c/n)} \u00b7 F ${R1(t.f/n)}.`:'';
+}
+function updPortion(el){
+  const r=db.recipes[+el.dataset.i],t=recTot(r.items),n=num(el.querySelector('.pn').value)||0,d=num(el.querySelector('.pd').value)||r.servings,sc=n/d;
+  el.querySelector('.pvt').textContent=`= ${Math.round(t.k*sc)} kcal \u00b7 P ${R1(t.p*sc)} \u00b7 C ${R1(t.c*sc)} \u00b7 F ${R1(t.f*sc)}`;
+}
+function renderRecipes(){
+  $('rcList').innerHTML=db.recipes.length?db.recipes.map((r,i)=>{const t=recTot(r.items),n=r.servings;
+    return `<div class="sf" data-i="${i}"><strong>${esc(r.n)}</strong><span class="muted">Makes ${n} \u00b7 per serving ${Math.round(t.k/n)} kcal \u00b7 P ${R1(t.p/n)} \u00b7 C ${R1(t.c/n)} \u00b7 F ${R1(t.f/n)} \u00b7 ${r.items.length} ingredients</span><div class="portion"><span class="muted">Portion</span><input class="pn" type="number" min="0" step="any" inputmode="decimal" value="1" aria-label="Portion, top number"><span>/</span><input class="pd" type="number" min="0" step="any" inputmode="decimal" value="${n}" aria-label="Portion, out of"><span class="muted">of the recipe</span></div><span class="pvt muted" style="flex:1 1 100%"></span><select data-rc="${i}" aria-label="Add ${esc(r.n)} to this day"><option value="">Add to\u2026</option>${MEALS.map((x,m)=>`<option value="${m}">${x}</option>`).join('')}</select><button data-rcedit="${i}">Edit</button><button data-rcdel="${i}">Delete</button></div>`}).join(''):'<p class="muted" style="margin:4px 0">No recipes yet. Build one above.</p>';
+  document.querySelectorAll('#rcList .sf').forEach(updPortion);
+}
+$('rcF').addEventListener('input',()=>{const f=db.foods.find(x=>x.n.toLowerCase()===$('rcF').value.trim().toLowerCase());if(f){const rf=fref(f);$('rcU').textContent=rf.u||'items';$('rcA').placeholder=String(rf.a)}});
+$('rcS').addEventListener('input',renderRB);
+$('rcAdd').onclick=()=>{
+  const txt=$('rcF').value.trim(),f=db.foods.find(x=>x.n.toLowerCase()===txt.toLowerCase());
+  if(!f){$('rcMsg').textContent=txt?`"${txt}" is not a saved food. Press New food to save it first.`:'Choose an ingredient from your saved foods.';return}
+  const rf=fref(f),a=num($('rcA').value)||rf.a,sc=a/rf.a,it={n:f.n,a,ru:rf.u,k:f.k*sc,p:f.p*sc,c:f.c*sc,f:f.f*sc};
+  if(f.u)it.u=scaleU(f.u,sc);if(f.w)it.w=f.w*sc;
+  rb.items.push(it);$('rcF').value='';$('rcA').value='';$('rcMsg').textContent='';renderRB();$('rcF').focus();
+};
+$('rcA').addEventListener('keydown',ev=>{if(ev.key==='Enter')$('rcAdd').click()});
+$('rcItems').addEventListener('change',ev=>{const t=ev.target;if(t.dataset.ri===undefined)return;const it=rb.items[+t.dataset.ri],na=num(t.value);if(!na){t.value=it.a;return}scaleIt(it,na/it.a);it.a=na;renderRB()});
+$('rcItems').addEventListener('click',ev=>{const b=ev.target.closest('button[data-rd]');if(b){rb.items.splice(+b.dataset.rd,1);renderRB()}});
+$('rcNew').onclick=()=>{$('rcMsg').textContent='In the dialog choose "Save only" to store the food, then add it here.';openNF(0,$('rcF').value.trim(),0)};
+const clearRB=()=>{rb.items=[];$('rcN').value='';$('rcS').value=4;$('rcSave').textContent='Save recipe';renderRB()};
+$('rcClear').onclick=()=>{clearRB();$('rcMsg').textContent=''};
+$('rcSave').onclick=()=>{
+  const n=$('rcN').value.trim(),sv=Math.max(1,num($('rcS').value)||0),msg=t=>{$('rcMsg').textContent=t};
+  if(!n)return msg('Name the recipe.');if(!rb.items.length)return msg('Add at least one ingredient.');
+  const r={n,servings:sv,items:JSON.parse(JSON.stringify(rb.items))},i=db.recipes.findIndex(x=>x.n.toLowerCase()===n.toLowerCase());
+  if(i<0)db.recipes.push(r);else db.recipes[i]=r;
+  clearRB();save();render();msg('Saved '+n+'. You can now add portions of it below, or by name in the Log tab.');
+};
+$('rcList').addEventListener('input',ev=>{if(ev.target.classList.contains('pn')||ev.target.classList.contains('pd'))updPortion(ev.target.closest('.sf'))});
+$('rcList').addEventListener('change',ev=>{
+  const t=ev.target;if(t.dataset.rc===undefined||t.value==='')return;
+  const el=t.closest('.sf'),r=db.recipes[+t.dataset.rc],n=num(el.querySelector('.pn').value)||1,d=num(el.querySelector('.pd').value)||r.servings,m=+t.value;
+  const e=recEntry(r,m,n,d);save();render();$('rcStat').textContent='Added '+e.n+' to '+MEALS[m]+'.';
+});
+$('rcList').addEventListener('click',ev=>{
+  const b=ev.target.closest('button');if(!b)return;
+  if(b.dataset.rcdel!==undefined){db.recipes.splice(+b.dataset.rcdel,1);save();render()}
+  else if(b.dataset.rcedit!==undefined){const r=db.recipes[+b.dataset.rcedit];rb.items=JSON.parse(JSON.stringify(r.items));$('rcN').value=r.n;$('rcS').value=r.servings;$('rcSave').textContent='Update recipe';renderRB();$('rcMsg').textContent='Editing '+r.n+'. Change it, then press Update recipe.';window.scrollTo({top:0,behavior:'smooth'})}
+});
+renderRB();
+const sleepMin=s=>{if(!s||!s.bed||!s.wake)return null;const t=x=>{const[h,m]=x.split(':').map(Number);return h*60+m};let d=t(s.wake)-t(s.bed);if(d<0)d+=1440;return d};
+const fmtDur=m=>Math.floor(m/60)+'h '+String(m%60).padStart(2,'0')+'m';
+function renderSleep(){
+  const d=$('date').value,s=db.sleep[d]||{},m=sleepMin(s);
+  $('slBed').value=s.bed||'';$('slWake').value=s.wake||'';$('slDur').textContent=m==null?'':fmtDur(m);
+  let tot=0,n=0,t=d;for(let i=0;i<7;i++,t=prev(t)){const x=sleepMin(db.sleep[t]);if(x!=null){tot+=x;n++}}
+  $('slAvg').textContent=n>1?`7-day average: ${fmtDur(Math.round(tot/n))} (${n} nights logged)`:'';
+  if(document.activeElement!==$('noteTx'))$('noteTx').value=db.notes[d]||'';
+}
+['slBed','slWake'].forEach(id=>$(id).onchange=()=>{
+  const d=$('date').value,s=db.sleep[d]=db.sleep[d]||{};s.bed=$('slBed').value;s.wake=$('slWake').value;
+  if(!s.bed&&!s.wake)delete db.sleep[d];save();renderSleep();
+});
+let noteT=null;
+$('noteTx').addEventListener('input',()=>{
+  const d=$('date').value,v=$('noteTx').value;clearTimeout(noteT);
+  noteT=setTimeout(()=>{if(v.trim())db.notes[d]=v;else delete db.notes[d];save()},300);
+});
+$('copyAll').onclick=ev=>copyFrom(null,ev.target);
+
+$('wIn').onchange=()=>{const v=parseFloat($('wIn').value),d=$('date').value;if(v>0)db.weights[d]=v;else delete db.weights[d];save();charts()};
+$('gEdit').onclick=()=>{const o=$('gForm').hidden;$('gForm').hidden=!o;$('gEdit').textContent=o?'Done':'Goals';$('gEdit').setAttribute('aria-expanded',o)};
+$('range').onchange=charts;
+$('prevD').onclick=()=>{$('date').value=prev($('date').value);render()};
+$('nextD').onclick=()=>{const t=new Date($('date').value+'T00:00:00');t.setDate(t.getDate()+1);$('date').value=iso(t);render()};
+$('gK').onchange=()=>{goals();const o=db.goals.k,n=num($('gK').value),r=o?n/o:1;db.goals.k=n;db.mg.p=Math.round(db.mg.p*r);db.mg.f=Math.round(db.mg.f*r);save();render()};
+$('gP').onchange=()=>{goals();db.mg.p=num($('gP').value);save();render()};
+$('gF').onchange=()=>{goals();db.mg.f=num($('gF').value);save();render()};
+$('date').onchange=render;
+const bkMsg=t=>$('bkMsg').textContent=t;
+const lastBk=()=>{$('lastBk').textContent=db.lastBackup?'Last backup: '+db.lastBackup+'.':'No backup yet.'};
+$('bkExport').onclick=async()=>{
+  db.lastBackup=iso(new Date());save();
+  const txt=JSON.stringify({app:'daily-log',version:1,exported:new Date().toISOString(),data:db},null,1);
+  $('bk').value=txt;
+  try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'application/json'}));a.download='daily-log-backup-'+iso(new Date())+'.json';document.body.appendChild(a);a.click();a.remove()}catch(e){}
+  try{await navigator.clipboard.writeText(txt)}catch(e){}
+  bkMsg('Backup created. A file download was started and the text was copied if your browser allowed it. The full text is also in the box below: if no file appeared, copy it and save it as a .json file.');lastBk();
+};
+$('bkFile').onchange=async()=>{const f=$('bkFile').files[0];if(f){$('bk').value=await f.text();bkMsg('File loaded. Choose an import mode, then press Import.')}};
+$('bkImport').onclick=()=>{
+  let o;try{o=JSON.parse($('bk').value)}catch(e){return bkMsg('That is not valid backup text.')}
+  const d=o&&o.app==='daily-log'&&o.data;if(!d||typeof d!=='object')return bkMsg('That does not look like a Daily log backup.');
+  if($('bkMode').value==='replace'){db=Object.assign({goals:{k:2000},split:{p:30,f:25},days:{},weights:{},foods:[],meals:[],m4:{},water:{},waterGoal:2000,recipes:[],sleep:{},notes:{}},d)}
+  else{
+    if(!Object.keys(db.days).length)['goals','split','mg'].forEach(k=>{if(d[k])db[k]=d[k]});
+    Object.keys(d.days||{}).forEach(k=>{if(!(db.days[k]||[]).length)db.days[k]=d.days[k]});
+    Object.keys(d.weights||{}).forEach(k=>{if(db.weights[k]==null)db.weights[k]=d.weights[k]});
+    Object.assign(db.m4,d.m4||{},db.m4);
+    Object.keys(d.water||{}).forEach(k=>{if(!(db.water[k]||[]).length)db.water[k]=d.water[k]});
+    (d.recipes||[]).forEach(r=>{if(!db.recipes.some(x=>x.n.toLowerCase()===r.n.toLowerCase()))db.recipes.push(r)});
+    Object.keys(d.sleep||{}).forEach(k=>{if(!db.sleep[k])db.sleep[k]=d.sleep[k]});Object.keys(d.notes||{}).forEach(k=>{if(!db.notes[k])db.notes[k]=d.notes[k]});
+    (d.foods||[]).forEach(f=>{if(!db.foods.some(x=>x.n.toLowerCase()===f.n.toLowerCase()))db.foods.push(f)});
+    (d.meals||[]).forEach(m=>{if(!db.meals.some(x=>x.n.toLowerCase()===m.n.toLowerCase()))db.meals.push(m)});
+  }
+  save();render();lastBk();bkMsg('Backup imported.');
+};
+try{if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}
+try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
+lastBk();
+render();
+</script>
+</body>
+</html>
