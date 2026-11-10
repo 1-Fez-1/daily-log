@@ -572,12 +572,6 @@ function renderDash(t,g){
   $('dKv').textContent=Math.round(t.k);$('dKg').textContent=g.k;const l=Math.round(g.k-t.k);$('dKl').textContent=l>=0?l+' left':(-l)+' over';
   ['P','C','F'].forEach(L=>{const k=L.toLowerCase();$('d'+L+'v').textContent=Math.round(t[k])+' / '+g[k]+' g'});
 }
-function applyEa(inp){
-  const e=dayList()[+inp.dataset.i],v=num(inp.value);if(!e||!v||!e.pu)return;
-  applyAmt(e,v);const tr=inp.closest('tr');
-  F.forEach(f=>{const c=tr.querySelector(`[data-v="${f}"]`);if(c)c.textContent=fmtV(f,e[f])});
-  save();totals();renderWater();renderNut();
-}
 function copyFrom(m,btn){
   const src=(db.days[prev($('date').value)]||[]).filter(e=>m===null||(e.m??0)===m);
   if(!src.length){toast('Nothing logged yesterday'+(m===null?'':' in '+MEALS[m]));return}
@@ -614,12 +608,10 @@ sheet.addEventListener('click',ev=>{
 });
 sheet.addEventListener('change',ev=>{
   const t=ev.target;
-  if(t.classList.contains('ea')){const e=dayList()[+t.dataset.i];if(e&&!num(t.value))t.value=e.a;return}
   if(t.classList.contains('sm')&&t.value!==''){const m=+t.closest('tbody').dataset.m,r=db.recipes[+t.value];recEntry(r,m,1,r.servings);openM.add(m);save();render();toast('Added '+r.n+' to '+MEALS[m]);return}
-  if(t.dataset.f){const e=dayList()[+t.dataset.i];if(!e)return;e[t.dataset.f]=t.dataset.f==='n'?t.value.trim()||'Food':num(t.value);save();totals()}
 });
 sheet.addEventListener('input',ev=>{
-  const c=ev.target.classList;if(c.contains('n')||c.contains('a'))updAdd(ev.target.closest('tbody'));if(c.contains('ea'))applyEa(ev.target);
+  const c=ev.target.classList;if(c.contains('n')||c.contains('a'))updAdd(ev.target.closest('tbody'));
 });
 sheet.addEventListener('keydown',ev=>{
   if(ev.key==='Enter'&&ev.target.closest('.ar,.ar2'))addFood(ev.target.closest('tbody'));
