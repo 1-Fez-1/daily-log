@@ -298,6 +298,7 @@ input,select,textarea,.ar td input.n,.tl select,.tl input,.fa input,.amtc input,
       <p class="muted" id="slAvg" style="margin:8px 0 0"></p>
       <label>Notes<textarea id="noteTx" rows="5" maxlength="2000" placeholder="Mood, energy, training, anything worth remembering"></textarea></label>
     </section>
+    <p class="muted" style="text-align:center;font-size:11px;margin:14px 0 0">Version 6 · grouped contributors</p>
     <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
       <p class="muted" style="margin:8px 0">Data is stored only in this browser. Export a backup regularly, and before moving to a new version or device. <span id="lastBk"></span></p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
@@ -448,7 +449,7 @@ function build(){
   MEALS.forEach((name,m)=>{
     if(m===3&&!showM4(d)){h+='<tbody><tr class="m4"><td colspan="6"><button class="m4on">+ Add Meal 4</button></td></tr></tbody>';return}
     const items=list.map((e,i)=>({e,i})).filter(x=>(x.e.m??0)===m),open=openM.has(m);
-    h+=`<tbody data-m="${m}"${open?' class="open"':''}><tr class="gh"><th><button class="tg" aria-expanded="${open}"><span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span><span class="nm">${name}</span><span class="cnt">${items.length?items.length+(items.length>1?' foods':' food'):'empty'}${fe[m]?' \u00b7 feel '+fe[m]+'/10':''}</span></button></th>${F.map(f=>`<td data-s="${f}"></td>`).join('')}<td><button class="cp" aria-label="Copy ${name} from yesterday" title="Copy ${name} from yesterday">\u21ba</button></td></tr>`;
+    h+=`<tbody data-m="${m}"${open?' class="open"':''}><tr class="gh"><th><button class="tg" aria-expanded="${open}"><span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span><span class="nm">${name}</span><span class="cnt">${items.length?items.length+(items.length>1?' foods':' food'):'empty'}${fe[m]?' · feel '+fe[m]+'/10':''}</span></button></th>${F.map(f=>`<td data-s="${f}"></td>`).join('')}<td><button class="cp" aria-label="Copy ${name} from yesterday" title="Copy ${name} from yesterday">\u21ba</button></td></tr>`;
     items.forEach(({e,i})=>{
       const q=e.a?{n:e.n,a:e.a,ru:e.ru}:parseAmt(e);
       h+=`<tr class="it" data-i="${i}" tabindex="0" role="button" aria-label="Change amount of ${esc(q.n)}"><td><div class="fn">${esc(q.n)}</div><div class="fa2"><span class="amtv">${amtLabel(q)}</span><span class="tapn" aria-hidden="true">✎</span></div></td>`
@@ -866,15 +867,15 @@ const scaleIt=(it,r)=>{['k','p','c','f'].forEach(x=>it[x]*=r);if(it.u)it.u=scale
 function renderRB(){
   $('rcItems').innerHTML=rb.items.map((it,i)=>`<div class="rci"><span class="nm2">${esc(it.n)}</span><input type="number" min="0" step="any" inputmode="decimal" value="${it.a}" data-ri="${i}" aria-label="Amount of ${esc(it.n)}"><span class="muted">${it.ru||'items'}</span><span class="muted kc">${Math.round(it.k)} kcal</span><button data-rd="${i}" aria-label="Remove ${esc(it.n)}">\u00d7</button></div>`).join('')||'<p class="muted" style="margin:4px 0">No ingredients yet.</p>';
   const t=recTot(rb.items),n=Math.max(1,num($('rcS').value)||1);
-  $('rcTot').textContent=rb.items.length?`Whole recipe: ${Math.round(t.k)} kcal \u00b7 P ${R1(t.p)} \u00b7 C ${R1(t.c)} \u00b7 F ${R1(t.f)}. Per serving (1/${n}): ${Math.round(t.k/n)} kcal \u00b7 P ${R1(t.p/n)} \u00b7 C ${R1(t.c/n)} \u00b7 F ${R1(t.f/n)}.`:'';
+  $('rcTot').textContent=rb.items.length?`Whole recipe: ${Math.round(t.k)} kcal · P ${R1(t.p)} \u00b7 C ${R1(t.c)} \u00b7 F ${R1(t.f)}. Per serving (1/${n}): ${Math.round(t.k/n)} kcal \u00b7 P ${R1(t.p/n)} \u00b7 C ${R1(t.c/n)} \u00b7 F ${R1(t.f/n)}.`:'';
 }
 function updPortion(el){
   const r=db.recipes[+el.dataset.i],t=recTot(r.items),n=num(el.querySelector('.pn').value)||0,d=num(el.querySelector('.pd').value)||r.servings,sc=n/d;
-  el.querySelector('.pvt').textContent=`= ${Math.round(t.k*sc)} kcal \u00b7 P ${R1(t.p*sc)} \u00b7 C ${R1(t.c*sc)} \u00b7 F ${R1(t.f*sc)}`;
+  el.querySelector('.pvt').textContent=`= ${Math.round(t.k*sc)} kcal · P ${R1(t.p*sc)} \u00b7 C ${R1(t.c*sc)} \u00b7 F ${R1(t.f*sc)}`;
 }
 function renderRecipes(){
   $('rcList').innerHTML=db.recipes.length?db.recipes.map((r,i)=>{const t=recTot(r.items),n=r.servings;
-    return `<div class="sf" data-i="${i}"><strong>${esc(r.n)}</strong><span class="muted">Makes ${n} \u00b7 per serving ${Math.round(t.k/n)} kcal \u00b7 P ${R1(t.p/n)} \u00b7 C ${R1(t.c/n)} \u00b7 F ${R1(t.f/n)} \u00b7 ${r.items.length} ingredients</span><div class="portion"><span class="muted">Portion</span><input class="pn" type="number" min="0" step="any" inputmode="decimal" value="1" aria-label="Portion, top number"><span>/</span><input class="pd" type="number" min="0" step="any" inputmode="decimal" value="${n}" aria-label="Portion, out of"><span class="muted">of the recipe</span></div><span class="pvt muted" style="flex:1 1 100%"></span><select data-rc="${i}" aria-label="Add ${esc(r.n)} to this day"><option value="">Add to\u2026</option>${MEALS.map((x,m)=>`<option value="${m}">${x}</option>`).join('')}</select><button data-rcedit="${i}">Edit</button><button data-rcdel="${i}">Delete</button></div>`}).join(''):'<p class="muted" style="margin:4px 0">No recipes yet. Build one above.</p>';
+    return `<div class="sf" data-i="${i}"><strong>${esc(r.n)}</strong><span class="muted">Makes ${n} · per serving ${Math.round(t.k/n)} kcal \u00b7 P ${R1(t.p/n)} \u00b7 C ${R1(t.c/n)} \u00b7 F ${R1(t.f/n)} \u00b7 ${r.items.length} ingredients</span><div class="portion"><span class="muted">Portion</span><input class="pn" type="number" min="0" step="any" inputmode="decimal" value="1" aria-label="Portion, top number"><span>/</span><input class="pd" type="number" min="0" step="any" inputmode="decimal" value="${n}" aria-label="Portion, out of"><span class="muted">of the recipe</span></div><span class="pvt muted" style="flex:1 1 100%"></span><select data-rc="${i}" aria-label="Add ${esc(r.n)} to this day"><option value="">Add to\u2026</option>${MEALS.map((x,m)=>`<option value="${m}">${x}</option>`).join('')}</select><button data-rcedit="${i}">Edit</button><button data-rcdel="${i}">Delete</button></div>`}).join(''):'<p class="muted" style="margin:4px 0">No recipes yet. Build one above.</p>';
   document.querySelectorAll('#rcList .sf').forEach(updPortion);
 }
 $('rcF').addEventListener('input',()=>{const f=db.foods.find(x=>x.n.toLowerCase()===$('rcF').value.trim().toLowerCase());if(f){const rf=fref(f);$('rcU').textContent=rf.u||'items';$('rcA').placeholder=String(rf.a)}});
