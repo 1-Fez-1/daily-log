@@ -18,7 +18,8 @@ box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e0e0e;--cal:#6f9ee0;--pro:#58b88f;--surface:#171717;--ink:#f3f3f1;--muted:#9b9b97;--line:#2a2a28;--soft:#232322;--tint:#1b1b1a;--head:#0e0e0e;--acc:#f3f3f1;--accfg:#111;--hl:#f0735e;--p:#58b88f;--c:#e6b455;--f:#ee8670;--k:#6f9ee0;--w:#6cb6e6;--band:#f3f3f1;--bandtxt:#111}}
 :root[data-theme="dark"]{--bg:#0e0e0e;--cal:#6f9ee0;--pro:#58b88f;--surface:#171717;--ink:#f3f3f1;--muted:#9b9b97;--line:#2a2a28;--soft:#232322;--tint:#1b1b1a;--head:#0e0e0e;--acc:#f3f3f1;--accfg:#111;--hl:#f0735e;--p:#58b88f;--c:#e6b455;--f:#ee8670;--k:#6f9ee0;--w:#6cb6e6;--band:#f3f3f1;--bandtxt:#111}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);touch-action:manipulation}
+body,button,input,select,textarea,label,a{touch-action:manipulation}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 "Avenir Next","Segoe UI",system-ui,sans-serif}
 main{max-width:680px;margin:0 auto;padding:10px 10px 40px}
 [hidden]{display:none!important}
@@ -88,7 +89,15 @@ svg{width:100%;height:auto;display:block}
 .mgrid label{font-size:12px;color:var(--muted);display:block}.mgrid input{width:100%}
 details.micro summary{cursor:pointer;margin-top:10px;color:var(--p);font-weight:600}
 .nr{display:grid;grid-template-columns:84px 1fr 118px;gap:8px;align-items:center;padding:6px 0;border-top:1px solid var(--line)}
-.nr .muted{text-align:right}
+.nr .muted{text-align:right;line-height:1.2}
+button.nr{white-space:normal;grid-template-columns:minmax(0,108px) minmax(24px,1fr) minmax(0,124px);font-size:13px;width:100%;background:transparent;border:0;border-top:1px solid var(--line);border-radius:0;color:var(--ink);font:inherit;text-align:left;cursor:pointer;min-height:44px}
+button.nr .nm{display:block;min-width:0;overflow-wrap:anywhere;line-height:1.2}button.nr .nm:before{content:"\25b8";display:inline-block;margin-right:6px;color:var(--muted);font-size:11px;transition:transform .15s}
+button.nr[aria-expanded=true] .nm:before{transform:rotate(90deg)}
+.nsub{font:600 12px/1.3 var(--font);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:14px 0 4px}.nsub:first-child{margin-top:0}
+.ctr{padding:2px 0 10px 16px;border-top:0}.ctr .cr{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:5px 0;font-size:13px}
+.ctr .cr b{font-weight:500;overflow-wrap:anywhere}.ctr .cr span{color:var(--muted);text-align:right;white-space:nowrap}
+.ctr .cb{grid-column:1/3;height:3px;background:var(--soft);border-radius:2px;overflow:hidden}.ctr .cb i{display:block;height:100%;background:var(--ink);opacity:.55}
+.ctr .none{font-size:13px;color:var(--muted);padding:4px 0}
 .nb{height:8px;background:var(--line);border-radius:4px;overflow:hidden}.nb i{display:block;height:100%;background:var(--p)}
 #scan,#nf,#ea{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:12px;z-index:50}
 #scan>div,#nf>div,#ea>div{background:var(--surface);border-radius:12px;padding:16px;max-width:460px;width:100%;max-height:100%;overflow:auto}
@@ -127,7 +136,7 @@ details.micro summary{cursor:pointer;margin-top:10px;color:var(--p);font-weight:
 .slrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .sl label{display:block;font-size:12px;color:var(--muted)}.sl>label{margin-top:12px}
 .tl2{font-size:12px;color:var(--muted)}.tsel{display:flex;align-items:center;gap:4px;margin-top:3px}.tsel select{flex:1;min-width:0;padding:8px 6px;font-size:16px}
-.sl textarea{display:block;width:100%;margin-top:3px;margin-top:8px;font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;resize:vertical;min-height:56px}
+.sl textarea{display:block;width:100%;margin-top:3px;margin-top:8px;font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;resize:vertical;min-height:120px}
 @media (min-width:560px){thead th:nth-child(n+2){width:64px}}
 /* minimal theme (v2) */
 body{font:15px/1.45 var(--font);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
@@ -286,7 +295,7 @@ tfoot tr:last-child th,tfoot tr:last-child td{font-weight:500;color:var(--muted)
         <div><span class="tl2">Wake-up time</span><div class="tsel" id="slWake"></div></div>
       </div>
       <p class="muted" id="slAvg" style="margin:8px 0 0"></p>
-      <label>Notes<textarea id="noteTx" rows="2" maxlength="2000" placeholder="Mood, energy, training, anything worth remembering"></textarea></label>
+      <label>Notes<textarea id="noteTx" rows="5" maxlength="2000" placeholder="Mood, energy, training, anything worth remembering"></textarea></label>
     </section>
     <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
       <p class="muted" style="margin:8px 0">Data is stored only in this browser. Export a backup regularly, and before moving to a new version or device. <span id="lastBk"></span></p>
@@ -656,12 +665,26 @@ function editFood(i){
   clearMicro();NUTS.forEach(([k])=>{if(f.u&&f.u[k])$('sfu_'+k).value=f.u[k]});
   $('sfW').value=f.w||'';document.querySelector('details.micro').open=true;$('sfSave').textContent='Update food';$('sfN').focus();
 }
+const openN=new Set();
 function renderNut(){
-  const list=db.days[$('date').value]||[],tot={};let withData=0;
-  list.forEach(e=>{if(e.u){withData++;for(const k in e.u)tot[k]=(tot[k]||0)+e.u[k]}});
-  $('nutNote').textContent=list.length?`${withData} of ${list.length} logged foods have vitamin or mineral data. Targets are FDA Daily Values.`:'Nothing logged for this day.';
-  $('nutList').innerHTML=NUTS.map(([k,n,u,t])=>{const v=tot[k]||0,pc=v/t*100;return `<div class="nr"><span>${n}</span><div class="nb"><i style="width:${Math.min(100,pc)}%"></i></div><span class="muted">${+v.toFixed(1)} / ${t} ${u} (${Math.round(pc)}%)</span></div>`}).join('');
+  const list=db.days[$('date').value]||[],tot={},g=goals();let withData=0;
+  const MAC=[['k','Calories','kcal',g.k],['p','Protein','g',g.p],['c','Carbs','g',g.c],['f','Fat','g',g.f]];
+  const val=(e,k)=>(k==='k'||k==='p'||k==='c'||k==='f')?(e[k]||0):((e.u&&e.u[k])||0);
+  list.forEach(e=>{if(e.u)withData++;[...MAC.map(m=>m[0]),...NUTS.map(n=>n[0])].forEach(k=>{tot[k]=(tot[k]||0)+val(e,k)})});
+  $('nutNote').textContent=list.length?`Tap any row to see which foods contributed most. ${withData} of ${list.length} logged foods have vitamin or mineral data. Targets are FDA Daily Values.`:'Nothing logged for this day.';
+  const row=([k,n,u,t])=>{
+    const v=tot[k]||0,pc=t?v/t*100:0,open=openN.has(k);
+    let ct='';
+    if(open){
+      const by={};list.forEach(e=>{const x=val(e,k);if(x>0)by[e.n]=(by[e.n]||0)+x});
+      const arr=Object.entries(by).sort((a,b)=>b[1]-a[1]);
+      ct='<div class="ctr">'+(arr.length?arr.map(([nm,x])=>{const sh=v?x/v*100:0;return `<div class="cr"><b>${esc(nm)}</b><span>${+x.toFixed(1)} ${u} · ${Math.round(sh)}%</span><div class="cb"><i style="width:${sh}%"></i></div></div>`}).join(''):'<div class="none">No logged food has this yet.</div>')+'</div>';
+    }
+    return `<div class="ni"><button class="nr" data-nk="${k}" aria-expanded="${open}"><span class="nm">${n}</span><div class="nb"><i style="width:${Math.min(100,pc)}%"></i></div><span class="muted">${+v.toFixed(1)} / ${+(+t).toFixed(1)} ${u} (${Math.round(pc)}%)</span></button>${ct}</div>`;
+  };
+  $('nutList').innerHTML='<h3 class="nsub">Calories &amp; macros</h3>'+MAC.map(row).join('')+'<h3 class="nsub">Vitamins &amp; minerals</h3>'+NUTS.map(row).join('');
 }
+$('nutList').addEventListener('click',ev=>{const b=ev.target.closest('button[data-nk]');if(!b)return;const k=b.dataset.nk;openN.has(k)?openN.delete(k):openN.add(k);renderNut()});
 function setTab(t){document.querySelectorAll('[data-tab]').forEach(el=>el.hidden=el.dataset.tab!==t);document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t))}
 document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
 setTab('log');
