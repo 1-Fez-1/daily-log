@@ -4,7 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Daily log</title>
-<meta name="theme-color" content="#2f6f5a">
+<meta name="theme-color" content="#f7f7f5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e0e0e" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Daily log">
@@ -12,10 +13,10 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" href="icon-192.png">
 <style>
-:root{--bg:#f3f5f0;--surface:#fff;--ink:#1e2a22;--muted:#6a776e;--line:#d8dfd5;--head:#e9efe6;--p:#2f6f5a;--c:#d9a441;--f:#c4624a;--k:#4a6fa5;--band:#2f6f5a;--w:#3b8fd6;
-box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121815;--surface:#1b241f;--ink:#e8eee9;--muted:#8fa096;--line:#33443a;--head:#243029;--p:#5fb596;--c:#e3b55a;--f:#e07f66;--k:#86a8d8;--band:#2d5e4d;--w:#6bb0ea}}
-:root[data-theme="dark"]{--bg:#121815;--surface:#1b241f;--ink:#e8eee9;--muted:#8fa096;--line:#33443a;--head:#243029;--p:#5fb596;--c:#e3b55a;--f:#e07f66;--k:#86a8d8;--band:#2d5e4d;--w:#6bb0ea}
+:root{--bg:#f7f7f5;--surface:#fff;--ink:#171717;--muted:#737373;--line:#e7e7e4;--soft:#f1f1ee;--tint:#fbfbfa;--head:#f7f7f5;--headtxt:#737373;--acc:#171717;--accfg:#fff;--hl:#d4472f;--p:#3c8d69;--c:#d9a441;--f:#d4664d;--k:#3b6fb6;--w:#4a9bd4;--band:#171717;--bandtxt:#fff;--font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",Roboto,system-ui,sans-serif;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e0e0e;--surface:#171717;--ink:#f3f3f1;--muted:#9b9b97;--line:#2a2a28;--soft:#232322;--tint:#1b1b1a;--head:#0e0e0e;--acc:#f3f3f1;--accfg:#111;--hl:#f0735e;--p:#58b88f;--c:#e6b455;--f:#ee8670;--k:#6f9ee0;--w:#6cb6e6;--band:#f3f3f1;--bandtxt:#111}}
+:root[data-theme="dark"]{--bg:#0e0e0e;--surface:#171717;--ink:#f3f3f1;--muted:#9b9b97;--line:#2a2a28;--soft:#232322;--tint:#1b1b1a;--head:#0e0e0e;--acc:#f3f3f1;--accfg:#111;--hl:#f0735e;--p:#58b88f;--c:#e6b455;--f:#ee8670;--k:#6f9ee0;--w:#6cb6e6;--band:#f3f3f1;--bandtxt:#111}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 "Avenir Next","Segoe UI",system-ui,sans-serif}
@@ -126,8 +127,103 @@ details.micro summary{cursor:pointer;margin-top:10px;color:var(--p);font-weight:
 #slDur{font:700 22px/1 Georgia,serif;font-variant-numeric:tabular-nums}
 .slrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .sl label{display:block;font-size:12px;color:var(--muted)}.sl>label{margin-top:12px}
-.sl input[type=time]{width:100%;margin-top:3px;color:var(--ink)}
+.tl2{font-size:12px;color:var(--muted)}.tsel{display:flex;align-items:center;gap:4px;margin-top:3px}.tsel select{flex:1;min-width:0;padding:8px 6px;font-size:16px}
 .sl textarea{display:block;width:100%;margin-top:3px;margin-top:8px;font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;resize:vertical;min-height:56px}
+@media (min-width:560px){thead th:nth-child(n+2){width:64px}}
+/* minimal theme (v2) */
+body{font:15px/1.45 var(--font);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+main{padding:12px 12px calc(32px + env(safe-area-inset-bottom,0px))}
+input,select,textarea{font-size:16px;background:var(--soft);border:1px solid transparent;border-radius:10px;padding:9px 12px;color:var(--ink)}
+input:focus,select:focus,textarea:focus{border-color:var(--ink);outline:none;background:var(--surface)}
+button{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:7px 14px;min-height:40px;font-size:14px;font-weight:500;text-transform:none;letter-spacing:0;box-shadow:none}
+button:active{transform:scale(.97)}
+button.primary{background:var(--acc);color:var(--accfg);border-color:var(--acc);font-weight:600}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.muted{color:var(--muted);font-size:13px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:none;padding:16px;margin-bottom:12px}
+.card h2,#scan h2,#nf h2{font:600 12px/1.3 var(--font)!important;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);background:none;display:block;padding:0;margin:0 0 12px}
+details.card summary{font-weight:600;font-size:14px}
+.top{margin-bottom:10px}
+.dn button{width:40px;padding:0;border:0;background:var(--soft);font-size:18px}
+.dn input{background:transparent;font-weight:600;padding:8px 4px;text-align:center}
+#scanBtn{background:var(--soft);border:0}
+.dash{border-radius:16px;padding:14px 16px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+@media (min-height:650px){.dash{box-shadow:0 6px 18px rgba(0,0,0,.08)}}
+.dk b{font:600 34px/1 var(--font);letter-spacing:-.02em}
+.dk .pct{font-weight:600;color:var(--muted);font-size:14px}
+.dk button.sm{border:0;background:var(--soft);min-height:30px;padding:2px 12px;font-size:13px}
+.pb{height:6px;border:0;background:var(--soft);border-radius:3px;overflow:hidden}.pb.th{height:4px}
+.pb i{border-radius:3px;transition:width .3s}
+.pb.over i{background:var(--hl)!important}
+.nb{height:6px;border:0;background:var(--soft);border-radius:3px}
+.mac3{gap:14px;margin-top:12px}
+.ml{font-size:12px;font-weight:500;color:var(--muted)}.ml span:last-child{color:var(--ink)}
+.mv{font-size:12px}
+.tabs{display:flex;gap:2px;margin:2px 0 14px;background:var(--soft);border-radius:12px;padding:3px;border:0}
+.tabs button{flex:1;border:0;background:transparent;color:var(--muted);font-size:12px;font-weight:600;min-height:38px;padding:6px 0;border-radius:9px}
+.tabs button[aria-selected=true]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.wrap{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--surface);box-shadow:none}
+th,td{border-top:1px solid var(--line)}
+thead th{background:transparent;color:var(--muted);border-top:0;font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;padding:10px 4px 6px}
+thead th:first-child{padding-left:16px}
+thead th:nth-child(n+2){width:42px}
+.gh th,.gh td{background:transparent;color:var(--muted);height:auto;padding:0 4px;font-size:13px;font-weight:500}
+.gh td[data-s="k"]{color:var(--ink);font-weight:600;font-size:14px}
+.gh th{padding:0;font:inherit;color:var(--ink)}
+.tg{display:block;width:100%;border:0;background:transparent;color:var(--ink);text-align:left;text-transform:none;font:600 16px/1.2 var(--font);padding:14px 4px 12px 16px;min-height:0;letter-spacing:0;white-space:nowrap}
+.tg:active{transform:none}
+.chev{display:inline-block;width:18px;color:var(--muted);font-size:12px}
+.cnt{display:block;font:400 12px/1.3 var(--font);color:var(--muted);padding-left:18px;margin-top:2px}
+.gh td button.cp{border:0;background:transparent;color:var(--muted);font-size:18px;min-height:44px;width:100%}
+tbody[data-m]:not(.open)>tr:not(.gh){display:none}
+tbody.open>tr:not(.gh){background:var(--tint)}
+tbody[data-m] tr:not(.gh) td:first-child{border-left:0}
+.it td{padding:0}
+.fn{font:500 14px/1.3 var(--font);padding:10px 6px 2px 16px;overflow-wrap:anywhere}
+.fa{display:flex;align-items:center;gap:4px;padding:4px 2px 10px 16px}
+.fa input{flex:1 1 40px;min-width:34px;width:auto!important;border:1px solid var(--line)!important;background:var(--surface)!important;padding:4px 2px!important;text-align:center!important;font-size:15px;font-weight:600;border-radius:8px}
+.fa .st{flex:0 0 26px;width:26px;min-width:26px;min-height:30px;padding:0;font-size:16px;border-radius:8px;background:var(--soft);border:0}
+.fa span{font-size:11px;margin-left:2px;color:var(--muted);flex:0 0 auto}
+td[data-v]{padding:10px 4px;font-size:14px;vertical-align:top;font-weight:500}
+td[data-v="p"],td[data-v="c"],td[data-v="f"]{color:var(--muted)}
+td button.del{color:var(--muted);font-size:18px;min-height:36px;vertical-align:top}
+.ar td{padding:0}
+.ar td input.n{background:transparent;padding:12px 6px 12px 16px;font-size:15px}
+.ar td input.n::placeholder{color:var(--muted)}
+.pv{text-align:right;padding:0 12px 0 0}
+.ar td .nfb{color:var(--muted);font-size:13px;font-weight:500;text-decoration:underline;text-underline-offset:3px;min-height:40px;border:0;background:transparent;width:auto;padding:0}
+.ar2 td{padding:4px 12px 12px 16px}
+.ar2 .st{border:0;background:var(--soft);width:40px;min-width:40px;min-height:40px;font-size:20px;border-radius:10px}
+.ar2 .a{border:1px solid var(--line);background:var(--surface);border-radius:10px;text-align:center}
+.ar2 .u{color:var(--muted);font-size:13px;padding:0 4px}
+.amtc .pvt{flex:1;font-size:12px;color:var(--muted);line-height:1.25}
+.ar2 td .ab{background:var(--acc);color:var(--accfg);border:0;font-weight:600;border-radius:10px;padding:0 18px;min-height:40px}
+.fl td{padding:10px 16px 12px;text-align:left}
+.tl2{font-size:12px;color:var(--muted)}
+.fbtns{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin-top:6px}
+.fbtns button{border:0;background:var(--soft);color:var(--ink);padding:0;min-height:34px;width:auto;font-size:13px;font-weight:500;border-radius:8px}
+.fbtns button.on{background:var(--ink);color:var(--surface)}
+.tl td{padding:6px 16px 10px}
+.tl button{border:1px solid var(--line);background:var(--surface);color:var(--ink);width:auto;font-size:13px;min-height:36px;padding:4px 12px}
+.tl select,.tl input{font-size:14px;padding:6px 10px;flex:1 1 120px}
+.tl div+div{margin-top:6px}
+.dnrow td{padding:2px 16px 14px}
+.dnrow button{width:100%;background:var(--soft);border:0;color:var(--muted);font-weight:600;min-height:40px}
+.m4 td{padding:2px 16px;text-align:left}
+.m4 button{color:var(--muted);border:0;background:transparent;width:auto;font-size:13px;min-height:40px;padding:0}
+tfoot th,tfoot td{background:transparent;color:var(--ink);font-weight:600;padding:10px 4px;font-size:14px}
+tfoot th{padding-left:16px;font-size:13px}
+tfoot tr:last-child th,tfoot tr:last-child td{font-weight:500;color:var(--muted)}
+.neg,tfoot .neg{color:var(--hl)}
+.logfoot{margin:12px 0}.logfoot input{width:80px;text-align:center}
+.logfoot button{background:var(--soft);border:0}
+.wc .wq{background:var(--soft);border:0;min-width:64px;font-weight:600}
+.wc .st,.sf .st{background:var(--soft);border:0;border-radius:10px}
+#slDur{font:600 22px/1 var(--font)}
+#scan,#nf{background:rgba(0,0,0,.45);align-items:flex-end;padding:0}
+#scan>div,#nf>div{border:0;border-radius:20px 20px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.2);max-height:92%;max-width:560px;padding:20px 16px calc(20px + env(safe-area-inset-bottom,0px))}
+@media (min-width:560px){#scan,#nf{align-items:center;padding:12px}#scan>div,#nf>div{border-radius:20px}}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(24px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--surface);border:0;border-radius:999px;padding:10px 18px;font-size:14px;font-weight:500;z-index:80;max-width:90%;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.2)}
 @media (min-width:560px){thead th:nth-child(n+2){width:64px}}
 </style>
 </head>
@@ -174,8 +270,8 @@ details.micro summary{cursor:pointer;margin-top:10px;color:var(--p);font-weight:
     <section class="card sl" id="sleepCard" aria-label="Sleep and notes">
       <div class="slh"><h2>Sleep</h2><span id="slDur" aria-live="polite"></span></div>
       <div class="slrow">
-        <label>Bedtime (night before)<input type="time" id="slBed"></label>
-        <label>Wake-up time<input type="time" id="slWake"></label>
+        <div><span class="tl2">Bedtime (night before)</span><div class="tsel" id="slBed"></div></div>
+        <div><span class="tl2">Wake-up time</span><div class="tsel" id="slWake"></div></div>
       </div>
       <p class="muted" id="slAvg" style="margin:8px 0 0"></p>
       <label>Notes<textarea id="noteTx" rows="2" maxlength="2000" placeholder="Mood, energy, training, anything worth remembering"></textarea></label>
@@ -196,6 +292,7 @@ details.micro summary{cursor:pointer;margin-top:10px;color:var(--p);font-weight:
     <section class="card"><h2>Calories</h2><div id="chCal"></div></section>
     <section class="card"><h2>Macros (g)</h2><div class="lg"><span><i style="background:var(--p)"></i>Protein</span><span><i style="background:var(--c)"></i>Carbs</span><span><i style="background:var(--f)"></i>Fat</span></div><div id="chMac"></div></section>
     <section class="card"><h2>Water (ml)</h2><div id="chWat"></div></section>
+    <section class="card"><h2>Feel after meals (1-10)</h2><div id="chFeel"></div></section>
     <section class="card"><h2>Weight (kg)</h2><div id="chWt"></div></section>
   </div>
 
@@ -243,6 +340,7 @@ details.micro summary{cursor:pointer;margin-top:10px;color:var(--p);font-weight:
     </section>
   </div>
 </main>
+<div id="toast" hidden role="status"></div>
 <div id="scan" hidden>
   <div role="dialog" aria-modal="true" aria-label="Scan food">
     <h2 style="font:600 16px Georgia,serif;margin:0 0 6px">Scan food</h2>
@@ -279,8 +377,17 @@ details.micro summary{cursor:pointer;margin-top:10px;color:var(--p);font-weight:
 </div>
 <script>
 const KEY='dailylog.v1',MEALS=['Meal 1','Meal 2','Meal 3','Meal 4','Snacks'],F=['k','p','c','f'],LBL={k:'kcal',p:'P g',c:'C g',f:'F g'};
-let db={goals:{k:2000},split:{p:30,f:25},days:{},weights:{},foods:[],meals:[],m4:{},water:{},waterGoal:2000,recipes:[],sleep:{},notes:{}};
+let db={goals:{k:2000},split:{p:30,f:25},days:{},weights:{},foods:[],meals:[],m4:{},water:{},waterGoal:2000,recipes:[],sleep:{},notes:{},feel:{}};
 try{const s=localStorage.getItem(KEY);if(s)db=Object.assign(db,JSON.parse(s))}catch(e){}
+function migrateMeals(){
+  (db.meals||[]).forEach(m=>{
+    if(db.recipes.some(r=>r.n.toLowerCase()===m.n.toLowerCase()))return;
+    db.recipes.push({n:m.n,servings:1,items:(m.items||[]).map(e=>({n:e.n,a:e.a||1,ru:e.ru&&e.ru[0]!=='/'?e.ru:'',k:e.k,p:e.p,c:e.c,f:e.f,u:e.u,w:e.w}))});
+  });
+  db.meals=[];
+}
+migrateMeals();
+Object.values(db.sleep||{}).forEach(s=>{s.bed=r5(s.bed);s.wake=r5(s.wake)});
 db.foods.forEach(f=>{if(!f.ra){const r=fref(f);f.ra=r.a;f.ru=r.u;delete f.b}});
 let view='cal';
 const $=id=>document.getElementById(id);
@@ -293,22 +400,33 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 const sum=a=>a.reduce((t,e)=>({k:t.k+e.k,p:t.p+e.p,c:t.c+e.c,f:t.f+e.f}),{k:0,p:0,c:0,f:0});
 function goals(){const k=db.goals.k;if(!db.mg){const s=db.split;db.mg={p:Math.round(k*s.p/400),f:Math.round(k*s.f/900)}}const p=db.mg.p,f=db.mg.f;return{k,p,f,c:Math.max(0,Math.round((k-4*p-9*f)/4))}}
 const dayList=()=>{const d=$('date').value;return db.days[d]||(db.days[d]=[])};
-const clone=(e,m)=>({n:e.n,k:e.k,p:e.p,c:e.c,f:e.f,m,u:e.u?{...e.u}:undefined,w:e.w});
+const clone=(e,m)=>({n:e.n,k:e.k,p:e.p,c:e.c,f:e.f,m,u:e.u?{...e.u}:undefined,w:e.w,a:e.a,ru:e.ru,pu:e.pu?JSON.parse(JSON.stringify(e.pu)):undefined});
 const showM4=d=>db.m4[d]||(db.days[d]||[]).some(e=>e.m===3);
 
-const SH={k:'kcal',p:'P',c:'C',f:'F'},openT=new Set();
+const SH={k:'kcal',p:'P',c:'C',f:'F'},openM=new Set();
+const fmtV=(f,x)=>f==='k'?Math.round(x):Math.round(x*10)/10;
+let toastT=null;
+function toast(t){const el=$('toast');el.textContent=t;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{el.hidden=true},2400)}
+const mkPU=(e,a)=>({k:e.k/a,p:e.p/a,c:e.c/a,f:e.f/a,w:(e.w||0)/a,u:e.u?Object.fromEntries(Object.entries(e.u).map(([k,v])=>[k,v/a])):undefined});
+function applyAmt(e,a){const q=e.pu;e.a=a;e.k=q.k*a;e.p=q.p*a;e.c=q.c*a;e.f=q.f*a;e.w=q.w?q.w*a:undefined;e.u=q.u?Object.fromEntries(Object.entries(q.u).map(([k,v])=>[k,v*a])):undefined}
 function build(){
-  const d=$('date').value,list=db.days[d]||[];
-  const opts='<option value="">Add saved meal…</option>'+db.meals.map((x,i)=>`<option value="${i}">${esc(x.n)}</option>`).join('');
+  const d=$('date').value,list=db.days[d]||[],fe=(db.feel||{})[d]||{};
+  const opts='<option value="">Add a recipe…</option>'+db.recipes.map((x,i)=>`<option value="${i}">${esc(x.n)}</option>`).join('');
   let h=`<thead><tr><th>Food</th>${F.map(f=>`<th>${SH[f]}</th>`).join('')}<th></th></tr></thead>`;
   MEALS.forEach((name,m)=>{
     if(m===3&&!showM4(d)){h+='<tbody><tr class="m4"><td colspan="6"><button class="m4on">+ Add Meal 4</button></td></tr></tbody>';return}
-    const items=list.map((e,i)=>({e,i})).filter(x=>(x.e.m??0)===m);
-    h+=`<tbody data-m="${m}"${openT.has(m)?' class="open"':''}><tr class="gh"><th><span class="nm">${name}</span><button class="mt" aria-label="${name} options">⋯</button></th>${F.map(f=>`<td data-s="${f}"></td>`).join('')}<td>${m===3?'<button class="m4off" aria-label="Remove Meal 4 from this day">×</button>':''}</td></tr>`;
-    items.forEach(({e,i})=>{h+=`<tr><td><input data-i="${i}" data-f="n" value="${esc(e.n)}" aria-label="Food"></td>${F.map(f=>`<td><input type="number" min="0" inputmode="decimal" data-i="${i}" data-f="${f}" value="${Math.round(e[f]*10)/10}" aria-label="${LBL[f]}"></td>`).join('')}<td><button class="del" data-i="${i}" aria-label="Remove ${esc(e.n)}">×</button></td></tr>`});
-    h+=`<tr class="ar"><td colspan="4"><input class="n" list="foodlist" placeholder="Add food…" aria-label="Food to add to ${name}"></td><td colspan="2" class="pv"><button class="nfb">New food</button></td></tr>`;
-    h+=`<tr class="ar2" hidden><td colspan="6"><div class="amtc"><button type="button" class="st" data-d="-1" aria-label="Decrease amount">−</button><input class="a" type="number" min="0" step="1" inputmode="decimal" placeholder="amount" aria-label="Amount"><button type="button" class="st" data-d="1" aria-label="Increase amount">+</button><span class="u">g</span><span class="pvt"></span><button class="ab" aria-label="Add food">Add</button></div></td></tr>`;
-    h+=`<tr class="tl"><td colspan="6"><div><button class="cp">Copy from yesterday</button><select class="sm" aria-label="Add a saved meal">${opts}</select><input class="sn" placeholder="Name to save as meal"><button class="sv">Save as meal</button></div></td></tr></tbody>`;
+    const items=list.map((e,i)=>({e,i})).filter(x=>(x.e.m??0)===m),open=openM.has(m);
+    h+=`<tbody data-m="${m}"${open?' class="open"':''}><tr class="gh"><th><button class="tg" aria-expanded="${open}"><span class="chev">${open?'\u25be':'\u25b8'}</span><span class="nm">${name}</span><span class="cnt">${items.length?items.length+(items.length>1?' foods':' food'):'empty'}${fe[m]?' \u00b7 feel '+fe[m]+'/10':''}</span></button></th>${F.map(f=>`<td data-s="${f}"></td>`).join('')}<td><button class="cp" aria-label="Copy ${name} from yesterday" title="Copy ${name} from yesterday">\u21ba</button></td></tr>`;
+    items.forEach(({e,i})=>{
+      const st=(e.ru==='g'||e.ru==='ml')?1:0.5;
+      h+=`<tr class="it"><td><div class="fn">${esc(e.n)}</div>`+(e.a?`<div class="fa"><button type="button" class="st" data-d="${-st}" aria-label="Decrease amount">\u2212</button><input class="ea" type="number" min="0" step="${st}" inputmode="decimal" value="${e.a}" data-i="${i}" aria-label="Amount of ${esc(e.n)}"><button type="button" class="st" data-d="${st}" aria-label="Increase amount">+</button><span>${esc(e.ru||'')}</span></div>`:'')+'</td>'
+        +F.map(f=>e.a?`<td data-v="${f}">${fmtV(f,e[f])}</td>`:`<td><input type="number" min="0" inputmode="decimal" data-i="${i}" data-f="${f}" value="${Math.round(e[f]*10)/10}" aria-label="${LBL[f]}"></td>`).join('')
+        +`<td><button class="del" data-i="${i}" aria-label="Remove ${esc(e.n)}">\u00d7</button></td></tr>`});
+    h+=`<tr class="ar"><td colspan="4"><input class="n" list="foodlist" placeholder="Add food\u2026" aria-label="Food to add to ${name}"></td><td colspan="2" class="pv"><button class="nfb">New food</button></td></tr>`;
+    h+=`<tr class="ar2" hidden><td colspan="6"><div class="amtc"><button type="button" class="st" data-d="-1" aria-label="Decrease amount">\u2212</button><input class="a" type="number" min="0" step="1" inputmode="decimal" placeholder="amount" aria-label="Amount"><button type="button" class="st" data-d="1" aria-label="Increase amount">+</button><span class="u">g</span><span class="pvt"></span><button class="ab" aria-label="Add food">Add</button></div></td></tr>`;
+    h+=`<tr class="fl"><td colspan="6"><span class="tl2">How do you feel after ${name}? (1\u201310)</span><div class="fbtns">${[1,2,3,4,5,6,7,8,9,10].map(v=>`<button class="fb${fe[m]===v?' on':''}" data-v="${v}" aria-pressed="${fe[m]===v}">${v}</button>`).join('')}</div></td></tr>`;
+    h+=`<tr class="tl"><td colspan="6"><div><button class="cp">Copy yesterday</button><select class="sm" aria-label="Add a recipe">${opts}</select></div><div><input class="sn" placeholder="Recipe name"><button class="sv">Save as recipe</button></div>${m===3?'<div><button class="m4off">Remove Meal 4</button></div>':''}</td></tr>`;
+    h+=`<tr class="dnrow"><td colspan="6"><button class="done">Done \u25b4</button></td></tr></tbody>`;
   });
   h+=`<tfoot><tr><th>Total</th>${F.map(f=>`<td data-t="${f}"></td>`).join('')}<td></td></tr><tr><th>Left</th>${F.map(f=>`<td data-l="${f}"></td>`).join('')}<td></td></tr></tfoot>`;
   $('sheet').innerHTML=h;
@@ -354,8 +472,8 @@ function charts(){
   const B=bk.length,lab=d=>N>180?d.slice(0,7):d.slice(5),dayInfo=d=>{const l=db.days[d]||[];return l.length?sum(l):null};
   const A=bk.map(days=>{
     const inf=days.map(dayInfo).filter(Boolean),n=inf.length,t=sum(inf),w=days.map(d=>db.weights[d]).filter(v=>v>0);
-    const wv=days.map(waterTotal).filter(v=>v>0);
-    return{n,wn:wv.length,wa:wv.length?wv.reduce((a,b)=>a+b,0)/wv.length:0,k:n?t.k/n:0,p:n?t.p/n:0,c:n?t.c/n:0,f:n?t.f/n:0,w:w.length?w.reduce((a,b)=>a+b,0)/w.length:null,name:days[0]===days[days.length-1]?days[0]:days[0]+' to '+days[days.length-1]};
+    const wv=days.map(waterTotal).filter(v=>v>0),fv=days.flatMap(x=>Object.values((db.feel||{})[x]||{}));
+    return{n,fn:fv.length,fa:fv.length?fv.reduce((a,b)=>a+b,0)/fv.length:0,wn:wv.length,wa:wv.length?wv.reduce((a,b)=>a+b,0)/wv.length:0,k:n?t.k/n:0,p:n?t.p/n:0,c:n?t.c/n:0,f:n?t.f/n:0,w:w.length?w.reduce((a,b)=>a+b,0)/w.length:null,name:days[0]===days[days.length-1]?days[0]:days[0]+' to '+days[days.length-1]};
   });
   const names=A.map(x=>x.name),logged=A.reduce((a,x)=>a+x.n,0),per=size>1?' per day (avg)':'';
   $('chNote').textContent=(size===1?'Daily values':size===7?'Weekly averages':'Monthly averages')+(logged?` · ${logged} days logged · average ${Math.round(A.reduce((a,x)=>a+x.k*x.n,0)/logged)} kcal/day`:'');
@@ -371,6 +489,8 @@ function charts(){
     const wg=db.waterGoal||2000,mx=Math.max(wg,...A.map(x=>x.wa))*1.1,bw=CW/B,gy=cy(wg,0,mx);
     $('chWat').innerHTML=frame(lab(ds[0]),lab(end),Math.round(mx),0,A.map((x,i)=>x.wn?`<rect x="${G.l+i*bw+bw*.12}" y="${cy(x.wa,0,mx)}" width="${bw*.76}" height="${Math.max(0,G.t+CH-cy(x.wa,0,mx))}" rx="2" fill="var(--w)" opacity="${i===B-1?1:.6}"><title>${x.name}: ${Math.round(x.wa)} ml${per}</title></rect>`:'').join('')+`<line x1="${G.l}" x2="${G.W-G.r}" y1="${gy}" y2="${gy}" stroke="var(--ink)" stroke-dasharray="5 4"/>`+txt(G.W-G.r,gy-4,'goal '+wg),'Water');
   }
+  if(!A.some(x=>x.fn))$('chFeel').innerHTML=NONE('Rate how you feel after a meal to see this graph.');
+  else $('chFeel').innerHTML=frame(lab(ds[0]),lab(end),10,0,series(A.map((x,i)=>x.fn?[i,x.fa]:null).filter(Boolean),'var(--ink)',B,0,10,names,'/10'+per),'Feel after meals');
   const wp=A.map((x,i)=>x.w!=null?[i,x.w]:null).filter(Boolean);
   if(wp.length<2)$('chWt').innerHTML=NONE('Enter your weight on two or more days in this range.');
   else{
@@ -401,7 +521,7 @@ function addScaled(f,m,amt){
   const rf=fref(f),sc=amt/rf.a;
   if(m===3)db.m4[$('date').value]=true;
   const e=clone(f,m);e.k=f.k*sc;e.p=f.p*sc;e.c=f.c*sc;e.f=f.f*sc;if(f.u)e.u=scaleU(f.u,sc);if(f.w)e.w=f.w*sc;
-  e.n=rf.u?`${f.n} ${amt}${rf.u}`:(amt===1?f.n:`${f.n} x${amt}`);
+  e.n=f.n;e.a=amt;e.ru=rf.u||'items';e.pu=mkPU(e,amt);
   dayList().push(e);return e;
 }
 function updAdd(tb){
@@ -433,42 +553,52 @@ function renderDash(t,g){
   $('dKv').textContent=Math.round(t.k);$('dKg').textContent=g.k;const l=Math.round(g.k-t.k);$('dKl').textContent=l>=0?l+' left':(-l)+' over';
   ['P','C','F'].forEach(L=>{const k=L.toLowerCase();$('d'+L+'v').textContent=Math.round(t[k])+' / '+g[k]+' g'});
 }
+function applyEa(inp){
+  const e=dayList()[+inp.dataset.i],v=num(inp.value);if(!e||!v||!e.pu)return;
+  applyAmt(e,v);const tr=inp.closest('tr');
+  F.forEach(f=>{const c=tr.querySelector(`[data-v="${f}"]`);if(c)c.textContent=fmtV(f,e[f])});
+  save();totals();renderWater();renderNut();
+}
 function copyFrom(m,btn){
   const src=(db.days[prev($('date').value)]||[]).filter(e=>m===null||(e.m??0)===m);
-  if(!src.length){const o=btn.textContent;btn.textContent='Nothing yesterday';setTimeout(()=>btn.textContent=o,1500);return}
-  src.forEach(e=>dayList().push(clone(e,e.m??0)));save();render();
+  if(!src.length){toast('Nothing logged yesterday'+(m===null?'':' in '+MEALS[m]));return}
+  src.forEach(e=>dayList().push(clone(e,e.m??0)));if(m!==null)openM.add(m);
+  save();render();toast('Copied '+src.length+(src.length>1?' foods':' food')+(m===null?'':' to '+MEALS[m]));
 }
-
 const sheet=$('sheet');
 sheet.addEventListener('click',ev=>{
+  const gh=ev.target.closest('tr.gh');
+  if(gh){const tb0=gh.closest('tbody'),m0=+tb0.dataset.m;if(ev.target.closest('button.cp')){copyFrom(m0);return}openM.has(m0)?openM.delete(m0):openM.add(m0);build();totals();return}
   const b=ev.target.closest('button');if(!b)return;
   const tb=b.closest('tbody'),m=tb&&tb.dataset.m!==undefined?+tb.dataset.m:null,d=$('date').value;
   if(b.classList.contains('st')){if(ev.detail===0)stepIt(b);return}
   if(b.classList.contains('nfb')){const t2=b.closest('tbody');openNF(m,t2.querySelector('.n').value.trim(),num(t2.querySelector('.a').value));return}
-  if(b.classList.contains('mt')){openT.has(m)?openT.delete(m):openT.add(m);tb.classList.toggle('open');return}
+  if(b.classList.contains('done')){openM.delete(m);build();totals();return}
+  if(b.classList.contains('fb')){const fe=(db.feel[d]=db.feel[d]||{}),v=+b.dataset.v;if(fe[m]===v)delete fe[m];else fe[m]=v;if(!Object.keys(fe).length)delete db.feel[d];save();build();totals();return}
   if(b.classList.contains('m4on')){db.m4[d]=true;save();render()}
   else if(b.classList.contains('m4off')){
-    const th=b.closest('tr').querySelector('.nm');
-    if(dayList().some(e=>e.m===3)&&!b.dataset.armed){b.dataset.armed=1;th.textContent='Delete Meal 4 foods? Tap × again';setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;th.textContent='Meal 4'}},3000);return}
+    const th=b;
+    if(dayList().some(e=>e.m===3)&&!b.dataset.armed){b.dataset.armed=1;th.textContent='Tap again to delete its foods';setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;th.textContent='Remove Meal 4'}},3000);return}
     db.days[d]=dayList().filter(e=>e.m!==3);delete db.m4[d];save();render()}
   else if(b.classList.contains('del')){dayList().splice(+b.dataset.i,1);save();render()}
   else if(b.classList.contains('ab'))addFood(tb);
   else if(b.classList.contains('cp'))copyFrom(m,b);
   else if(b.classList.contains('sv')){
-    const items=dayList().filter(e=>(e.m??0)===m).map(e=>clone(e,0));
-    if(!items.length){b.textContent='Add foods first';setTimeout(()=>b.textContent='Save as meal',1500);return}
-    const name=tb.querySelector('.sn').value.trim()||MEALS[m],i=db.meals.findIndex(x=>x.n.toLowerCase()===name.toLowerCase());
-    if(i<0)db.meals.push({n:name,items});else db.meals[i]={n:name,items};
-    save();render();
+    const items=dayList().filter(e=>(e.m??0)===m).map(e=>({n:e.n,a:e.a||1,ru:e.ru&&e.ru[0]!=='/'?e.ru:'',k:e.k,p:e.p,c:e.c,f:e.f,u:e.u?{...e.u}:undefined,w:e.w||undefined}));
+    if(!items.length){toast('Add foods to this meal first');return}
+    const name=tb.querySelector('.sn').value.trim()||MEALS[m],r={n:name,servings:1,items},i=db.recipes.findIndex(x=>x.n.toLowerCase()===name.toLowerCase());
+    if(i<0)db.recipes.push(r);else db.recipes[i]=r;
+    save();render();toast('Saved recipe: '+name+'. Edit servings in the Recipes tab.');
   }
 });
 sheet.addEventListener('change',ev=>{
   const t=ev.target;
-  if(t.classList.contains('sm')&&t.value!==''){const m=+t.closest('tbody').dataset.m;db.meals[+t.value].items.forEach(e=>dayList().push(clone(e,m)));save();render();return}
+  if(t.classList.contains('ea')){const e=dayList()[+t.dataset.i];if(e&&!num(t.value))t.value=e.a;return}
+  if(t.classList.contains('sm')&&t.value!==''){const m=+t.closest('tbody').dataset.m,r=db.recipes[+t.value];recEntry(r,m,1,r.servings);openM.add(m);save();render();toast('Added '+r.n+' to '+MEALS[m]);return}
   if(t.dataset.f){const e=dayList()[+t.dataset.i];if(!e)return;e[t.dataset.f]=t.dataset.f==='n'?t.value.trim()||'Food':num(t.value);save();totals()}
 });
 sheet.addEventListener('input',ev=>{
-  const c=ev.target.classList;if(c.contains('n')||c.contains('a'))updAdd(ev.target.closest('tbody'));
+  const c=ev.target.classList;if(c.contains('n')||c.contains('a'))updAdd(ev.target.closest('tbody'));if(c.contains('ea'))applyEa(ev.target);
 });
 sheet.addEventListener('keydown',ev=>{
   if(ev.key==='Enter'&&ev.target.closest('.ar,.ar2'))addFood(ev.target.closest('tbody'));
@@ -687,9 +817,9 @@ const recTot=items=>items.reduce((t,it)=>{t.k+=it.k;t.p+=it.p;t.c+=it.c;t.f+=it.
 const findRec=n=>db.recipes.find(x=>x.n.toLowerCase()===(n||'').trim().toLowerCase());
 function recEntry(r,m,n,d){
   const t=recTot(r.items),sc=n/d;
-  const e={n:`${r.n} ${+n.toFixed(2)}/${+d.toFixed(2)}`,k:t.k*sc,p:t.p*sc,c:t.c*sc,f:t.f*sc,m};
+  const e={n:r.n,k:t.k*sc,p:t.p*sc,c:t.c*sc,f:t.f*sc,m,a:n,ru:'/'+(+d.toFixed(2))};
   if(Object.keys(t.u).length)e.u=scaleU(t.u,sc);if(t.w)e.w=t.w*sc;
-  if(m===3)db.m4[$('date').value]=true;dayList().push(e);return e;
+  e.pu=mkPU(e,n);if(m===3)db.m4[$('date').value]=true;dayList().push(e);return e;
 }
 const rb={items:[]};
 const scaleIt=(it,r)=>{['k','p','c','f'].forEach(x=>it[x]*=r);if(it.u)it.u=scaleU(it.u,r);if(it.w)it.w*=r};
@@ -741,19 +871,23 @@ $('rcList').addEventListener('click',ev=>{
   else if(b.dataset.rcedit!==undefined){const r=db.recipes[+b.dataset.rcedit];rb.items=JSON.parse(JSON.stringify(r.items));$('rcN').value=r.n;$('rcS').value=r.servings;$('rcSave').textContent='Update recipe';renderRB();$('rcMsg').textContent='Editing '+r.n+'. Change it, then press Update recipe.';window.scrollTo({top:0,behavior:'smooth'})}
 });
 renderRB();
+function r5(v){if(!v)return v;let [h,m]=v.split(':').map(Number);m=Math.round(m/5)*5;if(m===60){m=0;h=(h+1)%24}return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')}
 const sleepMin=s=>{if(!s||!s.bed||!s.wake)return null;const t=x=>{const[h,m]=x.split(':').map(Number);return h*60+m};let d=t(s.wake)-t(s.bed);if(d<0)d+=1440;return d};
 const fmtDur=m=>Math.floor(m/60)+'h '+String(m%60).padStart(2,'0')+'m';
 function renderSleep(){
   const d=$('date').value,s=db.sleep[d]||{},m=sleepMin(s);
-  $('slBed').value=s.bed||'';$('slWake').value=s.wake||'';$('slDur').textContent=m==null?'':fmtDur(m);
+  setT('slBed',s.bed);setT('slWake',s.wake);$('slDur').textContent=m==null?'':fmtDur(m);
   let tot=0,n=0,t=d;for(let i=0;i<7;i++,t=prev(t)){const x=sleepMin(db.sleep[t]);if(x!=null){tot+=x;n++}}
   $('slAvg').textContent=n>1?`7-day average: ${fmtDur(Math.round(tot/n))} (${n} nights logged)`:'';
   if(document.activeElement!==$('noteTx'))$('noteTx').value=db.notes[d]||'';
 }
-['slBed','slWake'].forEach(id=>$(id).onchange=()=>{
-  const d=$('date').value,s=db.sleep[d]=db.sleep[d]||{};s.bed=$('slBed').value;s.wake=$('slWake').value;
-  if(!s.bed&&!s.wake)delete db.sleep[d];save();renderSleep();
-});
+const hOpts='<option value="">--</option>'+[...Array(24).keys()].map(h=>`<option>${String(h).padStart(2,'0')}</option>`).join('');
+const mOpts=[...Array(12).keys()].map(i=>`<option>${String(i*5).padStart(2,'0')}</option>`).join('');
+['slBed','slWake'].forEach(id=>{const n=id==='slBed'?'Bedtime':'Wake-up';$(id).innerHTML=`<select data-p="h" aria-label="${n} hour">${hOpts}</select><span>:</span><select data-p="m" aria-label="${n} minutes">${mOpts}</select>`});
+const getT=id=>{const h=$(id).querySelector('[data-p=h]').value;return h===''?'':h+':'+$(id).querySelector('[data-p=m]').value};
+const setT=(id,v)=>{const h=$(id).querySelector('[data-p=h]'),m=$(id).querySelector('[data-p=m]');if(!v){h.value='';m.value='00';return}const p=r5(v).split(':');h.value=p[0];m.value=p[1]};
+const onSleep=()=>{const d=$('date').value,bed=getT('slBed'),wake=getT('slWake');if(!bed&&!wake)delete db.sleep[d];else db.sleep[d]={bed,wake};save();renderSleep()};
+['slBed','slWake'].forEach(id=>$(id).addEventListener('change',onSleep));
 let noteT=null;
 $('noteTx').addEventListener('input',()=>{
   const d=$('date').value,v=$('noteTx').value;clearTimeout(noteT);
@@ -784,7 +918,7 @@ $('bkFile').onchange=async()=>{const f=$('bkFile').files[0];if(f){$('bk').value=
 $('bkImport').onclick=()=>{
   let o;try{o=JSON.parse($('bk').value)}catch(e){return bkMsg('That is not valid backup text.')}
   const d=o&&o.app==='daily-log'&&o.data;if(!d||typeof d!=='object')return bkMsg('That does not look like a Daily log backup.');
-  if($('bkMode').value==='replace'){db=Object.assign({goals:{k:2000},split:{p:30,f:25},days:{},weights:{},foods:[],meals:[],m4:{},water:{},waterGoal:2000,recipes:[],sleep:{},notes:{}},d)}
+  if($('bkMode').value==='replace'){db=Object.assign({goals:{k:2000},split:{p:30,f:25},days:{},weights:{},foods:[],meals:[],m4:{},water:{},waterGoal:2000,recipes:[],sleep:{},notes:{},feel:{}},d)}
   else{
     if(!Object.keys(db.days).length)['goals','split','mg'].forEach(k=>{if(d[k])db[k]=d[k]});
     Object.keys(d.days||{}).forEach(k=>{if(!(db.days[k]||[]).length)db.days[k]=d.days[k]});
@@ -792,11 +926,11 @@ $('bkImport').onclick=()=>{
     Object.assign(db.m4,d.m4||{},db.m4);
     Object.keys(d.water||{}).forEach(k=>{if(!(db.water[k]||[]).length)db.water[k]=d.water[k]});
     (d.recipes||[]).forEach(r=>{if(!db.recipes.some(x=>x.n.toLowerCase()===r.n.toLowerCase()))db.recipes.push(r)});
-    Object.keys(d.sleep||{}).forEach(k=>{if(!db.sleep[k])db.sleep[k]=d.sleep[k]});Object.keys(d.notes||{}).forEach(k=>{if(!db.notes[k])db.notes[k]=d.notes[k]});
+    Object.keys(d.sleep||{}).forEach(k=>{if(!db.sleep[k])db.sleep[k]=d.sleep[k]});Object.keys(d.notes||{}).forEach(k=>{if(!db.notes[k])db.notes[k]=d.notes[k]});Object.keys(d.feel||{}).forEach(k=>{if(!db.feel[k])db.feel[k]=d.feel[k]});
     (d.foods||[]).forEach(f=>{if(!db.foods.some(x=>x.n.toLowerCase()===f.n.toLowerCase()))db.foods.push(f)});
     (d.meals||[]).forEach(m=>{if(!db.meals.some(x=>x.n.toLowerCase()===m.n.toLowerCase()))db.meals.push(m)});
   }
-  save();render();lastBk();bkMsg('Backup imported.');
+  migrateMeals();save();render();lastBk();bkMsg('Backup imported.');
 };
 try{if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
