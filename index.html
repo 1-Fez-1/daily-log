@@ -315,7 +315,7 @@ input,select,textarea,.ar td input.n,.tl select,.tl input,.fa input,.amtc input,
       <p class="muted" id="slAvg" style="margin:8px 0 0"></p>
       <label>Notes<textarea id="noteTx" rows="5" maxlength="2000" placeholder="Mood, energy, training, anything worth remembering"></textarea></label>
     </section>
-    <p class="muted" style="text-align:center;font-size:11px;margin:14px 0 0">Version 10 · quick add, backups, summary</p>
+    <p class="muted" style="text-align:center;font-size:11px;margin:14px 0 0">Version 11 · daily backup reminder, summary periods</p>
     <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
       <p class="muted" style="margin:8px 0">Data is stored only in this browser. Export a backup regularly, and before moving to a new version or device. <span id="lastBk"></span></p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
@@ -328,7 +328,7 @@ input,select,textarea,.ar td input.n,.tl select,.tl input,.fa input,.amtc input,
   <datalist id="foodlist"></datalist><datalist id="ingredlist"></datalist>
 
   <div data-tab="graphs">
-    <section class="card" id="wkCard"><h2>Last 7 days</h2><p class="muted" id="wkT" style="margin:0 0 10px"></p><div id="wkBody"></div></section>
+    <section class="card" id="wkCard"><h2>Summary</h2><div class="row" style="margin:0 0 10px;align-items:center"><select id="wkRange" aria-label="Summary period"><option value="7">Last 7 days</option><option value="14">Last 2 weeks</option><option value="30">Last month</option><option value="90">Last 3 months</option><option value="365">Last year</option></select></div><p class="muted" id="wkT" style="margin:0 0 10px"></p><div id="wkBody"></div></section>
     <div class="row" style="margin-top:0"><select id="range" aria-label="Range"><option value="7">Last 7 days</option><option value="14" selected>Last 14 days</option><option value="30">Last 30 days</option><option value="90">Last 3 months</option><option value="180">Last 6 months</option><option value="365">Last year</option><option value="all">All time</option></select></div>
     <p class="muted" id="chNote" style="margin:0 0 8px"></p>
     <section class="card"><h2>Calories</h2><div id="chCal"></div></section>
@@ -969,12 +969,12 @@ function r5(v){if(!v)return v;let [h,m]=v.split(':').map(Number);m=Math.round(m/
 const sleepMin=s=>{if(!s||!s.bed||!s.wake)return null;const t=x=>{const[h,m]=x.split(':').map(Number);return h*60+m};let d=t(s.wake)-t(s.bed);if(d<0)d+=1440;return d};
 const fmtDur=m=>Math.floor(m/60)+'h '+String(m%60).padStart(2,'0')+'m';
 function renderWeek(){
-  const end=$('date').value,days=[];let t=end;for(let i=0;i<7;i++,t=prev(t))days.push(t);
+  const end=$('date').value,N=+$('wkRange').value||7,days=[];let t=end;for(let i=0;i<N;i++,t=prev(t))days.push(t);
   const logged=days.filter(d=>(db.days[d]||[]).length),n=logged.length,body=$('wkBody');
-  $('wkT').textContent=days[6]+' to '+end;
+  $('wkT').textContent=days[N-1]+' to '+end;
   if(!n){body.innerHTML='<p class="muted" style="margin:0">Nothing logged in this period yet.</p>';return}
   const g=goals(),tot=logged.map(d=>sum(db.days[d])),avg=k=>tot.reduce((a,x)=>a+x[k],0)/n;
-  const tiles=[['Days logged',n+' / 7',''],['Calories',Math.round(avg('k'))+' kcal','goal '+g.k],['Protein',Math.round(avg('p'))+' g','goal '+g.p],['Carbs',Math.round(avg('c'))+' g','goal '+g.c],['Fat',Math.round(avg('f'))+' g','goal '+g.f],['Water',Math.round(logged.reduce((a,d)=>a+waterTotal(d),0)/n)+' ml','goal '+(db.waterGoal||2000)]];
+  const tiles=[['Days logged',n+' / '+N,''],['Calories',Math.round(avg('k'))+' kcal','goal '+g.k],['Protein',Math.round(avg('p'))+' g','goal '+g.p],['Carbs',Math.round(avg('c'))+' g','goal '+g.c],['Fat',Math.round(avg('f'))+' g','goal '+g.f],['Water',Math.round(logged.reduce((a,d)=>a+waterTotal(d),0)/n)+' ml','goal '+(db.waterGoal||2000)]];
   const nights=days.map(d=>sleepMin(db.sleep[d])).filter(x=>x!=null);
   if(nights.length)tiles.push(['Sleep',fmtDur(Math.round(nights.reduce((a,b)=>a+b,0)/nights.length)),nights.length+' nights']);
   const fv=[];days.forEach(d=>Object.values(db.feel[d]||{}).forEach(v=>fv.push(v)));
@@ -993,6 +993,8 @@ function renderWeek(){
   if(parts.reduce((a,p)=>a+1,0)&&Object.values(bk).reduce((a,x)=>a+x.length,0)>=3)h+=`<p class="wkn"><strong>Feel by meal time:</strong> ${parts.join(' · ')}</p>`;
   body.innerHTML=h;
 }
+try{const w=localStorage.getItem('dailylog.wk');if(w&&[...$('wkRange').options].some(o=>o.value===w))$('wkRange').value=w}catch(e){}
+$('wkRange').onchange=()=>{try{localStorage.setItem('dailylog.wk',$('wkRange').value)}catch(e){}renderWeek()};
 function updToday(){$('todayRow').hidden=$('date').value===iso(new Date())}
 $('todayD').onclick=()=>{$('date').value=iso(new Date());render()};
 function renderSleep(){
@@ -1083,13 +1085,13 @@ async function doBackup(){
 $('bkExport').onclick=doBackup;
 const daysSince=d=>Math.round((new Date(iso(new Date())+'T00:00:00')-new Date(d+'T00:00:00'))/864e5);
 function renderNudge(){
-  let sn='';try{sn=localStorage.getItem('dailylog.nudge')||''}catch(e){}
-  const has=Object.values(db.days).some(l=>l&&l.length),n=db.lastBackup?daysSince(db.lastBackup):null,show=has&&(n===null||n>=7)&&sn!==iso(new Date());
+  let sn=0;try{sn=+localStorage.getItem('dailylog.nudge')||0}catch(e){}
+  const has=Object.values(db.days).some(l=>l&&l.length),n=db.lastBackup?daysSince(db.lastBackup):null,show=has&&(n===null||n>=1)&&Date.now()>sn;
   $('bkNudge').hidden=!show;
-  if(show)$('bkNudgeT').textContent=n===null?'No backup yet. Your data lives only on this phone.':'Last backup was '+n+' days ago.';
+  if(show)$('bkNudgeT').textContent=n===null?'No backup yet. Your data lives only on this phone.':(n===1?'Last backup was yesterday.':'Last backup was '+n+' days ago.');
 }
 $('bkNudgeGo').onclick=doBackup;
-$('bkNudgeLater').onclick=()=>{try{localStorage.setItem('dailylog.nudge',iso(new Date()))}catch(e){}renderNudge()};
+$('bkNudgeLater').onclick=()=>{try{localStorage.setItem('dailylog.nudge',String(Date.now()+3*36e5))}catch(e){}renderNudge()};
 let tidyArmed=null;
 function tidyPlan(){
   const plan=[];
