@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Daily log</title>
 <meta name="theme-color" content="#f7f7f5" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0e0e0e" media="(prefers-color-scheme: dark)">
@@ -246,6 +246,7 @@ tfoot tr:last-child th,tfoot tr:last-child td{font-weight:500;color:var(--muted)
 .eac .u{font-size:15px;padding:0 4px}
 .eaq{display:flex;gap:8px;margin-bottom:6px}.eaq button{flex:1;background:var(--soft);border:0}
 @media (min-width:560px){thead th:nth-child(n+2){width:64px}}
+input,select,textarea,.ar td input.n,.tl select,.tl input,.fa input,.amtc input,.ar2 .a,.wc input.wi{font-size:16px!important}
 </style>
 </head>
 <body>
@@ -676,8 +677,8 @@ function renderNut(){
     const v=tot[k]||0,pc=t?v/t*100:0,open=openN.has(k);
     let ct='';
     if(open){
-      const by={};list.forEach(e=>{const x=val(e,k);if(x>0)by[e.n]=(by[e.n]||0)+x});
-      const arr=Object.entries(by).sort((a,b)=>b[1]-a[1]);
+      const by={};list.forEach(e=>{const x=val(e,k);if(x<=0)return;const key=String(e.n).replace(/\s+/g,' ').trim().toLowerCase(),o=by[key]||(by[key]={nm:String(e.n).replace(/\s+/g,' ').trim(),x:0,c:0});o.x+=x;o.c++});
+      const arr=Object.values(by).sort((a,b)=>b.x-a.x).map(o=>[o.nm+(o.c>1?' \u00d7'+o.c:''),o.x]);
       ct='<div class="ctr">'+(arr.length?arr.map(([nm,x])=>{const sh=v?x/v*100:0;return `<div class="cr"><b>${esc(nm)}</b><span>${+x.toFixed(1)} ${u} · ${Math.round(sh)}%</span><div class="cb"><i style="width:${sh}%"></i></div></div>`}).join(''):'<div class="none">No logged food has this yet.</div>')+'</div>';
     }
     return `<div class="ni"><button class="nr" data-nk="${k}" aria-expanded="${open}"><span class="nm">${n}</span><div class="nb"><i style="width:${Math.min(100,pc)}%"></i></div><span class="muted">${+v.toFixed(1)} / ${+(+t).toFixed(1)} ${u} (${Math.round(pc)}%)</span></button>${ct}</div>`;
