@@ -274,6 +274,8 @@ body.kp-open{padding-bottom:var(--kp-h,0px)}body.kp-open #ea{padding-bottom:var(
 .remind .rl{color:var(--muted);margin-right:2px}
 .remind button{min-height:30px;padding:3px 10px;font-size:13px;border-radius:999px;background:var(--surface);border:1px solid var(--line);color:var(--ink);width:auto}
 .remind button.rx{margin-left:auto;border:0;background:transparent;color:var(--muted);font-size:18px;line-height:1;padding:0 8px}
+.pulse{animation:pls 2.2s ease-out}@keyframes pls{0%,55%{box-shadow:0 0 0 3px rgba(255,190,40,.75);background-color:rgba(255,200,60,.22)}100%{box-shadow:0 0 0 3px rgba(255,190,40,0)}}
+.fl td.pulse{box-shadow:none;animation:plsb 2.2s ease-out}@keyframes plsb{0%,55%{background:rgba(255,200,60,.35)}100%{background:transparent}}
 </style>
 </head>
 <body>
@@ -319,7 +321,7 @@ body.kp-open{padding-bottom:var(--kp-h,0px)}body.kp-open #ea{padding-bottom:var(
       <div class="wbtns"><button class="wq" data-w="150">+150</button><button class="wq" data-w="250">+250</button><button class="wq" data-w="500">+500</button><span class="muted">ml</span></div>
       <div class="wbtns"><div class="amtc"><button type="button" class="st" data-d="-10" aria-label="Decrease">&minus;</button><input class="wi" id="wIn2" type="number" min="0" step="1" inputmode="numeric" placeholder="ml" aria-label="Custom water amount in ml"><button type="button" class="st" data-d="10" aria-label="Increase">+</button></div><button class="primary" id="wAdd">Add</button><button id="wUndo">Undo last</button></div>
     </section>
-    <p class="muted" style="text-align:center;font-size:11px;margin:14px 0 0">Version 16 · reminders</p>
+    <p class="muted" style="text-align:center;font-size:11px;margin:14px 0 0">Version 17 · reminder links</p>
     <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
       <p class="muted" style="margin:8px 0">Data is stored only in this browser. Export a backup regularly, and before moving to a new version or device. <span id="lastBk"></span></p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
@@ -340,7 +342,7 @@ body.kp-open{padding-bottom:var(--kp-h,0px)}body.kp-open #ea{padding-bottom:var(
       </div>
       <p class="muted" id="slAvg" style="margin:8px 0 0"></p>
     </section>
-    <section class="card sl" aria-label="Bowel movement">
+    <section class="card sl" id="bmCard" aria-label="Bowel movement">
       <div class="slh"><h2>BM</h2></div>
       <div class="bmrow"><label class="bmck"><input type="checkbox" id="bmY" aria-label="BM: yes"><span>Yes</span></label><label class="bmck"><input type="checkbox" id="bmN" aria-label="BM: no"><span>No</span></label><input id="bmTx" type="text" maxlength="120" placeholder="Short note (optional)" aria-label="BM note"></div>
     </section>
@@ -516,7 +518,7 @@ function build(){
     h+=`<tr class="ar"><td colspan="4"><input class="n" list="foodlist" placeholder="Add food\u2026" aria-label="Food to add to ${name}"></td><td colspan="2" class="pv"><button class="nfb">New food</button></td></tr>`;
     if(quickList.length)h+=`<tr class="qr"><td colspan="6"><span class="tl2">Quick add</span><div class="chips">${quickList.map((q,qi)=>`<button class="qa" data-q="${qi}">${esc(q.food.n)}<small>${amtLabel({a:q.amt,ru:fref(q.food).u||'items'})}</small></button>`).join('')}</div></td></tr>`;
     h+=`<tr class="ar2" hidden><td colspan="6"><div class="amtc"><button type="button" class="st" data-d="-1" aria-label="Decrease amount">\u2212</button><input class="a" type="text" inputmode="${KPM}" autocomplete="off" placeholder="amount" aria-label="Amount"><button type="button" class="st" data-d="1" aria-label="Increase amount">+</button><span class="u">g</span><span class="pvt"></span><button class="ab" aria-label="Add food">Add</button></div></td></tr>`;
-    h+=`<tr class="fl"><td colspan="6"><span class="tl2">How do you feel after ${name}? (1\u201310)</span><div class="fbtns">${[1,2,3,4,5,6,7,8,9,10].map(v=>`<button class="fb${fe[m]===v?' on':''}" data-v="${v}" aria-pressed="${fe[m]===v}">${v}</button>`).join('')}</div></td></tr>`;
+    h+=`<tr class="fl"><td colspan="6"><span class="tl2">How do you feel after ${name}? (1\u201310)${/snack/i.test(name)?' \u00b7 optional':''}</span><div class="fbtns">${[1,2,3,4,5,6,7,8,9,10].map(v=>`<button class="fb${fe[m]===v?' on':''}" data-v="${v}" aria-pressed="${fe[m]===v}">${v}</button>`).join('')}</div></td></tr>`;
     h+=`<tr class="mtr"><td colspan="6"><span class="tl2">Time eaten (optional)</span><div class="mtl"><div class="tsel" data-mt="${mtm[m]||''}"><select data-p="h" aria-label="${name} hour">${hOpts}</select><span>:</span><select data-p="m" aria-label="${name} minutes">${mOpts}</select></div><button class="mnow">Now</button>${mtm[m]?'<button class="mclr">Clear</button>':''}</div></td></tr>`;
     h+=`<tr class="tl"><td colspan="6"><div><button class="cp">Copy yesterday</button><select class="sm" aria-label="Add a recipe">${opts}</select></div>${m===3?'<div><button class="m4off">Remove Meal 4</button></div>':''}</td></tr>`;
     h+=`<tr class="dnrow"><td colspan="6"><button class="done">Done \u25b4</button></td></tr></tbody>`;
@@ -1121,7 +1123,7 @@ $('kp').addEventListener('click',ev=>{
 function remMissing(){
   const d=$('date').value,today=iso(new Date());if(d>today)return[];
   const out=[],list=db.days[d]||[],fe=db.feel[d]||{};
-  const ms=[...new Set(list.map(e=>e.m??0))].sort((a,b)=>a-b).filter(m=>!fe[m]);
+  const ms=[...new Set(list.map(e=>e.m??0))].sort((a,b)=>a-b).filter(m=>!fe[m]&&!/snack/i.test(MEALS[m]));
   if(ms.length)out.push({k:'feel',t:'How you felt ('+ms.map(m=>MEALS[m]).join(', ')+')',m:ms[0]});
   const bm=db.bm[d]||{};
   if(!bm.y&&!bm.n&&(d<today||new Date().getHours()>=18))out.push({k:'bm',t:'BM'});
@@ -1136,11 +1138,16 @@ function renderRem(){
   el.hidden=!miss.length;if(!miss.length)return;
   el.innerHTML='<span class="rl">Don’t forget:</span>'+miss.map(x=>`<button data-r="${x.k}"${x.m!==undefined?` data-m="${x.m}"`:''}>${esc(x.t)}</button>`).join('')+'<button class="rx" data-r="x" aria-label="Dismiss reminders for this day">×</button>';
 }
+function goTo(el){
+  if(!el)return;const dash=document.querySelector('.dash'),sticky=dash&&getComputedStyle(dash).position==='sticky',off=(sticky?dash.offsetHeight:0)+12;
+  scrollTo({top:Math.max(0,el.getBoundingClientRect().top+scrollY-off),behavior:'smooth'});
+  el.classList.remove('pulse');void el.offsetWidth;el.classList.add('pulse');setTimeout(()=>el.classList.remove('pulse'),2200);
+}
 $('remBar').addEventListener('click',ev=>{
   const b=ev.target.closest('button');if(!b)return;const r=b.dataset.r;
   if(r==='x'){try{localStorage.setItem('dailylog.rem',$('date').value)}catch(e){}renderRem();return}
-  if(r==='feel'){const m=+b.dataset.m;openOnly(m);build();totals();const t=document.querySelector(`tbody[data-m="${m}"] .fl`);if(t)t.scrollIntoView({block:'center'});return}
-  setTab('diary');scrollTo({top:0});
+  if(r==='feel'){const m=+b.dataset.m;openOnly(m);build();totals();setTimeout(()=>goTo(document.querySelector(`tbody[data-m="${m}"] .fl td`)||document.querySelector(`tbody[data-m="${m}"] .fl`)),60);return}
+  setTab('diary');setTimeout(()=>goTo($(r==='bm'?'bmCard':'sleepCard')),60);
 });
 let eaT=null;
 function eaApply(){
