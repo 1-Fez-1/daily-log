@@ -90,8 +90,8 @@ details.micro summary{cursor:pointer;margin-top:10px;color:var(--p);font-weight:
 .nr{display:grid;grid-template-columns:84px 1fr 118px;gap:8px;align-items:center;padding:6px 0;border-top:1px solid var(--line)}
 .nr .muted{text-align:right}
 .nb{height:8px;background:var(--line);border-radius:4px;overflow:hidden}.nb i{display:block;height:100%;background:var(--p)}
-#scan,#nf{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:12px;z-index:50}
-#scan>div,#nf>div{background:var(--surface);border-radius:12px;padding:16px;max-width:460px;width:100%;max-height:100%;overflow:auto}
+#scan,#nf,#ea{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:12px;z-index:50}
+#scan>div,#nf>div,#ea>div{background:var(--surface);border-radius:12px;padding:16px;max-width:460px;width:100%;max-height:100%;overflow:auto}
 #scan video{width:100%;border-radius:8px;background:#000;margin:8px 0}
 .dash{padding:10px 12px}
 @media (min-height:650px){.dash{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;box-shadow:0 2px 10px rgba(0,0,0,.1)}}
@@ -141,7 +141,7 @@ button.primary{background:var(--acc);color:var(--accfg);border-color:var(--acc);
 :focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .muted{color:var(--muted);font-size:13px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:none;padding:16px;margin-bottom:12px}
-.card h2,#scan h2,#nf h2{font:600 12px/1.3 var(--font)!important;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);background:none;display:block;padding:0;margin:0 0 12px}
+.card h2,#scan h2,#nf h2,#ea h2{font:600 12px/1.3 var(--font)!important;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);background:none;display:block;padding:0;margin:0 0 12px}
 details.card summary{font-weight:600;font-size:14px}
 .top{margin-bottom:10px}
 .dn button{width:40px;padding:0;border:0;background:var(--soft);font-size:18px}
@@ -220,10 +220,19 @@ tfoot tr:last-child th,tfoot tr:last-child td{font-weight:500;color:var(--muted)
 .wc .wq{background:var(--soft);border:0;min-width:64px;font-weight:600}
 .wc .st,.sf .st{background:var(--soft);border:0;border-radius:10px}
 #slDur{font:600 22px/1 var(--font)}
-#scan,#nf{background:rgba(0,0,0,.45);align-items:flex-end;padding:0}
-#scan>div,#nf>div{border:0;border-radius:20px 20px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.2);max-height:92%;max-width:560px;padding:20px 16px calc(20px + env(safe-area-inset-bottom,0px))}
-@media (min-width:560px){#scan,#nf{align-items:center;padding:12px}#scan>div,#nf>div{border-radius:20px}}
+#scan,#nf,#ea{background:rgba(0,0,0,.45);align-items:flex-end;padding:0}
+#scan>div,#nf>div,#ea>div{border:0;border-radius:20px 20px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.2);max-height:92%;max-width:560px;padding:20px 16px calc(20px + env(safe-area-inset-bottom,0px))}
+@media (min-width:560px){#scan,#nf,#ea{align-items:center;padding:12px}#scan>div,#nf>div,#ea>div{border-radius:20px}}
 #toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(24px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--surface);border:0;border-radius:999px;padding:10px 18px;font-size:14px;font-weight:500;z-index:80;max-width:90%;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+.it{cursor:pointer;-webkit-user-select:none;user-select:none}.it:active td{background:var(--soft)}
+.fa2{display:flex;align-items:center;gap:8px;padding:4px 6px 10px 16px}
+.amtv{font-weight:600;font-size:13px;background:var(--soft);border-radius:8px;padding:4px 10px;white-space:nowrap}
+.tapn{font-size:13px;color:var(--muted)}
+.eaname{font:600 17px/1.3 var(--font);margin:0 0 12px;overflow-wrap:anywhere}
+.eac{gap:8px;margin-bottom:10px}.eac .st{width:52px;min-width:52px;min-height:52px;font-size:24px;border-radius:12px;background:var(--soft);border:0;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.eac input{flex:1;text-align:center;font-size:26px;font-weight:600;padding:10px 4px;border:1px solid var(--line);background:var(--surface)}
+.eac .u{font-size:15px;padding:0 4px}
+.eaq{display:flex;gap:8px;margin-bottom:6px}.eaq button{flex:1;background:var(--soft);border:0}
 @media (min-width:560px){thead th:nth-child(n+2){width:64px}}
 </style>
 </head>
@@ -357,6 +366,16 @@ tfoot tr:last-child th,tfoot tr:last-child td{font-weight:500;color:var(--muted)
     <button id="scClose">Close</button>
   </div>
 </div>
+<div id="ea" hidden>
+  <div role="dialog" aria-modal="true" aria-label="Change amount">
+    <h2>Change amount</h2>
+    <div id="eaName" class="eaname"></div>
+    <div class="amtc eac"><button type="button" class="st" data-d="-1" aria-label="Decrease amount">−</button><input id="eaIn" type="number" min="0" step="1" inputmode="decimal" aria-label="Amount"><button type="button" class="st" data-d="1" aria-label="Increase amount">+</button><span id="eaU" class="u"></span></div>
+    <div class="eaq" id="eaQ"><button data-q="-10">−10</button><button data-q="10">+10</button><button data-q="50">+50</button></div>
+    <p class="muted" id="eaPv" role="status"></p>
+    <div class="row"><button class="primary" id="eaSave">Save</button><button id="eaCancel">Cancel</button><button id="eaDel">Remove food</button></div>
+  </div>
+</div>
 <div id="nf" hidden>
   <div role="dialog" aria-modal="true" aria-label="New food">
     <h2 style="font:600 16px Georgia,serif;margin:0 0 6px">New food</h2>
@@ -418,10 +437,10 @@ function build(){
     const items=list.map((e,i)=>({e,i})).filter(x=>(x.e.m??0)===m),open=openM.has(m);
     h+=`<tbody data-m="${m}"${open?' class="open"':''}><tr class="gh"><th><button class="tg" aria-expanded="${open}"><span class="chev">${open?'\u25be':'\u25b8'}</span><span class="nm">${name}</span><span class="cnt">${items.length?items.length+(items.length>1?' foods':' food'):'empty'}${fe[m]?' \u00b7 feel '+fe[m]+'/10':''}</span></button></th>${F.map(f=>`<td data-s="${f}"></td>`).join('')}<td><button class="cp" aria-label="Copy ${name} from yesterday" title="Copy ${name} from yesterday">\u21ba</button></td></tr>`;
     items.forEach(({e,i})=>{
-      const st=(e.ru==='g'||e.ru==='ml')?1:0.5;
-      h+=`<tr class="it"><td><div class="fn">${esc(e.n)}</div>`+(e.a?`<div class="fa"><button type="button" class="st" data-d="${-st}" aria-label="Decrease amount">\u2212</button><input class="ea" type="number" min="0" step="${st}" inputmode="decimal" value="${e.a}" data-i="${i}" aria-label="Amount of ${esc(e.n)}"><button type="button" class="st" data-d="${st}" aria-label="Increase amount">+</button><span>${esc(e.ru||'')}</span></div>`:'')+'</td>'
-        +F.map(f=>e.a?`<td data-v="${f}">${fmtV(f,e[f])}</td>`:`<td><input type="number" min="0" inputmode="decimal" data-i="${i}" data-f="${f}" value="${Math.round(e[f]*10)/10}" aria-label="${LBL[f]}"></td>`).join('')
-        +`<td><button class="del" data-i="${i}" aria-label="Remove ${esc(e.n)}">\u00d7</button></td></tr>`});
+      const q=e.a?{n:e.n,a:e.a,ru:e.ru}:parseAmt(e);
+      h+=`<tr class="it" data-i="${i}" tabindex="0" role="button" aria-label="Change amount of ${esc(q.n)}"><td><div class="fn">${esc(q.n)}</div><div class="fa2"><span class="amtv">${amtLabel(q)}</span><span class="tapn" aria-hidden="true">✎</span></div></td>`
+        +F.map(f=>`<td data-v="${f}">${fmtV(f,e[f])}</td>`).join('')
+        +`<td><button class="del" data-i="${i}" aria-label="Remove ${esc(q.n)}">×</button></td></tr>`});
     h+=`<tr class="ar"><td colspan="4"><input class="n" list="foodlist" placeholder="Add food\u2026" aria-label="Food to add to ${name}"></td><td colspan="2" class="pv"><button class="nfb">New food</button></td></tr>`;
     h+=`<tr class="ar2" hidden><td colspan="6"><div class="amtc"><button type="button" class="st" data-d="-1" aria-label="Decrease amount">\u2212</button><input class="a" type="number" min="0" step="1" inputmode="decimal" placeholder="amount" aria-label="Amount"><button type="button" class="st" data-d="1" aria-label="Increase amount">+</button><span class="u">g</span><span class="pvt"></span><button class="ab" aria-label="Add food">Add</button></div></td></tr>`;
     h+=`<tr class="fl"><td colspan="6"><span class="tl2">How do you feel after ${name}? (1\u201310)</span><div class="fbtns">${[1,2,3,4,5,6,7,8,9,10].map(v=>`<button class="fb${fe[m]===v?' on':''}" data-v="${v}" aria-pressed="${fe[m]===v}">${v}</button>`).join('')}</div></td></tr>`;
@@ -569,6 +588,8 @@ const sheet=$('sheet');
 sheet.addEventListener('click',ev=>{
   const gh=ev.target.closest('tr.gh');
   if(gh){const tb0=gh.closest('tbody'),m0=+tb0.dataset.m;if(ev.target.closest('button.cp')){copyFrom(m0);return}openM.has(m0)?openM.delete(m0):openM.add(m0);build();totals();return}
+  const it=ev.target.closest('tr.it');
+  if(it&&!ev.target.closest('button.del')){openEA(+it.dataset.i);return}
   const b=ev.target.closest('button');if(!b)return;
   const tb=b.closest('tbody'),m=tb&&tb.dataset.m!==undefined?+tb.dataset.m:null,d=$('date').value;
   if(b.classList.contains('st')){if(ev.detail===0)stepIt(b);return}
@@ -893,6 +914,46 @@ $('noteTx').addEventListener('input',()=>{
   const d=$('date').value,v=$('noteTx').value;clearTimeout(noteT);
   noteT=setTimeout(()=>{if(v.trim())db.notes[d]=v;else delete db.notes[d];save()},300);
 });
+function parseAmt(e){
+  let m=e.n.match(/^(.*\S)\s+(\d+(?:\.\d+)?)\s*(g|ml)$/i);if(m)return{n:m[1],a:+m[2],ru:m[3].toLowerCase()};
+  m=e.n.match(/^(.*\S)\s+x\s*(\d+(?:\.\d+)?)$/i);if(m)return{n:m[1],a:+m[2],ru:'items'};
+  m=e.n.match(/^(.*\S)\s+(\d+(?:\.\d+)?)\/(\d+(?:\.\d+)?)$/);if(m)return{n:m[1],a:+m[2],ru:'/'+m[3]};
+  return{n:e.n,a:1,ru:'items'};
+}
+function amtLabel(q){const a=+(+q.a).toFixed(2);return q.ru==='g'||q.ru==='ml'?a+' '+q.ru:(q.ru||'')[0]==='/'?a+q.ru:a+(a===1?' item':' items')}
+let eaState=null;
+function eaPv(){
+  if(!eaState)return;const v=num($('eaIn').value),p=eaState.pu,r1=x=>Math.round(x*10)/10;
+  $('eaPv').textContent=v?`${Math.round(p.k*v)} kcal · P ${r1(p.p*v)} · C ${r1(p.c*v)} · F ${r1(p.f*v)}`:'Enter an amount';
+}
+function openEA(i){
+  const e=dayList()[i];if(!e)return;
+  const base=(e.pu&&e.a)?{n:e.n,a:e.a,ru:e.ru,pu:e.pu}:(q=>({n:q.n,a:q.a||1,ru:q.ru,pu:mkPU(e,q.a||1)}))(parseAmt(e));
+  eaState={i,n:base.n,ru:base.ru,pu:base.pu};
+  const mass=base.ru==='g'||base.ru==='ml',st=mass?1:0.5;
+  $('eaName').textContent=base.n;$('eaU').textContent=mass?base.ru:(base.ru||'')[0]==='/'?'servings':base.ru;
+  document.querySelectorAll('#ea .amtc .st').forEach(b=>b.dataset.d=(+b.dataset.d<0?-1:1)*st);
+  $('eaQ').hidden=!mass;$('eaIn').step=st;$('eaIn').value=base.a;
+  $('ea').hidden=false;eaPv();setTimeout(()=>{$('eaIn').focus();$('eaIn').select()},60);
+}
+function eaSave(){
+  if(!eaState)return;const v=num($('eaIn').value);if(!v){toast('Enter an amount above 0');return}
+  const e=dayList()[eaState.i];if(!e)return;
+  e.n=eaState.n;e.ru=eaState.ru;e.pu=eaState.pu;applyAmt(e,v);
+  save();$('ea').hidden=true;eaState=null;render();toast('Updated to '+amtLabel({a:v,ru:e.ru}));
+}
+$('eaIn').addEventListener('input',eaPv);
+$('eaIn').addEventListener('keydown',ev=>{if(ev.key==='Enter')eaSave()});
+$('eaSave').onclick=eaSave;
+$('eaCancel').onclick=()=>{$('ea').hidden=true;eaState=null};
+$('eaDel').onclick=()=>{if(!eaState)return;dayList().splice(eaState.i,1);save();$('ea').hidden=true;eaState=null;render();toast('Removed')};
+$('ea').addEventListener('click',ev=>{
+  if(ev.target===$('ea')){$('ea').hidden=true;eaState=null;return}
+  const b=ev.target.closest('button');if(!b)return;
+  if(b.classList.contains('st')&&ev.detail===0)stepIt(b);
+  if(b.dataset.q){$('eaIn').value=Math.max(0,Math.round(((parseFloat($('eaIn').value)||0)+ +b.dataset.q)*100)/100);eaPv()}
+});
+sheet.addEventListener('keydown',ev=>{if(ev.key==='Enter'&&ev.target.matches('tr.it'))openEA(+ev.target.dataset.i)});
 $('copyAll').onclick=ev=>copyFrom(null,ev.target);
 
 $('wIn').onchange=()=>{const v=parseFloat($('wIn').value),d=$('date').value;if(v>0)db.weights[d]=v;else delete db.weights[d];save();charts()};
