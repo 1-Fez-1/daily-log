@@ -288,12 +288,20 @@ body.kp-open{padding-bottom:var(--kp-h,0px)}body.kp-open #ea,body.kp-open #nf,bo
 #medCard>summary:after{content:"\25b8";font-size:12px;transition:transform .15s;margin-left:auto;flex:0 0 auto}#medCard[open]>summary:after{transform:rotate(90deg)}
 #medCard .medsum{margin-left:auto;text-transform:none;letter-spacing:0;font-size:13px;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 #medCard[open]>summary .medsum{display:none}#medCard[open]>summary{margin-bottom:10px}
+.top .dn{flex:1 1 auto;min-width:0}.top .dn input{min-width:0;flex:1 1 auto}.top .dn button{flex:0 0 38px;width:38px;padding:0}
+#graphsBtn{flex:0 0 44px;width:44px;padding:0;background:var(--soft);border:0;font-size:18px}#graphsBtn[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+#scanBtn{flex:0 0 auto;padding:0 12px}
+.ar td input.n[readonly]{font-weight:600;color:var(--ink)}
+.ar td .pclr{width:auto;min-height:36px;padding:0 12px;border:0;background:transparent;color:var(--muted);font-size:16px}
+.ar2 td .ab{display:inline-flex;align-items:center;gap:4px}
+.ar2 .amtc{flex-wrap:wrap}.ar2 .amtc .pvt{order:9;flex:1 0 100%;padding:4px 2px 0;font-size:12px;color:var(--muted)}
 </style>
 </head>
 <body>
 <main>
   <header class="top">
     <div class="dn"><button id="prevD" aria-label="Previous day">&lsaquo;</button><input type="date" id="date" aria-label="Date"><button id="nextD" aria-label="Next day">&rsaquo;</button></div>
+    <button id="graphsBtn" aria-label="Graphs" title="Graphs" aria-pressed="false">&#128200;</button>
     <button id="scanBtn">&#128247; Scan</button>
   </header>
   <div id="todayRow" class="todayrow" hidden><button id="todayD">Back to today</button></div>
@@ -318,7 +326,7 @@ body.kp-open{padding-bottom:var(--kp-h,0px)}body.kp-open #ea,body.kp-open #nf,bo
   </section>
 
   
-<nav class="tabs" role="tablist"><button role="tab" data-t="log">Log</button><button role="tab" data-t="diary">Diary</button><button role="tab" data-t="graphs">Graphs</button><button role="tab" data-t="nut">Vitamins</button><button role="tab" data-t="foods">Foods</button><button role="tab" data-t="rec">Recipes</button></nav>
+<nav class="tabs" role="tablist"><button role="tab" data-t="log">Log</button><button role="tab" data-t="diary">Diary</button><button role="tab" data-t="nut">Vitamins</button><button role="tab" data-t="foods">Foods</button><button role="tab" data-t="rec">Recipes</button></nav>
 
   <div data-tab="log">
     <div id="bkNudge" class="nudge" hidden><span id="bkNudgeT"></span><div><button id="bkNudgeGo" class="primary">Back up now</button><button id="bkNudgeLater">Later</button></div></div>
@@ -640,18 +648,29 @@ function addScaled(f,m,amt){
   e.n=f.n;e.a=amt;e.ru=rf.u||'items';e.pu=mkPU(e,amt);
   dayList().push(e);return e;
 }
+function lastAmtFor(food){
+  const rf=fref(food),low=food.n.toLowerCase();
+  for(const d of Object.keys(db.days).sort().reverse()){
+    const l=db.days[d]||[];
+    for(let i=l.length-1;i>=0;i--){const e=l[i],q=e.a?{n:e.n,a:e.a,ru:e.ru}:parseAmt(e);
+      if((String(e.n).trim().toLowerCase()===low||baseName(q.n).toLowerCase()===low)&&q.a>0&&(q.ru||'items')===(rf.u||'items'))return q.a}
+  }
+  return rf.a;
+}
+document.addEventListener('click',ev=>{const n=ev.target.closest&&ev.target.closest('#sheet .ar .n[readonly]');if(n){const a2=n.closest('tbody').querySelector('.ar2 .a');if(a2)a2.focus()}});
 function updAdd(tb){
   const ra=tb.querySelector('.ar'),rb=tb.querySelector('.ar2'),txt=ra.querySelector('.n').value.trim(),pv=ra.querySelector('.pv');
   const food=txt&&db.foods.find(x=>x.n.toLowerCase()===txt.toLowerCase()),a=num(rb.querySelector('.a').value),r1=x=>Math.round(x*10)/10;
   if(!food){
     const rc=findRec(txt);
-    if(rc){const t=recTot(rc.items),sc=(a||1)/rc.servings;rb.hidden=false;rb.querySelector('.u').textContent='serv';rb.querySelectorAll('.st').forEach(x=>{x.dataset.d=(+x.dataset.d<0?-1:1)*0.5});rb.querySelector('.pvt').textContent=`${Math.round(t.k*sc)} kcal · P ${r1(t.p*sc)} · C ${r1(t.c*sc)} · F ${r1(t.f*sc)}`;pv.innerHTML=`<span class="pvt muted">recipe · ${rc.servings} servings</span>`;return}
+    if(rc){const t=recTot(rc.items),sc=(a||1)/rc.servings;rb.hidden=false;rb.querySelector('.u').textContent='serv';rb.querySelectorAll('.st').forEach(x=>{x.dataset.d=(+x.dataset.d<0?-1:1)*0.5});rb.querySelector('.pvt').textContent=`${Math.round(t.k*sc)} kcal · P ${r1(t.p*sc)} · C ${r1(t.c*sc)} · F ${r1(t.f*sc)}`;pv.innerHTML=ra.querySelector('.n').readOnly?'<button class="pclr" aria-label="Choose a different food" title="Change food">\u2715</button>':`<span class="pvt muted">recipe · ${rc.servings} servings</span>`;rb.querySelector('.ab').innerHTML='\u2713 Add';return}
     rb.hidden=true;pv.innerHTML='<button class="nfb">New food</button>';return}
   const rf=fref(food),sc=a?a/rf.a:(rf.u?0:1);
   rb.hidden=false;rb.querySelector('.u').textContent=rf.u||'items';
   rb.querySelectorAll('.st').forEach(x=>{x.dataset.d=(+x.dataset.d<0?-1:1)*(rf.u?1:0.5)});
   rb.querySelector('.pvt').textContent=sc?`${Math.round(food.k*sc)} kcal · P ${r1(food.p*sc)} · C ${r1(food.c*sc)} · F ${r1(food.f*sc)}`:'enter amount';
-  pv.innerHTML=`<span class="pvt muted">${rf.u?'label: '+rf.a+' '+rf.u:'per item'}</span>`;
+  pv.innerHTML=(ra.querySelector('.n').readOnly?'<button class="pclr" aria-label="Choose a different food" title="Change food">\u2715</button>':`<span class="pvt muted">${rf.u?'label: '+rf.a+' '+rf.u:'per item'}</span>`);
+  rb.querySelector('.ab').innerHTML='\u2713 Add';
 }
 function addFood(tb){
   const row=tb.querySelector('.ar'),rb=tb.querySelector('.ar2'),txt=row.querySelector('.n').value.trim(),m=+tb.dataset.m;
@@ -688,6 +707,7 @@ sheet.addEventListener('click',ev=>{
   if(b.classList.contains('mnow')){const n=new Date(),mm=Math.round(n.getMinutes()/5)*5;n.setMinutes(mm);setMT(m,String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0'));return}
   if(b.classList.contains('mclr')){setMT(m,'');return}
   if(b.classList.contains('st')){if(ev.detail===0)stepIt(b);return}
+  if(b.classList.contains('pclr')){const t2=b.closest('tbody'),n=t2.querySelector('.ar .n'),a2=t2.querySelector('.ar2 .a');n.readOnly=false;n.value='';a2.value='';delete a2.dataset.auto;updAdd(t2);kpHide();n.focus();return}
   if(b.classList.contains('nfb')){const t2=b.closest('tbody');openNF(m,t2.querySelector('.n').value.trim(),num(t2.querySelector('.a').value));return}
   if(b.classList.contains('done')){openM.delete(m);build();totals();return}
   if(b.classList.contains('fb')){const fe=(db.feel[d]=db.feel[d]||{}),v=+b.dataset.v;if(fe[m]===v)delete fe[m];else fe[m]=v;if(!Object.keys(fe).length)delete db.feel[d];save();build();totals();return}
@@ -712,11 +732,14 @@ sheet.addEventListener('change',ev=>{
 });
 sheet.addEventListener('input',ev=>{
   const c=ev.target.classList;if(c.contains('n')||c.contains('a'))updAdd(ev.target.closest('tbody'));
+  if(c.contains('a'))delete ev.target.dataset.auto;
   if(c.contains('n')){
-    const n=ev.target,txt=n.value.trim(),prev=n._pl||0;n._pl=n.value.length;
-    const known=txt&&(db.foods.some(x=>x.n.toLowerCase()===txt.toLowerCase())||findRec(txt));
+    const n=ev.target,tb=n.closest('tbody'),txt=n.value.trim(),prev=n._pl||0;n._pl=n.value.length;
+    const food=txt&&db.foods.find(x=>x.n.toLowerCase()===txt.toLowerCase()),rec=!food&&txt&&findRec(txt),a2=tb.querySelector('.ar2 .a');
     const typed=['insertText','deleteContentBackward','deleteContentForward','insertFromPaste','deleteByCut'].includes(ev.inputType);
-    if(known&&(!typed||Math.abs(n.value.length-prev)>1)){const a2=n.closest('tbody').querySelector('.ar2 .a');if(a2&&!a2.value)a2.focus()}
+    if((food||rec)&&(!a2.value||a2.dataset.auto)){a2.value=food?lastAmtFor(food):1;a2.dataset.auto='1';updAdd(tb)}
+    else if(!food&&!rec&&a2.dataset.auto){a2.value='';delete a2.dataset.auto;updAdd(tb)}
+    if((food||rec)&&(!typed||Math.abs(n.value.length-prev)>1)&&KPM==='none'){n.readOnly=true;updAdd(tb)}
   }
 });
 sheet.addEventListener('keydown',ev=>{
@@ -792,8 +815,9 @@ function jumpTo(ix){
   if(rows[0])rows[0].scrollIntoView({block:'center'});rows.forEach(r=>{r.classList.add('flash');setTimeout(()=>r.classList.remove('flash'),2000)});
 }
 $('nutList').addEventListener('click',ev=>{const c=ev.target.closest('button.cr');if(c){const ix=cgroups[c.dataset.cg];if(ix&&ix.length)jumpTo(ix);return}const b=ev.target.closest('button[data-nk]');if(!b)return;const k=b.dataset.nk;openN.has(k)?openN.delete(k):openN.add(k);renderNut()});
-function setTab(t){document.querySelectorAll('[data-tab]').forEach(el=>el.hidden=el.dataset.tab!==t);document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t))}
+function setTab(t){document.querySelectorAll('[data-tab]').forEach(el=>el.hidden=el.dataset.tab!==t);document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t));$('graphsBtn').setAttribute('aria-pressed',t==='graphs');window.scrollTo(0,0)}
 document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
+$('graphsBtn').onclick=()=>{const on=$('graphsBtn').getAttribute('aria-pressed')==='true';setTab(on?'log':'graphs');if(!on)try{charts()}catch(e){}};
 setTab('log');
 let scStream=null,scReader=null,scRun=false;
 const scMsg=t=>$('scMsg').textContent=t;
