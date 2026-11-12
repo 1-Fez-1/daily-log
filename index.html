@@ -349,7 +349,7 @@ body.kp-open #fp{padding-bottom:var(--kp-h,0px)}
       <div class="wbtns"><div class="amtc"><button type="button" class="st" data-d="-10" aria-label="Decrease">&minus;</button><input class="wi" id="wIn2" type="number" min="0" step="1" inputmode="numeric" placeholder="ml" aria-label="Custom water amount in ml"><button type="button" class="st" data-d="10" aria-label="Increase">+</button></div><button class="primary" id="wAdd">Add</button><button id="wUndo">Undo last</button></div>
     </section>
     <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
-      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Export a backup regularly, and before moving to a new version or device. <span id="lastBk"></span> <span style="opacity:.7">Version 29 · tidy</span></p>
+      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Export a backup regularly, and before moving to a new version or device. <span id="lastBk"></span> <span style="opacity:.7">Version 30 · daily backup</span></p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
       <div class="row"><select id="bkMode" aria-label="Import mode"><option value="merge">Import: merge with current data</option><option value="replace">Import: replace everything</option></select><button id="bkImport">Import</button></div>
       <textarea id="bk" rows="3" style="width:100%;font:12px monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px" placeholder="Backup text appears here after Export. To restore, choose a file or paste backup text, then press Import." aria-label="Backup text"></textarea>
@@ -1306,12 +1306,12 @@ $('bkExport').onclick=doBackup;
 const daysSince=d=>Math.round((new Date(iso(new Date())+'T00:00:00')-new Date(d+'T00:00:00'))/864e5);
 function renderNudge(){
   let sn=0;try{sn=+localStorage.getItem('dailylog.nudge')||0}catch(e){}
-  const has=Object.values(db.days).some(l=>l&&l.length),n=db.lastBackup?daysSince(db.lastBackup):null,show=has&&(n===null||n>=7)&&Date.now()>sn;
+  const has=Object.values(db.days).some(l=>l&&l.length),n=db.lastBackup?daysSince(db.lastBackup):null,show=has&&(n===null||n>=1)&&Date.now()>sn;
   $('bkNudge').hidden=!show;
   if(show)$('bkNudgeT').textContent=n===null?'No backup yet. Your data lives only on this phone.':(n===1?'Last backup was yesterday.':'Last backup was '+n+' days ago.');
 }
 $('bkNudgeGo').onclick=doBackup;
-$('bkNudgeLater').onclick=()=>{try{localStorage.setItem('dailylog.nudge',String(Date.now()+24*36e5))}catch(e){}renderNudge()};
+$('bkNudgeLater').onclick=()=>{try{localStorage.setItem('dailylog.nudge',String(Date.now()+3*36e5))}catch(e){}renderNudge()};
 let tidyArmed=null;
 function tidyPlan(){
   const plan=[];
