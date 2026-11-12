@@ -358,7 +358,7 @@ body.kp-open #fp{padding-bottom:var(--kp-h,0px)}
       <div class="wbtns"><button class="wq" data-w="150">+150</button><button class="wq" data-w="250">+250</button><button class="wq" data-w="500">+500</button><span class="muted">ml</span></div>
       <div class="wbtns"><div class="amtc"><button type="button" class="st" data-d="-10" aria-label="Decrease">&minus;</button><input class="wi" id="wIn2" type="number" min="0" step="1" inputmode="numeric" placeholder="ml" aria-label="Custom water amount in ml"><button type="button" class="st" data-d="10" aria-label="Increase">+</button></div><button class="primary" id="wAdd">Add</button><button id="wUndo">Undo last</button></div>
     </section>
-    <p class="muted" style="text-align:center;font-size:11px;margin:14px 0 0">Version 27 · picker stays open</p>
+    <p class="muted" style="text-align:center;font-size:11px;margin:14px 0 0">Version 28 · cancel buttons</p>
     <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
       <p class="muted" style="margin:8px 0">Data is stored only in this browser. Export a backup regularly, and before moving to a new version or device. <span id="lastBk"></span></p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
@@ -427,6 +427,7 @@ body.kp-open #fp{padding-bottom:var(--kp-h,0px)}
         <input id="sfc" type="number" min="0" inputmode="decimal" placeholder="C g" aria-label="Carbs g">
         <input id="sff" type="number" min="0" inputmode="decimal" placeholder="F g" aria-label="Fat g">
         <button class="primary" id="sfSave">Save food</button>
+        <button id="sfCancel" type="button" style="grid-column:1/-1">Cancel</button>
       </div>
       <p class="muted" id="sfMsg" role="status" style="margin:8px 0 0"></p>
       <details class="micro"><summary>Water, vitamins &amp; minerals (optional)</summary><div id="sfMicro" class="mgrid"></div></details>
@@ -491,7 +492,7 @@ body.kp-open #fp{padding-bottom:var(--kp-h,0px)}
 </div>
 <div id="nf" hidden>
   <div role="dialog" aria-modal="true" aria-label="New food">
-    <h2 style="font:600 16px Georgia,serif;margin:0 0 6px">New food</h2>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin:0 0 6px"><h2 style="font:600 16px Georgia,serif;margin:0">New food</h2><button id="nfX" type="button" aria-label="Cancel" style="width:40px;min-height:40px;padding:0;border:0;background:var(--soft);color:var(--muted);border-radius:999px">✕</button></div>
     <p class="muted" style="margin:0 0 8px">Enter the values as printed on the pack, for the serving size shown there (for example 23 g, or 100 ml). After saving you can add it by any weight or volume.</p>
     <div class="sfadd">
       <input id="nfN" placeholder="Food name" aria-label="Food name">
@@ -785,9 +786,11 @@ $('sfSave').onclick=()=>{
   if(!e.k)e.k=e.p*4+e.c*4+e.f*9;
   const u=readMicro();if(Object.keys(u).length)e.u=u;{const w=num($('sfW').value);if(w>0)e.w=w}
   const i=db.foods.findIndex(x=>x.n.toLowerCase()===n.toLowerCase());if(i<0)db.foods.push(e);else db.foods[i]=e;
-  ['sfN','sfk','sfp','sfc','sff'].forEach(id=>$(id).value='');$('sfEU').value='kcal';$('sfEc').textContent='';clearMicro();$('sfRU').value='g';$('sfRA').value=100;$('sfRA').hidden=false;
-  $('sfSave').textContent='Save food';$('sfMsg').textContent='Saved '+n+'.';save();render();$('sfN').focus();
+  sfClear();
+  $('sfMsg').textContent='Saved '+n+'.';save();render();$('sfN').focus();
 };
+function sfClear(){['sfN','sfk','sfp','sfc','sff'].forEach(id=>$(id).value='');$('sfW')&&($('sfW').value='');$('sfEU').value='kcal';$('sfEc').textContent='';clearMicro();$('sfRU').value='g';$('sfRA').value=100;$('sfRA').hidden=false;$('sfSave').textContent='Save food';$('sfMsg').textContent=''}
+$('sfCancel').onclick=()=>{sfClear();document.querySelector('details.micro').open=false;toast('Cancelled')};
 document.querySelector('.sfadd').addEventListener('keydown',ev=>{if(ev.key==='Enter')$('sfSave').click()});
 let hold=null;
 const stepIt=b=>{const i=b.parentElement.querySelector('input'),v=(parseFloat(i.value)||0)+(+b.dataset.d);i.value=Math.max(0,Math.round(v*100)/100);i.dispatchEvent(new Event('input',{bubbles:true}))};
@@ -988,7 +991,7 @@ function nfSave(add){
 }
 $('nfRU').onchange=()=>{if($('nfRU').value&&+$('nfRA').value===1)$('nfRA').value=100;nfUnit()};$('nfRA').oninput=nfUnit;
 $('sfRU').onchange=()=>{const u=$('sfRU').value;$('sfRA').hidden=!u;if(!u)$('sfRA').value=1;else if(+$('sfRA').value===1)$('sfRA').value=100};
-$('nfAdd').onclick=()=>nfSave(true);$('nfOnly').onclick=()=>nfSave(false);$('nfCancel').onclick=()=>{$('nf').hidden=true};
+$('nfAdd').onclick=()=>nfSave(true);$('nfOnly').onclick=()=>nfSave(false);$('nfCancel').onclick=$('nfX').onclick=()=>{$('nf').hidden=true};
 function waterTotal(d){return (db.water[d]||[]).reduce((a,b)=>a+b,0)+(db.days[d]||[]).reduce((a,e)=>a+(e.w||0),0)}
 function renderWater(){
   const d=$('date').value,man=(db.water[d]||[]).reduce((a,b)=>a+b,0),tot=waterTotal(d),goal=db.waterGoal||2000,pc=Math.round(tot/goal*100);
@@ -1157,17 +1160,18 @@ function kpCommit(el){if(el&&el.dataset.orig!==undefined&&el.value!==el.dataset.
 function kpShow(el){
   kpT=el;el.dataset.fresh='1';el.dataset.last=el.value;el.dataset.orig=el.value;
   if(KPM!=='none')return;
-  $('kpAct').textContent=el.matches('#sheet input.a,#fp input.fa')?'Add':'Done';$('kp').hidden=false;document.body.classList.add('kp-open');
+  $('kpAct').textContent=el.matches('#sheet input.a,#fp input.fa')?'Add':'Done';$('kp').hidden=false;clearTimeout(kpRm);document.body.classList.add('kp-open');
   document.documentElement.style.setProperty('--kp-h',$('kp').offsetHeight+'px');
   if(el.id!=='eaIn')setTimeout(()=>{try{el.scrollIntoView({block:'center'})}catch(e){}},60);
 }
-function kpHide(){kpCommit(kpT);$('kp').hidden=true;document.body.classList.remove('kp-open');kpT=null}
-document.addEventListener('focusin',ev=>{const t=ev.target;if(kpIs(t))kpShow(t);else if(!t.closest('#kp,#fp .fpe'))kpHide()});
+let kpRm=null;
+function kpHide(defer){kpCommit(kpT);$('kp').hidden=true;clearTimeout(kpRm);if(defer===true)kpRm=setTimeout(()=>document.body.classList.remove('kp-open'),450);else document.body.classList.remove('kp-open');kpT=null}
+document.addEventListener('focusin',ev=>{const t=ev.target;if(kpIs(t))kpShow(t);else if(!t.closest('#kp,#fp .fpe'))kpHide(true)});
 document.addEventListener('pointerdown',ev=>{
   if(!kpT||KPM!=='none')return;const t=ev.target;
   if(t.closest('#kp')){ev.preventDefault();return}
   if(t===kpT||t.closest('.amtc,#ea>div,#fp .fpe'))return;
-  const o=kpT;o.blur();kpHide();
+  const o=kpT;o.blur();kpHide(true);
 },true);
 document.addEventListener('input',ev=>{const t=ev.target;if(kpIs(t)&&/[^0-9.]/.test(t.value))t.value=t.value.replace(/[^0-9.]/g,'')},true);
 $('kp').addEventListener('click',ev=>{
