@@ -350,7 +350,7 @@ body.kp-open #fp{padding-bottom:var(--kp-h,0px)}
       <div class="wbtns"><div class="amtc"><button type="button" class="st" data-d="-10" aria-label="Decrease">&minus;</button><input class="wi" id="wIn2" type="number" min="0" step="1" inputmode="numeric" placeholder="ml" aria-label="Custom water amount in ml"><button type="button" class="st" data-d="10" aria-label="Increase">+</button></div><button class="primary" id="wAdd">Add</button><button id="wUndo">Undo last</button></div>
     </section>
     <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
-      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Export a backup regularly, and before moving to a new version or device. <span id="lastBk"></span> <span style="opacity:.7">Version 33 · yes/no colours</span></p>
+      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Export a backup regularly, and before moving to a new version or device. <span id="lastBk"></span> <span style="opacity:.7">Version 34 · slower slide</span></p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
       <div class="row"><select id="bkMode" aria-label="Import mode"><option value="merge">Import: merge with current data</option><option value="replace">Import: replace everything</option></select><button id="bkImport">Import</button></div>
       <textarea id="bk" rows="3" style="width:100%;font:12px monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px" placeholder="Backup text appears here after Export. To restore, choose a file or paste backup text, then press Import." aria-label="Backup text"></textarea>
@@ -1282,7 +1282,7 @@ $('copyAll').onclick=ev=>copyFrom(null,ev.target);
 $('wIn').onchange=()=>{const v=parseFloat($('wIn').value),d=$('date').value;if(v>0)db.weights[d]=v;else delete db.weights[d];save();charts()};
 $('gEdit').onclick=()=>{const o=$('gForm').hidden;$('gForm').hidden=!o;$('gEdit').textContent=o?'Done':'Goals';$('gEdit').setAttribute('aria-expanded',o)};
 $('range').onchange=charts;
-function daySlide(dir){try{if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;const m=document.querySelector('main');m.getAnimations().forEach(a=>a.cancel());m.animate([{opacity:0,transform:'translateX('+(dir*44)+'px)'},{opacity:1,transform:'translateX(0)'}],{duration:260,easing:'cubic-bezier(.2,.8,.2,1)'})}catch(e){}}
+function daySlide(dir){try{if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;const m=document.querySelector('main');m.getAnimations().forEach(a=>a.cancel());m.animate([{opacity:0,transform:'translateX('+(dir*60)+'px)'},{opacity:1,transform:'translateX(0)'}],{duration:480,easing:'cubic-bezier(.22,.7,.2,1)'})}catch(e){}}
 $('prevD').onclick=()=>{$('date').value=prev($('date').value);render();daySlide(-1)};
 $('nextD').onclick=()=>{const t=new Date($('date').value+'T00:00:00');t.setDate(t.getDate()+1);$('date').value=iso(t);render();daySlide(1)};
 $('gK').onchange=()=>{goals();const o=db.goals.k,n=num($('gK').value),r=o?n/o:1;db.goals.k=n;db.mg.p=Math.round(db.mg.p*r);db.mg.f=Math.round(db.mg.f*r);save();render()};
