@@ -358,7 +358,7 @@ body.kp-open #fp{padding-bottom:var(--kp-h,0px)}
       <div class="wbtns"><button class="wq" data-w="150">+150</button><button class="wq" data-w="250">+250</button><button class="wq" data-w="500">+500</button><span class="muted">ml</span></div>
       <div class="wbtns"><div class="amtc"><button type="button" class="st" data-d="-10" aria-label="Decrease">&minus;</button><input class="wi" id="wIn2" type="number" min="0" step="1" inputmode="numeric" placeholder="ml" aria-label="Custom water amount in ml"><button type="button" class="st" data-d="10" aria-label="Increase">+</button></div><button class="primary" id="wAdd">Add</button><button id="wUndo">Undo last</button></div>
     </section>
-    <p class="muted" style="text-align:center;font-size:11px;margin:14px 0 0">Version 26 · food picker</p>
+    <p class="muted" style="text-align:center;font-size:11px;margin:14px 0 0">Version 27 · picker stays open</p>
     <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
       <p class="muted" style="margin:8px 0">Data is stored only in this browser. Export a backup regularly, and before moving to a new version or device. <span id="lastBk"></span></p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
@@ -472,7 +472,7 @@ body.kp-open #fp{padding-bottom:var(--kp-h,0px)}
 <div id="kp" hidden role="group" aria-label="Number pad"><div class="kpg"><button type="button" data-k="1">1</button><button type="button" data-k="2">2</button><button type="button" data-k="3">3</button><button type="button" data-k="bs" aria-label="Delete">⌫</button><button type="button" data-k="4">4</button><button type="button" data-k="5">5</button><button type="button" data-k="6">6</button><button type="button" data-k="7">7</button><button type="button" data-k="8">8</button><button type="button" data-k="9">9</button><button type="button" data-k=".">.</button><button type="button" data-k="0" class="kz">0</button><button type="button" class="kpa" id="kpAct">Done</button></div></div>
 <div id="fp" hidden>
   <div role="dialog" aria-modal="true" aria-label="Add food">
-    <div class="fph"><h2 id="fpT">Add food</h2><button id="fpX" aria-label="Close">✕</button></div>
+    <div class="fph"><h2 id="fpT">Add food</h2><button id="fpX" aria-label="Done">✓</button></div>
     <input id="fpQ" type="search" placeholder="Search saved foods" autocomplete="off" aria-label="Search saved foods">
     <div id="fpList"></div>
     <button id="fpNew" class="fpnew">+ New food</button>
@@ -568,7 +568,6 @@ function build(){
         +F.map(f=>`<td data-v="${f}">${fmtV(f,e[f])}</td>`).join('')
         +`<td><button class="del" data-i="${i}" aria-label="Remove ${esc(q.n)}">×</button></td></tr>`});
     h+=`<tr class="ar"><td colspan="4"><input class="n" readonly placeholder="Add food\u2026" aria-label="Add food to ${name}"></td><td colspan="2" class="pv"><button class="nfb">New food</button></td></tr>`;
-    if(quickList.length)h+=`<tr class="qr"><td colspan="6"><span class="tl2">Quick add</span><div class="chips">${quickList.map((q,qi)=>`<button class="qa" data-q="${qi}">${esc(q.food.n)}<small>${amtLabel({a:q.amt,ru:fref(q.food).u||'items'})}</small></button>`).join('')}</div></td></tr>`;
     h+=`<tr class="ar2" hidden><td colspan="6"><div class="amtc"><button type="button" class="st" data-d="-1" aria-label="Decrease amount">\u2212</button><input class="a" type="text" inputmode="${KPM}" autocomplete="off" placeholder="amount" aria-label="Amount"><button type="button" class="st" data-d="1" aria-label="Increase amount">+</button><span class="u">g</span><span class="pvt"></span><button class="ab" aria-label="Add food">Add</button></div></td></tr>`;
     h+=`<tr class="fl"><td colspan="6"><span class="tl2">How do you feel after ${name}? (1\u201310)${/snack/i.test(name)?' \u00b7 optional':''}</span><div class="fbtns">${[1,2,3,4,5,6,7,8,9,10].map(v=>`<button class="fb${fe[m]===v?' on':''}" data-v="${v}" aria-pressed="${fe[m]===v}">${v}</button>`).join('')}</div></td></tr>`;
     h+=`<tr class="mtr"><td colspan="6"><span class="tl2">Time eaten (optional)</span><div class="mtl"><div class="tsel" data-mt="${mtm[m]||''}"><select data-p="h" aria-label="${name} hour">${hOpts}</select><span>:</span><select data-p="m" aria-label="${name} minutes">${mOpts}</select></div><button class="mnow">Now</button>${mtm[m]?'<button class="mclr">Clear</button>':''}</div></td></tr>`;
@@ -727,7 +726,6 @@ sheet.addEventListener('click',ev=>{
   if(it&&!ev.target.closest('button.del')){openEA(+it.dataset.i);return}
   const b=ev.target.closest('button');if(!b)return;
   const tb=b.closest('tbody'),m=tb&&tb.dataset.m!==undefined?+tb.dataset.m:null,d=$('date').value;
-  if(b.classList.contains('qa')){const q=quickList[+b.dataset.q];if(q&&m!==null){addScaled(q.food,m,q.amt);save();render();toast('Added '+q.food.n+' ('+amtLabel({a:q.amt,ru:fref(q.food).u||'items'})+')')}return}
   if(b.classList.contains('mnow')){const n=new Date(),mm=Math.round(n.getMinutes()/5)*5;n.setMinutes(mm);setMT(m,String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0'));return}
   if(b.classList.contains('mclr')){setMT(m,'');return}
   if(b.classList.contains('st')){if(ev.detail===0)stepIt(b);return}
@@ -1291,14 +1289,14 @@ function renderFP(keep){
   $('fpList').innerHTML=items.length?items.map(x=>{
     const a=fpAmtOf(x),u=fpUnit(x),sel=fpSel===x.k;
     const sub=x.r?`recipe · makes ${x.r.servings} · ${Math.round(recTot(x.r.items).k/x.r.servings)} kcal a serving`:`last ${amtLabel({a,ru:u})} · ${Math.round(fpPrev(x,a).split(' ')[0])} kcal`;
-    return`<div class="fpr${sel?' sel':''}"><div class="fpm"><button class="fpn" data-k="${x.k}"><strong>${esc(x.n)}</strong><small>${sub}</small></button>${sel?'':`<button class="fpa" data-k="${x.k}" aria-label="Add ${esc(x.n)} at the same amount">✓ Add</button>`}</div>${sel?`<div class="fpe"><div class="amtc"><button class="fpst" data-d="-${x.r||!fref(x.f).u?0.5:1}" aria-label="Less">−</button><input class="fa" type="text" inputmode="${KPM}" autocomplete="off" value="${a}" aria-label="Amount of ${esc(x.n)}"><button class="fpst" data-d="${x.r||!fref(x.f).u?0.5:1}" aria-label="More">+</button><span class="u">${u}</span><button class="fpgo">Add</button><span class="pvt">${fpPrev(x,a)}</span></div></div>`:''}</div>`}).join(''):'<p class="muted" style="margin:12px 4px">No saved food matches. Tap New food below.</p>';
+    return`<div class="fpr${sel?' sel':''}"><div class="fpm"><button class="fpn" data-k="${x.k}"><strong>${esc(x.n)}</strong><small>${sub}</small></button>${sel?'':`<button class="fpa" data-k="${x.k}" aria-label="Add ${esc(x.n)} at the same amount">Add</button>`}</div>${sel?`<div class="fpe"><div class="amtc"><button class="fpst" data-d="-${x.r||!fref(x.f).u?0.5:1}" aria-label="Less">−</button><input class="fa" type="text" inputmode="${KPM}" autocomplete="off" value="${a}" aria-label="Amount of ${esc(x.n)}"><button class="fpst" data-d="${x.r||!fref(x.f).u?0.5:1}" aria-label="More">+</button><span class="u">${u}</span><button class="fpgo">Add</button><span class="pvt">${fpPrev(x,a)}</span></div></div>`:''}</div>`}).join(''):'<p class="muted" style="margin:12px 4px">No saved food matches. Tap New food below.</p>';
 }
 function openFP(m){fpM=m;fpSel=null;fpMap=fpBuildMap();$('fpQ').value='';$('fpT').textContent='Add to '+MEALS[m];$('fp').hidden=false;renderFP();$('fpList').scrollTop=0;if(KPM!=='none')$('fpQ').focus()}
 function closeFP(){$('fp').hidden=true;fpSel=null;kpHide()}
 function fpAdd(x,amt){
   if(!(amt>0)){toast('Enter an amount');return false}
   if(x.r)recEntry(x.r,fpM,amt,x.r.servings);else addScaled(x.f,fpM,amt);
-  openOnly(fpM);closeFP();save();render();toast('Added '+x.n+' ('+amtLabel({a:amt,ru:fpUnit(x)})+')');return true;
+  openOnly(fpM);fpSel=null;kpHide();save();render();renderFP();toast('Added '+x.n+' ('+amtLabel({a:amt,ru:fpUnit(x)})+')');return true;
 }
 function fpAddSelected(){const x=fpItems().find(i=>i.k===fpSel),inp=$('fpList').querySelector('.fa');if(x&&inp)fpAdd(x,num(inp.value))}
 $('fpQ').addEventListener('input',()=>renderFP());
