@@ -253,7 +253,7 @@ input,select,textarea,.ar td input.n,.tl select,.tl input,.fa input,.amtc input,
 .wk span{display:block;font-size:12px;color:var(--muted)}.wk strong{font-size:17px;font-weight:600}.wk em{display:block;font-style:normal;font-size:12px;color:var(--muted)}
 .wkn{font-size:13px;margin:10px 0 0}
 .bmrow{display:flex;gap:10px;align-items:center}.sl .bmck{display:flex;align-items:center;gap:8px;flex:0 0 auto;font-size:15px;color:var(--ink);min-height:44px;cursor:pointer;margin:0}
-.sl .bmck input{width:24px;height:24px;min-height:0;margin:0;padding:0;accent-color:var(--ink);flex:0 0 24px}.bmrow #bmTx{flex:1;min-width:0}
+.sl .bmck input{width:24px;height:24px;min-height:0;margin:0;padding:0;accent-color:#2e9d57;flex:0 0 24px}.bmrow #bmTx{flex:1;min-width:0}
 .sl>textarea{margin-top:0}
 #kp{position:fixed;left:0;right:0;bottom:0;z-index:2147483000;background:var(--surface);border-top:1px solid var(--line);padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px));box-shadow:0 -6px 24px rgba(0,0,0,.12)}
 #kp[hidden]{display:none}.kpg{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,52px);gap:6px;max-width:560px;margin:0 auto}
@@ -349,7 +349,7 @@ body.kp-open #fp{padding-bottom:var(--kp-h,0px)}
       <div class="wbtns"><div class="amtc"><button type="button" class="st" data-d="-10" aria-label="Decrease">&minus;</button><input class="wi" id="wIn2" type="number" min="0" step="1" inputmode="numeric" placeholder="ml" aria-label="Custom water amount in ml"><button type="button" class="st" data-d="10" aria-label="Increase">+</button></div><button class="primary" id="wAdd">Add</button><button id="wUndo">Undo last</button></div>
     </section>
     <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
-      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Export a backup regularly, and before moving to a new version or device. <span id="lastBk"></span> <span style="opacity:.7">Version 31 · graphs button</span></p>
+      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Export a backup regularly, and before moving to a new version or device. <span id="lastBk"></span> <span style="opacity:.7">Version 32 · day slide</span></p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
       <div class="row"><select id="bkMode" aria-label="Import mode"><option value="merge">Import: merge with current data</option><option value="replace">Import: replace everything</option></select><button id="bkImport">Import</button></div>
       <textarea id="bk" rows="3" style="width:100%;font:12px monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px" placeholder="Backup text appears here after Export. To restore, choose a file or paste backup text, then press Import." aria-label="Backup text"></textarea>
@@ -1281,8 +1281,9 @@ $('copyAll').onclick=ev=>copyFrom(null,ev.target);
 $('wIn').onchange=()=>{const v=parseFloat($('wIn').value),d=$('date').value;if(v>0)db.weights[d]=v;else delete db.weights[d];save();charts()};
 $('gEdit').onclick=()=>{const o=$('gForm').hidden;$('gForm').hidden=!o;$('gEdit').textContent=o?'Done':'Goals';$('gEdit').setAttribute('aria-expanded',o)};
 $('range').onchange=charts;
-$('prevD').onclick=()=>{$('date').value=prev($('date').value);render()};
-$('nextD').onclick=()=>{const t=new Date($('date').value+'T00:00:00');t.setDate(t.getDate()+1);$('date').value=iso(t);render()};
+function daySlide(dir){try{if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;const m=document.querySelector('main');m.getAnimations().forEach(a=>a.cancel());m.animate([{opacity:0,transform:'translateX('+(dir*44)+'px)'},{opacity:1,transform:'translateX(0)'}],{duration:260,easing:'cubic-bezier(.2,.8,.2,1)'})}catch(e){}}
+$('prevD').onclick=()=>{$('date').value=prev($('date').value);render();daySlide(-1)};
+$('nextD').onclick=()=>{const t=new Date($('date').value+'T00:00:00');t.setDate(t.getDate()+1);$('date').value=iso(t);render();daySlide(1)};
 $('gK').onchange=()=>{goals();const o=db.goals.k,n=num($('gK').value),r=o?n/o:1;db.goals.k=n;db.mg.p=Math.round(db.mg.p*r);db.mg.f=Math.round(db.mg.f*r);save();render()};
 $('gP').onchange=()=>{goals();db.mg.p=num($('gP').value);save();render()};
 $('gF').onchange=()=>{goals();db.mg.f=num($('gF').value);save();render()};
