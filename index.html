@@ -113,13 +113,7 @@ button.nr[aria-expanded=true] .nm:before{transform:rotate(90deg)}
 .mac3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:8px}
 .ml{display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:3px}
 .mv{font-size:12px;color:var(--muted);margin-top:2px;font-variant-numeric:tabular-nums}
-.ar2 td{padding:6px 10px}
-.ar2 .amtc{gap:6px}
-.ar2 .st{border:1px solid var(--line);background:var(--surface);color:var(--ink);width:38px;min-width:38px;min-height:38px;font-size:20px;border-radius:8px;touch-action:manipulation;user-select:none;-webkit-user-select:none}
-.ar2 .a{flex:0 0 84px;width:84px;border:1px solid var(--line);border-radius:8px;background:var(--bg);text-align:center;padding:8px 4px!important}
-.ar2 .u{padding:0 2px;color:var(--muted);font-size:13px}
 .amtc .pvt{flex:1;padding:0 4px;line-height:1.2;color:var(--ink)}
-.ar2 td .ab{border:0;background:var(--p);color:#fff;font-weight:600;font-size:15px;width:auto;padding:0 16px;min-height:38px;border-radius:8px}
 .wc .wbtns{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}
 .wc .wq{min-width:64px;min-height:38px;font-weight:600}
 .wc .amtc{gap:6px}.wc input.wi{width:84px;text-align:center;border:1px solid var(--line);border-radius:8px;background:var(--bg);padding:8px 4px}
@@ -204,12 +198,7 @@ td button.del{color:var(--muted);font-size:18px;min-height:36px;vertical-align:t
 .ar td input.n::placeholder{color:var(--muted)}
 .pv{text-align:right;padding:0 12px 0 0}
 .ar td .nfb{color:var(--muted);font-size:13px;font-weight:500;text-decoration:underline;text-underline-offset:3px;min-height:40px;border:0;background:transparent;width:auto;padding:0}
-.ar2 td{padding:4px 12px 12px 16px}
-.ar2 .st{border:0;background:var(--soft);width:40px;min-width:40px;min-height:40px;font-size:20px;border-radius:10px}
-.ar2 .a{border:1px solid var(--line);background:var(--surface);border-radius:10px;text-align:center}
-.ar2 .u{color:var(--muted);font-size:13px;padding:0 4px}
 .amtc .pvt{flex:1;font-size:12px;color:var(--muted);line-height:1.25}
-.ar2 td .ab{background:var(--acc);color:var(--accfg);border:0;font-weight:600;border-radius:10px;padding:0 18px;min-height:40px}
 .fl td{padding:10px 16px 12px;text-align:left}
 .tl2{font-size:12px;color:var(--muted)}
 .fbtns{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin-top:6px}
@@ -247,7 +236,7 @@ tfoot tr:last-child th,tfoot tr:last-child td{font-weight:500;color:var(--muted)
 .eac .u{font-size:15px;padding:0 4px}
 .eaq{display:flex;gap:8px;margin-bottom:6px}.eaq button{flex:1;background:var(--soft);border:0}
 @media (min-width:560px){thead th:nth-child(n+2){width:64px}}
-input,select,textarea,.ar td input.n,.tl select,.tl input,.fa input,.amtc input,.ar2 .a,.wc input.wi{font-size:16px!important}
+input,select,textarea,.ar td input.n,.tl select,.tl input,.fa input,.amtc input,.wc input.wi{font-size:16px!important}
 
 .todayrow{display:flex;justify-content:center;margin:-2px 0 10px}.todayrow button{min-height:32px;font-size:13px;padding:4px 14px;border-radius:999px}
 .nudge{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--tint);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 10px;font-size:13px}
@@ -293,8 +282,6 @@ body.kp-open{padding-bottom:var(--kp-h,0px)}body.kp-open #ea,body.kp-open #nf,bo
 #scanBtn{flex:0 0 auto;padding:0 12px}
 .ar td input.n[readonly]{font-weight:600;color:var(--ink)}
 .ar td .pclr{width:auto;min-height:36px;padding:0 12px;border:0;background:transparent;color:var(--muted);font-size:16px}
-.ar2 td .ab{display:inline-flex;align-items:center;gap:4px}
-.ar2 .amtc{flex-wrap:wrap}.ar2 .amtc .pvt{order:9;flex:1 0 100%;padding:4px 2px 0;font-size:12px;color:var(--muted)}
 #fp{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;z-index:50}
 #fp>div{background:var(--surface);border-radius:20px 20px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.2);max-height:92%;max-width:560px;width:100%;padding:16px 16px calc(14px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;min-height:0}
 @media (min-width:560px){#fp{align-items:center;padding:12px}#fp>div{border-radius:20px}}
@@ -312,6 +299,10 @@ body.kp-open{padding-bottom:var(--kp-h,0px)}body.kp-open #ea,body.kp-open #nf,bo
 .fpnew{margin-top:10px;width:100%;background:var(--soft);border:0;color:var(--ink)}
 body.kp-open #fp{padding-bottom:var(--kp-h,0px)}
 .ar td input.n{cursor:pointer}
+
+.fpscan{width:100%;margin-top:6px;background:var(--soft);border:0;color:var(--ink);font-weight:600;min-height:44px;border-radius:10px}
+#toast{display:flex;align-items:center;white-space:nowrap}body:has(#fp:not([hidden])) #toast{bottom:auto;top:calc(16px + env(safe-area-inset-top,0px))}
+#toast button{background:none;border:0;color:inherit;font-weight:700;text-decoration:underline;margin-left:12px;padding:4px 2px;min-height:0;font-size:14px}
 </style>
 </head>
 <body>
@@ -319,7 +310,6 @@ body.kp-open #fp{padding-bottom:var(--kp-h,0px)}
   <header class="top">
     <div class="dn"><button id="prevD" aria-label="Previous day">&lsaquo;</button><input type="date" id="date" aria-label="Date"><button id="nextD" aria-label="Next day">&rsaquo;</button></div>
     <button id="graphsBtn" aria-label="Graphs" title="Graphs" aria-pressed="false">&#128200;</button>
-    <button id="scanBtn">&#128247; Scan</button>
   </header>
   <div id="todayRow" class="todayrow" hidden><button id="todayD">Back to today</button></div>
 
@@ -358,9 +348,8 @@ body.kp-open #fp{padding-bottom:var(--kp-h,0px)}
       <div class="wbtns"><button class="wq" data-w="150">+150</button><button class="wq" data-w="250">+250</button><button class="wq" data-w="500">+500</button><span class="muted">ml</span></div>
       <div class="wbtns"><div class="amtc"><button type="button" class="st" data-d="-10" aria-label="Decrease">&minus;</button><input class="wi" id="wIn2" type="number" min="0" step="1" inputmode="numeric" placeholder="ml" aria-label="Custom water amount in ml"><button type="button" class="st" data-d="10" aria-label="Increase">+</button></div><button class="primary" id="wAdd">Add</button><button id="wUndo">Undo last</button></div>
     </section>
-    <p class="muted" style="text-align:center;font-size:11px;margin:14px 0 0">Version 28 · cancel buttons</p>
     <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
-      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Export a backup regularly, and before moving to a new version or device. <span id="lastBk"></span></p>
+      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Export a backup regularly, and before moving to a new version or device. <span id="lastBk"></span> <span style="opacity:.7">Version 29 · tidy</span></p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
       <div class="row"><select id="bkMode" aria-label="Import mode"><option value="merge">Import: merge with current data</option><option value="replace">Import: replace everything</option></select><button id="bkImport">Import</button></div>
       <textarea id="bk" rows="3" style="width:100%;font:12px monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px" placeholder="Backup text appears here after Export. To restore, choose a file or paste backup text, then press Import." aria-label="Backup text"></textarea>
@@ -476,7 +465,7 @@ body.kp-open #fp{padding-bottom:var(--kp-h,0px)}
     <div class="fph"><h2 id="fpT">Add food</h2><button id="fpX" aria-label="Done">✓</button></div>
     <input id="fpQ" type="search" placeholder="Search saved foods" autocomplete="off" aria-label="Search saved foods">
     <div id="fpList"></div>
-    <button id="fpNew" class="fpnew">+ New food</button>
+    <button id="fpNew" class="fpnew">+ New food</button><button id="fpScan" class="fpscan" type="button">&#128247; Scan a label</button>
   </div>
 </div>
 <div id="ea" hidden>
@@ -540,7 +529,7 @@ const showM4=d=>db.m4[d]||(db.days[d]||[]).some(e=>e.m===3);
 const SH={k:'kcal',p:'P',c:'C',f:'F'},openM=new Set(),openOnly=m=>{openM.clear();openM.add(m)};
 const fmtV=(f,x)=>f==='k'?Math.round(x):Math.round(x*10)/10;
 let toastT=null;
-function toast(t){const el=$('toast');el.textContent=t;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{el.hidden=true},2400)}
+function toast(t,undo){const el=$('toast');el.textContent=t;if(undo){const b=document.createElement('button');b.textContent='Undo';b.onclick=()=>{el.hidden=true;undo()};el.appendChild(b)}el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{el.hidden=true},undo?5000:2400)}
 const mkPU=(e,a)=>({k:e.k/a,p:e.p/a,c:e.c/a,f:e.f/a,w:(e.w||0)/a,u:e.u?Object.fromEntries(Object.entries(e.u).map(([k,v])=>[k,v/a])):undefined});
 function applyAmt(e,a){const q=e.pu;e.a=a;e.k=q.k*a;e.p=q.p*a;e.c=q.c*a;e.f=q.f*a;e.w=q.w?q.w*a:undefined;e.u=q.u?Object.fromEntries(Object.entries(q.u).map(([k,v])=>[k,v*a])):undefined}
 let quickList=[];
@@ -568,8 +557,7 @@ function build(){
       h+=`<tr class="it" data-i="${i}" tabindex="0" role="button" aria-label="Change amount of ${esc(q.n)}"><td><div class="fn">${esc(q.n)}</div><div class="fa2"><span class="amtv">${amtLabel(q)}</span><span class="tapn" aria-hidden="true">✎</span></div></td>`
         +F.map(f=>`<td data-v="${f}">${fmtV(f,e[f])}</td>`).join('')
         +`<td><button class="del" data-i="${i}" aria-label="Remove ${esc(q.n)}">×</button></td></tr>`});
-    h+=`<tr class="ar"><td colspan="4"><input class="n" readonly placeholder="Add food\u2026" aria-label="Add food to ${name}"></td><td colspan="2" class="pv"><button class="nfb">New food</button></td></tr>`;
-    h+=`<tr class="ar2" hidden><td colspan="6"><div class="amtc"><button type="button" class="st" data-d="-1" aria-label="Decrease amount">\u2212</button><input class="a" type="text" inputmode="${KPM}" autocomplete="off" placeholder="amount" aria-label="Amount"><button type="button" class="st" data-d="1" aria-label="Increase amount">+</button><span class="u">g</span><span class="pvt"></span><button class="ab" aria-label="Add food">Add</button></div></td></tr>`;
+    h+=`<tr class="ar"><td colspan="6"><input class="n" readonly placeholder="+ Add food" aria-label="Add food to ${name}"></td></tr>`;
     h+=`<tr class="fl"><td colspan="6"><span class="tl2">How do you feel after ${name}? (1\u201310)${/snack/i.test(name)?' \u00b7 optional':''}</span><div class="fbtns">${[1,2,3,4,5,6,7,8,9,10].map(v=>`<button class="fb${fe[m]===v?' on':''}" data-v="${v}" aria-pressed="${fe[m]===v}">${v}</button>`).join('')}</div></td></tr>`;
     h+=`<tr class="mtr"><td colspan="6"><span class="tl2">Time eaten (optional)</span><div class="mtl"><div class="tsel" data-mt="${mtm[m]||''}"><select data-p="h" aria-label="${name} hour">${hOpts}</select><span>:</span><select data-p="m" aria-label="${name} minutes">${mOpts}</select></div><button class="mnow">Now</button>${mtm[m]?'<button class="mclr">Clear</button>':''}</div></td></tr>`;
     if(m===3)h+=`<tr class="tl"><td colspan="6"><div><button class="m4off">Remove Meal 4</button></div></td></tr>`;
@@ -673,39 +661,6 @@ function addScaled(f,m,amt){
   e.n=f.n;e.a=amt;e.ru=rf.u||'items';e.pu=mkPU(e,amt);
   dayList().push(e);return e;
 }
-function lastAmtFor(food){
-  const rf=fref(food),low=food.n.toLowerCase();
-  for(const d of Object.keys(db.days).sort().reverse()){
-    const l=db.days[d]||[];
-    for(let i=l.length-1;i>=0;i--){const e=l[i],q=e.a?{n:e.n,a:e.a,ru:e.ru}:parseAmt(e);
-      if((String(e.n).trim().toLowerCase()===low||baseName(q.n).toLowerCase()===low)&&q.a>0&&(q.ru||'items')===(rf.u||'items'))return q.a}
-  }
-  return rf.a;
-}
-function updAdd(tb){
-  const ra=tb.querySelector('.ar'),rb=tb.querySelector('.ar2'),txt=ra.querySelector('.n').value.trim(),pv=ra.querySelector('.pv');
-  const food=txt&&db.foods.find(x=>x.n.toLowerCase()===txt.toLowerCase()),a=num(rb.querySelector('.a').value),r1=x=>Math.round(x*10)/10;
-  if(!food){
-    const rc=findRec(txt);
-    if(rc){const t=recTot(rc.items),sc=(a||1)/rc.servings;rb.hidden=false;rb.querySelector('.u').textContent='serv';rb.querySelectorAll('.st').forEach(x=>{x.dataset.d=(+x.dataset.d<0?-1:1)*0.5});rb.querySelector('.pvt').textContent=`${Math.round(t.k*sc)} kcal · P ${r1(t.p*sc)} · C ${r1(t.c*sc)} · F ${r1(t.f*sc)}`;pv.innerHTML=ra.querySelector('.n').readOnly?'<button class="pclr" aria-label="Choose a different food" title="Change food">\u2715</button>':`<span class="pvt muted">recipe · ${rc.servings} servings</span>`;rb.querySelector('.ab').innerHTML='\u2713 Add';return}
-    rb.hidden=true;pv.innerHTML='<button class="nfb">New food</button>';return}
-  const rf=fref(food),sc=a?a/rf.a:(rf.u?0:1);
-  rb.hidden=false;rb.querySelector('.u').textContent=rf.u||'items';
-  rb.querySelectorAll('.st').forEach(x=>{x.dataset.d=(+x.dataset.d<0?-1:1)*(rf.u?1:0.5)});
-  rb.querySelector('.pvt').textContent=sc?`${Math.round(food.k*sc)} kcal · P ${r1(food.p*sc)} · C ${r1(food.c*sc)} · F ${r1(food.f*sc)}`:'enter amount';
-  pv.innerHTML=(ra.querySelector('.n').readOnly?'<button class="pclr" aria-label="Choose a different food" title="Change food">\u2715</button>':`<span class="pvt muted">${rf.u?'label: '+rf.a+' '+rf.u:'per item'}</span>`);
-  rb.querySelector('.ab').innerHTML='\u2713 Add';
-}
-function addFood(tb){
-  const row=tb.querySelector('.ar'),rb=tb.querySelector('.ar2'),txt=row.querySelector('.n').value.trim(),m=+tb.dataset.m;
-  if(!txt){row.querySelector('.n').focus();return}
-  const a=num(rb.querySelector('.a').value),exact=db.foods.find(x=>x.n.toLowerCase()===txt.toLowerCase()),r=exact?null:resolveFood(txt),food=exact||(r&&r.food);
-  if(!food){const rc=findRec(txt);if(rc){recEntry(rc,m,a||1,rc.servings);save();render();return}toast('Not a saved food: '+txt+'. Tap New food to add it.');return}
-  const rf=fref(food);let amt=a||(r?r.amt:0);
-  if(!amt&&!rf.u)amt=1;
-  if(!amt){updAdd(tb);rb.querySelector('.a').focus();return}
-  addScaled(food,m,amt);save();render();
-}
 function renderDash(t,g){
   const set=(id,v,goal)=>{const pc=goal?Math.round(v/goal*100):0,bar=$(id+'b'),pb=bar.parentElement;bar.style.width=Math.min(100,pc)+'%';pb.setAttribute('aria-valuenow',Math.min(100,pc));$(id+'p').textContent=pc+'%';};
   set('dK',t.k,g.k);set('dP',t.p,g.p);set('dC',t.c,g.c);set('dF',t.f,g.f);
@@ -730,8 +685,6 @@ sheet.addEventListener('click',ev=>{
   if(b.classList.contains('mnow')){const n=new Date(),mm=Math.round(n.getMinutes()/5)*5;n.setMinutes(mm);setMT(m,String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0'));return}
   if(b.classList.contains('mclr')){setMT(m,'');return}
   if(b.classList.contains('st')){if(ev.detail===0)stepIt(b);return}
-  if(b.classList.contains('pclr')){const t2=b.closest('tbody'),n=t2.querySelector('.ar .n'),a2=t2.querySelector('.ar2 .a');n.readOnly=false;n.value='';a2.value='';delete a2.dataset.auto;updAdd(t2);kpHide();n.focus();return}
-  if(b.classList.contains('nfb')){const t2=b.closest('tbody');openNF(m,t2.querySelector('.n').value.trim(),num(t2.querySelector('.a').value));return}
   if(b.classList.contains('done')){openM.delete(m);build();totals();return}
   if(b.classList.contains('fb')){const fe=(db.feel[d]=db.feel[d]||{}),v=+b.dataset.v;if(fe[m]===v)delete fe[m];else fe[m]=v;if(!Object.keys(fe).length)delete db.feel[d];save();build();totals();return}
   if(b.classList.contains('m4on')){db.m4[d]=true;save();render()}
@@ -740,7 +693,6 @@ sheet.addEventListener('click',ev=>{
     if(dayList().some(e=>e.m===3)&&!b.dataset.armed){b.dataset.armed=1;th.textContent='Tap again to delete its foods';setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;th.textContent='Remove Meal 4'}},3000);return}
     db.days[d]=dayList().filter(e=>e.m!==3);delete db.m4[d];save();render()}
   else if(b.classList.contains('del')){dayList().splice(+b.dataset.i,1);save();render()}
-  else if(b.classList.contains('ab'))addFood(tb);
   else if(b.classList.contains('clx')){
     if(b.dataset.arm){const d=$('date').value;db.days[d]=(db.days[d]||[]).filter(e=>(e.m??0)!==m);save();render();toast('Cleared '+MEALS[m]);return}
     b.dataset.arm='1';b.textContent='Clear all?';b.classList.add('arm');
@@ -752,21 +704,6 @@ sheet.addEventListener('change',ev=>{
   const t=ev.target;
   if(t.dataset.p&&t.closest('.mtl')){const ts=t.closest('.tsel'),h=ts.querySelector('[data-p=h]').value,mi=ts.querySelector('[data-p=m]').value;setMT(+t.closest('tbody').dataset.m,h===''?'':h+':'+mi);return}
   if(t.classList.contains('sm')&&t.value!==''){const m=+t.closest('tbody').dataset.m,r=db.recipes[+t.value];recEntry(r,m,1,r.servings);openOnly(m);save();render();toast('Added '+r.n+' to '+MEALS[m]);return}
-});
-sheet.addEventListener('input',ev=>{
-  const c=ev.target.classList;if(c.contains('n')||c.contains('a'))updAdd(ev.target.closest('tbody'));
-  if(c.contains('a'))delete ev.target.dataset.auto;
-  if(c.contains('n')){
-    const n=ev.target,tb=n.closest('tbody'),txt=n.value.trim(),prev=n._pl||0;n._pl=n.value.length;
-    const food=txt&&db.foods.find(x=>x.n.toLowerCase()===txt.toLowerCase()),rec=!food&&txt&&findRec(txt),a2=tb.querySelector('.ar2 .a');
-    const typed=['insertText','deleteContentBackward','deleteContentForward','insertFromPaste','deleteByCut'].includes(ev.inputType);
-    if((food||rec)&&(!a2.value||a2.dataset.auto)){a2.value=food?lastAmtFor(food):1;a2.dataset.auto='1';updAdd(tb)}
-    else if(!food&&!rec&&a2.dataset.auto){a2.value='';delete a2.dataset.auto;updAdd(tb)}
-    if((food||rec)&&(!typed||Math.abs(n.value.length-prev)>1)&&KPM==='none'){n.readOnly=true;updAdd(tb)}
-  }
-});
-sheet.addEventListener('keydown',ev=>{
-  if(ev.key==='Enter'&&ev.target.closest('.ar,.ar2'))addFood(ev.target.closest('tbody'));
 });
 function renderFoods(){
   const q=($('sfQ').value||'').trim().toLowerCase();$('sfQ').hidden=db.foods.length<6&&!q;
@@ -928,7 +865,7 @@ function finish(text){
   const miss=[['protein',r.p],['carbs',r.c],['fat',r.f]].filter(x=>!x[1]).map(x=>x[0]);
   setForm(r,'Read from the label ('+(col?'second':'first')+' column'+(r.ra?', values for '+r.ra+' '+r.ru:', serving size not found: check "Label values are for"')+'). '+(miss.length?'Could not find: '+miss.join(', ')+'. ':'')+'Check every number against the label, add a name, then press Save food.');
 }
-$('scanBtn').onclick=()=>{$('scan').hidden=false;scMsg('')};
+$('fpScan').onclick=()=>{closeFP();$('scan').hidden=false;scMsg('')};
 $('scClose').onclick=scClose;
 $('scLook').onclick=()=>{const c=$('scCode').value.replace(/\D/g,'');if(c){scStop();lookup(c)}};
 $('scBar').onclick=async()=>{
@@ -1160,7 +1097,7 @@ function kpCommit(el){if(el&&el.dataset.orig!==undefined&&el.value!==el.dataset.
 function kpShow(el){
   kpT=el;el.dataset.fresh='1';el.dataset.last=el.value;el.dataset.orig=el.value;
   if(KPM!=='none')return;
-  $('kpAct').textContent=el.matches('#sheet input.a,#fp input.fa')?'Add':'Done';$('kp').hidden=false;clearTimeout(kpRm);document.body.classList.add('kp-open');
+  $('kpAct').textContent=el.matches('#fp input.fa')?'Add':'Done';$('kp').hidden=false;clearTimeout(kpRm);document.body.classList.add('kp-open');
   document.documentElement.style.setProperty('--kp-h',$('kp').offsetHeight+'px');
   if(el.id!=='eaIn')setTimeout(()=>{try{el.scrollIntoView({block:'center'})}catch(e){}},60);
 }
@@ -1177,7 +1114,7 @@ document.addEventListener('input',ev=>{const t=ev.target;if(kpIs(t)&&/[^0-9.]/.t
 $('kp').addEventListener('click',ev=>{
   const b=ev.target.closest('button');if(!b||!kpT)return;const el=kpT;
   if(b.id==='kpAct'){
-    if(el.id==='eaIn')eaDone();else if(el.matches('#fp input.fa')){fpAddSelected();return}else if(el.matches('#sheet input.a'))addFood(el.closest('tbody'));else{kpCommit(el);el.blur();kpHide();return}
+    if(el.id==='eaIn')eaDone();else if(el.matches('#fp input.fa')){fpAddSelected();return}else{kpCommit(el);el.blur();kpHide();return}
     if(!kpIs(document.activeElement))kpHide();return;
   }
   const k=b.dataset.k,fresh=el.dataset.fresh==='1'&&el.value===el.dataset.last;let v=fresh?'':el.value;
@@ -1299,8 +1236,8 @@ function openFP(m){fpM=m;fpSel=null;fpMap=fpBuildMap();$('fpQ').value='';$('fpT'
 function closeFP(){$('fp').hidden=true;fpSel=null;kpHide()}
 function fpAdd(x,amt){
   if(!(amt>0)){toast('Enter an amount');return false}
-  if(x.r)recEntry(x.r,fpM,amt,x.r.servings);else addScaled(x.f,fpM,amt);
-  openOnly(fpM);fpSel=null;kpHide();save();render();renderFP();toast('Added '+x.n+' ('+amtLabel({a:amt,ru:fpUnit(x)})+')');return true;
+  const e=x.r?recEntry(x.r,fpM,amt,x.r.servings):addScaled(x.f,fpM,amt);
+  openOnly(fpM);fpSel=null;kpHide();save();render();fpMap=fpBuildMap();renderFP();toast('Added '+x.n+' ('+amtLabel({a:amt,ru:fpUnit(x)})+')',()=>{const l=dayList(),i=l.indexOf(e);if(i>=0){l.splice(i,1);save();render();fpMap=fpBuildMap();if(!$('fp').hidden)renderFP()}});return true;
 }
 function fpAddSelected(){const x=fpItems().find(i=>i.k===fpSel),inp=$('fpList').querySelector('.fa');if(x&&inp)fpAdd(x,num(inp.value))}
 $('fpQ').addEventListener('input',()=>renderFP());
@@ -1369,12 +1306,12 @@ $('bkExport').onclick=doBackup;
 const daysSince=d=>Math.round((new Date(iso(new Date())+'T00:00:00')-new Date(d+'T00:00:00'))/864e5);
 function renderNudge(){
   let sn=0;try{sn=+localStorage.getItem('dailylog.nudge')||0}catch(e){}
-  const has=Object.values(db.days).some(l=>l&&l.length),n=db.lastBackup?daysSince(db.lastBackup):null,show=has&&(n===null||n>=1)&&Date.now()>sn;
+  const has=Object.values(db.days).some(l=>l&&l.length),n=db.lastBackup?daysSince(db.lastBackup):null,show=has&&(n===null||n>=7)&&Date.now()>sn;
   $('bkNudge').hidden=!show;
   if(show)$('bkNudgeT').textContent=n===null?'No backup yet. Your data lives only on this phone.':(n===1?'Last backup was yesterday.':'Last backup was '+n+' days ago.');
 }
 $('bkNudgeGo').onclick=doBackup;
-$('bkNudgeLater').onclick=()=>{try{localStorage.setItem('dailylog.nudge',String(Date.now()+3*36e5))}catch(e){}renderNudge()};
+$('bkNudgeLater').onclick=()=>{try{localStorage.setItem('dailylog.nudge',String(Date.now()+24*36e5))}catch(e){}renderNudge()};
 let tidyArmed=null;
 function tidyPlan(){
   const plan=[];
