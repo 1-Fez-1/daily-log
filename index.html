@@ -333,7 +333,7 @@ body.kp-open{padding-bottom:var(--kp-h,0px)}body.kp-open #ea,body.kp-open #nf,bo
       <div class="wbtns"><button class="wq" data-w="150">+150</button><button class="wq" data-w="250">+250</button><button class="wq" data-w="500">+500</button><span class="muted">ml</span></div>
       <div class="wbtns"><div class="amtc"><button type="button" class="st" data-d="-10" aria-label="Decrease">&minus;</button><input class="wi" id="wIn2" type="number" min="0" step="1" inputmode="numeric" placeholder="ml" aria-label="Custom water amount in ml"><button type="button" class="st" data-d="10" aria-label="Increase">+</button></div><button class="primary" id="wAdd">Add</button><button id="wUndo">Undo last</button></div>
     </section>
-    <p class="muted" style="text-align:center;font-size:11px;margin:14px 0 0">Version 23 · medications collapse</p>
+    <p class="muted" style="text-align:center;font-size:11px;margin:14px 0 0">Version 24 · keypad after picking a food</p>
     <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
       <p class="muted" style="margin:8px 0">Data is stored only in this browser. Export a backup regularly, and before moving to a new version or device. <span id="lastBk"></span></p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
@@ -712,6 +712,12 @@ sheet.addEventListener('change',ev=>{
 });
 sheet.addEventListener('input',ev=>{
   const c=ev.target.classList;if(c.contains('n')||c.contains('a'))updAdd(ev.target.closest('tbody'));
+  if(c.contains('n')){
+    const n=ev.target,txt=n.value.trim(),prev=n._pl||0;n._pl=n.value.length;
+    const known=txt&&(db.foods.some(x=>x.n.toLowerCase()===txt.toLowerCase())||findRec(txt));
+    const typed=['insertText','deleteContentBackward','deleteContentForward','insertFromPaste','deleteByCut'].includes(ev.inputType);
+    if(known&&(!typed||Math.abs(n.value.length-prev)>1)){const a2=n.closest('tbody').querySelector('.ar2 .a');if(a2&&!a2.value)a2.focus()}
+  }
 });
 sheet.addEventListener('keydown',ev=>{
   if(ev.key==='Enter'&&ev.target.closest('.ar,.ar2'))addFood(ev.target.closest('tbody'));
