@@ -278,7 +278,7 @@ body.kp-open{padding-bottom:var(--kp-h,0px)}body.kp-open #ea,body.kp-open #nf,bo
 #medCard .medsum{margin-left:auto;text-transform:none;letter-spacing:0;font-size:13px;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 #medCard[open]>summary .medsum{display:none}#medCard[open]>summary{margin-bottom:10px}
 .top .dn{flex:1 1 auto;min-width:0}.top .dn input{min-width:0;flex:1 1 auto}.top .dn button{flex:0 0 38px;width:38px;padding:0}
-#graphsBtn{flex:0 0 44px;width:44px;padding:0;background:var(--soft);border:0;font-size:18px}#graphsBtn[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+#graphsBtn{flex:0 0 auto;width:auto;padding:0 18px;background:var(--soft);border:0;font-size:15px;font-weight:600}#graphsBtn[aria-pressed=true]{background:var(--ink);color:var(--bg)}
 #scanBtn{flex:0 0 auto;padding:0 12px}
 .ar td input.n[readonly]{font-weight:600;color:var(--ink)}
 .ar td .pclr{width:auto;min-height:36px;padding:0 12px;border:0;background:transparent;color:var(--muted);font-size:16px}
@@ -309,7 +309,7 @@ body.kp-open #fp{padding-bottom:var(--kp-h,0px)}
 <main>
   <header class="top">
     <div class="dn"><button id="prevD" aria-label="Previous day">&lsaquo;</button><input type="date" id="date" aria-label="Date"><button id="nextD" aria-label="Next day">&rsaquo;</button></div>
-    <button id="graphsBtn" aria-label="Graphs" title="Graphs" aria-pressed="false">&#128200;</button>
+    <button id="graphsBtn" aria-label="Graphs" title="Graphs" aria-pressed="false">Graphs</button>
   </header>
   <div id="todayRow" class="todayrow" hidden><button id="todayD">Back to today</button></div>
 
@@ -349,7 +349,7 @@ body.kp-open #fp{padding-bottom:var(--kp-h,0px)}
       <div class="wbtns"><div class="amtc"><button type="button" class="st" data-d="-10" aria-label="Decrease">&minus;</button><input class="wi" id="wIn2" type="number" min="0" step="1" inputmode="numeric" placeholder="ml" aria-label="Custom water amount in ml"><button type="button" class="st" data-d="10" aria-label="Increase">+</button></div><button class="primary" id="wAdd">Add</button><button id="wUndo">Undo last</button></div>
     </section>
     <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
-      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Export a backup regularly, and before moving to a new version or device. <span id="lastBk"></span> <span style="opacity:.7">Version 30 · daily backup</span></p>
+      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Export a backup regularly, and before moving to a new version or device. <span id="lastBk"></span> <span style="opacity:.7">Version 31 · graphs button</span></p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
       <div class="row"><select id="bkMode" aria-label="Import mode"><option value="merge">Import: merge with current data</option><option value="replace">Import: replace everything</option></select><button id="bkImport">Import</button></div>
       <textarea id="bk" rows="3" style="width:100%;font:12px monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px" placeholder="Backup text appears here after Export. To restore, choose a file or paste backup text, then press Import." aria-label="Backup text"></textarea>
