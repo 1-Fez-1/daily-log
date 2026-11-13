@@ -304,6 +304,7 @@ body.kp-open #fp{padding-bottom:var(--kp-h,0px)}
 .fpscan{width:100%;margin-top:6px;background:var(--soft);border:0;color:var(--ink);font-weight:600;min-height:44px;border-radius:10px}
 #toast{display:flex;align-items:center;white-space:nowrap}body:has(#fp:not([hidden])) #toast{bottom:auto;top:calc(16px + env(safe-area-inset-top,0px))}
 #toast button{background:none;border:0;color:inherit;font-weight:700;text-decoration:underline;margin-left:12px;padding:4px 2px;min-height:0;font-size:14px}
+body.kp-open input[data-fresh="1"]:focus{background:color-mix(in srgb,var(--ink) 16%,var(--surface,#fff))!important;box-shadow:0 0 0 2px var(--ink) inset;border-radius:8px}
 </style>
 </head>
 <body>
@@ -350,7 +351,7 @@ body.kp-open #fp{padding-bottom:var(--kp-h,0px)}
       <div class="wbtns"><div class="amtc"><button type="button" class="st" data-d="-10" aria-label="Decrease">&minus;</button><input class="wi" id="wIn2" type="number" min="0" step="1" inputmode="numeric" placeholder="ml" aria-label="Custom water amount in ml"><button type="button" class="st" data-d="10" aria-label="Increase">+</button></div><button class="primary" id="wAdd">Add</button><button id="wUndo">Undo last</button></div>
     </section>
     <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
-      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Each backup is saved as one file named daily-log-backup.json. Save it to the same place each time and tap Replace, so you only ever keep the latest. <span id="lastBk"></span> <span style="opacity:.7">Version 42 · tidy removed</span></p>
+      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Each backup is saved as one file named daily-log-backup.json. Save it to the same place each time and tap Replace, so you only ever keep the latest. <span id="lastBk"></span> <span style="opacity:.7">Version 43 · highlighted amount</span></p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
       <div class="row"><select id="bkMode" aria-label="Import mode"><option value="merge">Import: merge with current data</option><option value="replace">Import: replace everything</option></select><button id="bkImport">Import</button></div>
       <textarea id="bk" rows="3" style="width:100%;font:12px monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px" placeholder="Backup text appears here after Export. To restore, choose a file or paste backup text, then press Import." aria-label="Backup text"></textarea>
@@ -1096,6 +1097,7 @@ if(KPM==='none'){
 function kpCommit(el){if(el&&el.dataset.orig!==undefined&&el.value!==el.dataset.orig){el.dataset.orig=el.value;el.dispatchEvent(new Event('change',{bubbles:true}))}}
 function kpShow(el){
   kpT=el;el.dataset.fresh='1';el.dataset.last=el.value;el.dataset.orig=el.value;
+  try{el.select()}catch(e){}
   if(KPM!=='none')return;
   $('kpAct').textContent=el.matches('#fp input.fa')?'Add':'Done';$('kp').hidden=false;clearTimeout(kpRm);document.body.classList.add('kp-open');
   document.documentElement.style.setProperty('--kp-h',$('kp').offsetHeight+'px');
