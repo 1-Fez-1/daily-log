@@ -350,7 +350,7 @@ body.kp-open #fp{padding-bottom:var(--kp-h,0px)}
       <div class="wbtns"><div class="amtc"><button type="button" class="st" data-d="-10" aria-label="Decrease">&minus;</button><input class="wi" id="wIn2" type="number" min="0" step="1" inputmode="numeric" placeholder="ml" aria-label="Custom water amount in ml"><button type="button" class="st" data-d="10" aria-label="Increase">+</button></div><button class="primary" id="wAdd">Add</button><button id="wUndo">Undo last</button></div>
     </section>
     <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
-      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Export a backup regularly, and before moving to a new version or device. <span id="lastBk"></span> <span style="opacity:.7">Version 39 · sleep + weight first</span></p>
+      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Each backup is saved as one file named daily-log-backup.json. Save it to the same place each time and tap Replace, so you only ever keep the latest. <span id="lastBk"></span> <span style="opacity:.7">Version 40 · single backup file</span></p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
       <div class="row"><select id="bkMode" aria-label="Import mode"><option value="merge">Import: merge with current data</option><option value="replace">Import: replace everything</option></select><button id="bkImport">Import</button></div>
       <textarea id="bk" rows="3" style="width:100%;font:12px monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px" placeholder="Backup text appears here after Export. To restore, choose a file or paste backup text, then press Import." aria-label="Backup text"></textarea>
@@ -1298,14 +1298,14 @@ $('date').onchange=render;
 const bkMsg=t=>$('bkMsg').textContent=t;
 const lastBk=()=>{$('lastBk').textContent=db.lastBackup?'Last backup: '+db.lastBackup+'.':'No backup yet.'};
 async function doBackup(){
-  const txt=JSON.stringify({app:'daily-log',version:1,exported:new Date().toISOString(),data:db},null,1),name='daily-log-backup-'+iso(new Date())+'.json';
+  const txt=JSON.stringify({app:'daily-log',version:1,exported:new Date().toISOString(),data:db},null,1),name='daily-log-backup.json';
   $('bk').value=txt;let done=false,msg='';
   try{const f=new File([txt],name,{type:'application/json'});
-    if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Daily log backup'});done=true;msg='Backup shared. Choose Save to Files or Drive so it is stored outside this browser.'}
+    if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Daily log backup'});done=true;msg='Choose Save to Files, pick the same folder each time, and tap Replace. That keeps one backup file that is always the latest.'}
   }catch(e){if(e&&e.name==='AbortError'){bkMsg('Backup cancelled, nothing saved.');return}}
   if(!done){
     try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'application/json'}));a.download=name;document.body.appendChild(a);a.click();a.remove();done=true}catch(e){}
-    msg='Backup created. A file download was started. The full text is also in the box below: if no file appeared, copy it and save it as a .json file.'
+    msg='Backup created as daily-log-backup.json. If your phone asks, choose Replace so there is only one file. The full text is also in the box below: if no file appeared, copy it and save it as a .json file.'
   }
   try{await navigator.clipboard.writeText(txt)}catch(e){}
   db.lastBackup=iso(new Date());save();bkMsg(msg);lastBk();renderNudge();
