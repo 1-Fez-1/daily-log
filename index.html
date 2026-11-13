@@ -350,7 +350,7 @@ body.kp-open #fp{padding-bottom:var(--kp-h,0px)}
       <div class="wbtns"><div class="amtc"><button type="button" class="st" data-d="-10" aria-label="Decrease">&minus;</button><input class="wi" id="wIn2" type="number" min="0" step="1" inputmode="numeric" placeholder="ml" aria-label="Custom water amount in ml"><button type="button" class="st" data-d="10" aria-label="Increase">+</button></div><button class="primary" id="wAdd">Add</button><button id="wUndo">Undo last</button></div>
     </section>
     <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
-      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Export a backup regularly, and before moving to a new version or device. <span id="lastBk"></span> <span style="opacity:.7">Version 37 · picker close guard</span></p>
+      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Export a backup regularly, and before moving to a new version or device. <span id="lastBk"></span> <span style="opacity:.7">Version 38 · keypad fix</span></p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
       <div class="row"><select id="bkMode" aria-label="Import mode"><option value="merge">Import: merge with current data</option><option value="replace">Import: replace everything</option></select><button id="bkImport">Import</button></div>
       <textarea id="bk" rows="3" style="width:100%;font:12px monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px" placeholder="Backup text appears here after Export. To restore, choose a file or paste backup text, then press Import." aria-label="Backup text"></textarea>
@@ -1100,11 +1100,12 @@ function kpShow(el){
   if(KPM!=='none')return;
   $('kpAct').textContent=el.matches('#fp input.fa')?'Add':'Done';$('kp').hidden=false;clearTimeout(kpRm);document.body.classList.add('kp-open');
   document.documentElement.style.setProperty('--kp-h',$('kp').offsetHeight+'px');
-  if(el.id!=='eaIn')setTimeout(()=>{try{el.scrollIntoView({block:'center'})}catch(e){}},60);
+  if(el.closest('#fp')){const l=$('fpList');setTimeout(()=>{const er=el.getBoundingClientRect(),lr=l.getBoundingClientRect();if(er.bottom>lr.bottom-8||er.top<lr.top)l.scrollTop+=er.top-lr.top-lr.height/3},60)}
+  else if(el.id!=='eaIn')setTimeout(()=>{try{el.scrollIntoView({block:'center'})}catch(e){}},60);
 }
 let kpRm=null;
 function kpHide(defer){kpCommit(kpT);$('kp').hidden=true;clearTimeout(kpRm);if(defer===true)kpRm=setTimeout(()=>document.body.classList.remove('kp-open'),450);else document.body.classList.remove('kp-open');kpT=null}
-function kpFocus(el){if(!el)return;try{el.focus()}catch(e){}if(kpT!==el&&kpIs(el))kpShow(el);[60,200].forEach(ms=>setTimeout(()=>{if(!el.isConnected||(el.closest('#ea')&&$('ea').hidden)||(el.closest('#fp')&&$('fp').hidden))return;if(document.activeElement!==el){try{el.focus()}catch(e){}}if(kpT!==el&&kpIs(el))kpShow(el)},ms))}
+function kpFocus(el){if(!el)return;try{el.focus({preventScroll:true})}catch(e){}if(kpT!==el&&kpIs(el))kpShow(el);[60,200].forEach(ms=>setTimeout(()=>{if(!el.isConnected||(el.closest('#ea')&&$('ea').hidden)||(el.closest('#fp')&&$('fp').hidden))return;if(document.activeElement!==el){try{el.focus({preventScroll:true})}catch(e){}}if(kpT!==el&&kpIs(el))kpShow(el)},ms))}
 document.addEventListener('focusin',ev=>{const t=ev.target;if(kpIs(t))kpShow(t);else if(!t.closest('#kp,#fp .fpe'))kpHide(true)});
 document.addEventListener('pointerdown',ev=>{
   if(!kpT||KPM!=='none')return;const t=ev.target;
