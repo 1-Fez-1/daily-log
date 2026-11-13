@@ -350,12 +350,11 @@ body.kp-open #fp{padding-bottom:var(--kp-h,0px)}
       <div class="wbtns"><div class="amtc"><button type="button" class="st" data-d="-10" aria-label="Decrease">&minus;</button><input class="wi" id="wIn2" type="number" min="0" step="1" inputmode="numeric" placeholder="ml" aria-label="Custom water amount in ml"><button type="button" class="st" data-d="10" aria-label="Increase">+</button></div><button class="primary" id="wAdd">Add</button><button id="wUndo">Undo last</button></div>
     </section>
     <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
-      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Each backup is saved as one file named daily-log-backup.json. Save it to the same place each time and tap Replace, so you only ever keep the latest. <span id="lastBk"></span> <span style="opacity:.7">Version 41 · one file only</span></p>
+      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Each backup is saved as one file named daily-log-backup.json. Save it to the same place each time and tap Replace, so you only ever keep the latest. <span id="lastBk"></span> <span style="opacity:.7">Version 42 · tidy removed</span></p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
       <div class="row"><select id="bkMode" aria-label="Import mode"><option value="merge">Import: merge with current data</option><option value="replace">Import: replace everything</option></select><button id="bkImport">Import</button></div>
       <textarea id="bk" rows="3" style="width:100%;font:12px monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px" placeholder="Backup text appears here after Export. To restore, choose a file or paste backup text, then press Import." aria-label="Backup text"></textarea>
       <p class="muted" id="bkMsg" role="status" style="margin:6px 0 0"></p>
-      <div class="row"><button id="tidyBtn">Tidy old entry names</button></div><p class="muted" id="tidyMsg" role="status" style="margin:6px 0 0">Removes amounts that older versions saved inside food names, such as "Oats 40g".</p>
     </details>
   </div>
   <datalist id="foodlist"></datalist><datalist id="ingredlist"></datalist>
@@ -1320,30 +1319,6 @@ function renderNudge(){
 }
 $('bkNudgeGo').onclick=doBackup;
 $('bkNudgeLater').onclick=()=>{try{localStorage.setItem('dailylog.nudge',String(Date.now()+3*36e5))}catch(e){}renderNudge()};
-let tidyArmed=null;
-function tidyPlan(){
-  const plan=[];
-  Object.keys(db.days).forEach(d=>(db.days[d]||[]).forEach(e=>{
-    const low=String(e.n).trim().toLowerCase();if(db.foods.some(x=>x.n.toLowerCase()===low))return;
-    const q=e.a?{n:e.n,a:e.a,ru:e.ru}:parseAmt(e);let nn=baseName(q.n);
-    const f=db.foods.find(x=>x.n.toLowerCase()===nn.toLowerCase());if(f)nn=f.n;
-    if(nn&&nn!==e.n)plan.push({e,nn,q,fix:!e.a});
-  }));
-  return plan;
-}
-$('tidyBtn').onclick=()=>{
-  const b=$('tidyBtn'),m=$('tidyMsg');
-  if(tidyArmed){
-    const plan=tidyPlan();try{localStorage.setItem(KEY+'.pretidy',JSON.stringify(db))}catch(e){}
-    plan.forEach(({e,nn,q,fix})=>{if(fix){e.a=q.a;e.ru=q.ru;e.pu=mkPU(e,q.a)}e.n=nn});
-    clearTimeout(tidyArmed);tidyArmed=null;b.textContent='Tidy old entry names';save();render();m.textContent='Renamed '+plan.length+' entries. A copy of your data from before was kept in this browser.';return;
-  }
-  const plan=tidyPlan();
-  if(!plan.length){m.textContent='Nothing to tidy.';return}
-  m.textContent=plan.length+' entries will be renamed, for example "'+plan[0].e.n+'" becomes "'+plan[0].nn+'". Amounts are kept. Tap again to apply.';
-  b.textContent='Apply '+plan.length+' renames';
-  tidyArmed=setTimeout(()=>{tidyArmed=null;b.textContent='Tidy old entry names';m.textContent='Cancelled.'},10000);
-};
 $('bkFile').onchange=async()=>{const f=$('bkFile').files[0];if(f){$('bk').value=await f.text();bkMsg('File loaded. Choose an import mode, then press Import.')}};
 $('bkImport').onclick=()=>{
   let o;try{o=JSON.parse($('bk').value)}catch(e){return bkMsg('That is not valid backup text.')}
