@@ -350,7 +350,7 @@ body.kp-open #fp{padding-bottom:var(--kp-h,0px)}
       <div class="wbtns"><div class="amtc"><button type="button" class="st" data-d="-10" aria-label="Decrease">&minus;</button><input class="wi" id="wIn2" type="number" min="0" step="1" inputmode="numeric" placeholder="ml" aria-label="Custom water amount in ml"><button type="button" class="st" data-d="10" aria-label="Increase">+</button></div><button class="primary" id="wAdd">Add</button><button id="wUndo">Undo last</button></div>
     </section>
     <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
-      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Export a backup regularly, and before moving to a new version or device. <span id="lastBk"></span> <span style="opacity:.7">Version 35 · amount box fix</span></p>
+      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Export a backup regularly, and before moving to a new version or device. <span id="lastBk"></span> <span style="opacity:.7">Version 36 · search + keypad fix</span></p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
       <div class="row"><select id="bkMode" aria-label="Import mode"><option value="merge">Import: merge with current data</option><option value="replace">Import: replace everything</option></select><button id="bkImport">Import</button></div>
       <textarea id="bk" rows="3" style="width:100%;font:12px monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px" placeholder="Backup text appears here after Export. To restore, choose a file or paste backup text, then press Import." aria-label="Backup text"></textarea>
@@ -1243,11 +1243,14 @@ function fpAdd(x,amt){
 }
 function fpAddSelected(){const x=fpItems().find(i=>i.k===fpSel),inp=$('fpList').querySelector('.fa');if(x&&inp)fpAdd(x,num(inp.value))}
 $('fpQ').addEventListener('input',()=>renderFP());
+$('fpQ').addEventListener('keydown',ev=>{if(ev.key==='Enter'){ev.preventDefault();$('fpQ').blur()}});
+$('fpQ').addEventListener('focus',()=>{if(kpT)kpHide()});
 $('fpX').onclick=closeFP;
 $('fp').addEventListener('click',ev=>{if(ev.target===$('fp')&&!(kpT&&!$('kp').hidden&&ev.clientY>=$('kp').getBoundingClientRect().top))closeFP()});
 $('fpNew').onclick=()=>{const m=fpM,t=$('fpQ').value.trim();closeFP();openNF(m,t,0)};
 $('fpList').addEventListener('click',ev=>{
   const b=ev.target.closest('button');if(!b)return;
+  if(document.activeElement===$('fpQ'))$('fpQ').blur();
   if(b.classList.contains('fpa')){const x=fpItems().find(i=>i.k===b.dataset.k);if(x)fpAdd(x,fpAmtOf(x));return}
   if(b.classList.contains('fpn')){
     kpHide();fpSel=fpSel===b.dataset.k?null:b.dataset.k;renderFP();
