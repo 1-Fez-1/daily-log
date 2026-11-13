@@ -350,7 +350,7 @@ body.kp-open #fp{padding-bottom:var(--kp-h,0px)}
       <div class="wbtns"><div class="amtc"><button type="button" class="st" data-d="-10" aria-label="Decrease">&minus;</button><input class="wi" id="wIn2" type="number" min="0" step="1" inputmode="numeric" placeholder="ml" aria-label="Custom water amount in ml"><button type="button" class="st" data-d="10" aria-label="Increase">+</button></div><button class="primary" id="wAdd">Add</button><button id="wUndo">Undo last</button></div>
     </section>
     <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
-      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Export a backup regularly, and before moving to a new version or device. <span id="lastBk"></span> <span style="opacity:.7">Version 38 · keypad fix</span></p>
+      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Export a backup regularly, and before moving to a new version or device. <span id="lastBk"></span> <span style="opacity:.7">Version 39 · sleep + weight first</span></p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
       <div class="row"><select id="bkMode" aria-label="Import mode"><option value="merge">Import: merge with current data</option><option value="replace">Import: replace everything</option></select><button id="bkImport">Import</button></div>
       <textarea id="bk" rows="3" style="width:100%;font:12px monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px" placeholder="Backup text appears here after Export. To restore, choose a file or paste backup text, then press Import." aria-label="Backup text"></textarea>
@@ -1150,12 +1150,11 @@ $('kp').addEventListener('click',ev=>{
 function remMissing(){
   const d=$('date').value,today=iso(new Date());if(d>today)return[];
   const out=[],list=db.days[d]||[],fe=db.feel[d]||{};
+  {const sl=db.sleep[d]||{};if(!(sl.bed&&sl.wake))out.push({k:'sleep',t:'Sleep'});if(!db.weights[d])out.push({k:'weight',t:'Weight'})}
   const ms=[...new Set(list.map(e=>e.m??0))].sort((a,b)=>a-b).filter(m=>!fe[m]&&!/snack/i.test(MEALS[m]));
   if(ms.length)out.push({k:'feel',t:'How you felt ('+ms.map(m=>MEALS[m]).join(', ')+')',m:ms[0]});
   const bm=db.bm[d]||{};
   if(!bm.y&&!bm.n&&(d<today||new Date().getHours()>=18))out.push({k:'bm',t:'BM'});
-  const sl=db.sleep[d]||{};
-  if(!(sl.bed&&sl.wake))out.push({k:'sleep',t:'Sleep'});
   return out;
 }
 function renderRem(){
@@ -1174,6 +1173,7 @@ $('remBar').addEventListener('click',ev=>{
   const b=ev.target.closest('button');if(!b)return;const r=b.dataset.r;
   if(r==='x'){try{localStorage.setItem('dailylog.rem',$('date').value)}catch(e){}renderRem();return}
   if(r==='feel'){const m=+b.dataset.m;openOnly(m);build();totals();setTimeout(()=>goTo(document.querySelector(`tbody[data-m="${m}"] .fl td`)||document.querySelector(`tbody[data-m="${m}"] .fl`)),60);return}
+  if(r==='weight'){setTab('log');setTimeout(()=>{goTo(document.querySelector('.logfoot'));try{$('wIn').focus({preventScroll:true})}catch(e){}},60);return}
   setTab('diary');setTimeout(()=>goTo($(r==='bm'?'bmCard':'sleepCard')),60);
 });
 
@@ -1285,7 +1285,7 @@ $('ea').addEventListener('click',ev=>{
 sheet.addEventListener('keydown',ev=>{if(ev.key==='Enter'&&ev.target.matches('tr.it'))openEA(+ev.target.dataset.i)});
 $('copyAll').onclick=ev=>copyFrom(null,ev.target);
 
-$('wIn').onchange=()=>{const v=parseFloat($('wIn').value),d=$('date').value;if(v>0)db.weights[d]=v;else delete db.weights[d];save();charts()};
+$('wIn').onchange=()=>{const v=parseFloat($('wIn').value),d=$('date').value;if(v>0)db.weights[d]=v;else delete db.weights[d];save();charts();renderRem()};
 $('gEdit').onclick=()=>{const o=$('gForm').hidden;$('gForm').hidden=!o;$('gEdit').textContent=o?'Done':'Goals';$('gEdit').setAttribute('aria-expanded',o)};
 $('range').onchange=charts;
 function daySlide(dir){try{if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;const m=document.querySelector('main');m.getAnimations().forEach(a=>a.cancel());m.animate([{opacity:0,transform:'translateX('+(dir*60)+'px)'},{opacity:1,transform:'translateX(0)'}],{duration:480,easing:'cubic-bezier(.22,.7,.2,1)'})}catch(e){}}
