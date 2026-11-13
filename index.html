@@ -350,7 +350,7 @@ body.kp-open #fp{padding-bottom:var(--kp-h,0px)}
       <div class="wbtns"><div class="amtc"><button type="button" class="st" data-d="-10" aria-label="Decrease">&minus;</button><input class="wi" id="wIn2" type="number" min="0" step="1" inputmode="numeric" placeholder="ml" aria-label="Custom water amount in ml"><button type="button" class="st" data-d="10" aria-label="Increase">+</button></div><button class="primary" id="wAdd">Add</button><button id="wUndo">Undo last</button></div>
     </section>
     <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
-      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Export a backup regularly, and before moving to a new version or device. <span id="lastBk"></span> <span style="opacity:.7">Version 36 · search + keypad fix</span></p>
+      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Export a backup regularly, and before moving to a new version or device. <span id="lastBk"></span> <span style="opacity:.7">Version 37 · picker close guard</span></p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
       <div class="row"><select id="bkMode" aria-label="Import mode"><option value="merge">Import: merge with current data</option><option value="replace">Import: replace everything</option></select><button id="bkImport">Import</button></div>
       <textarea id="bk" rows="3" style="width:100%;font:12px monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px" placeholder="Backup text appears here after Export. To restore, choose a file or paste backup text, then press Import." aria-label="Backup text"></textarea>
@@ -1235,7 +1235,7 @@ function renderFP(keep){
     return`<div class="fpr${sel?' sel':''}"><div class="fpm"><button class="fpn" data-k="${x.k}"><strong>${esc(x.n)}</strong><small>${sub}</small></button>${sel?'':`<button class="fpa" data-k="${x.k}" aria-label="Add ${esc(x.n)} at the same amount">Add</button>`}</div>${sel?`<div class="fpe"><div class="amtc"><button class="fpst" data-d="-${x.r||!fref(x.f).u?0.5:1}" aria-label="Less">−</button><input class="fa" type="text" inputmode="${KPM}" autocomplete="off" value="${a}" aria-label="Amount of ${esc(x.n)}"><button class="fpst" data-d="${x.r||!fref(x.f).u?0.5:1}" aria-label="More">+</button><span class="u">${u}</span><button class="fpgo">Add</button><span class="pvt">${fpPrev(x,a)}</span></div></div>`:''}</div>`}).join(''):'<p class="muted" style="margin:12px 4px">No saved food matches. Tap New food below.</p>';
 }
 function openFP(m){fpM=m;fpSel=null;fpMap=fpBuildMap();$('fpQ').value='';$('fpT').textContent='Add to '+MEALS[m];$('fp').hidden=false;renderFP();$('fpList').scrollTop=0;if(KPM!=='none')$('fpQ').focus()}
-function closeFP(){$('fp').hidden=true;fpSel=null;kpHide()}
+function closeFP(why){$('fp').hidden=true;fpSel=null;kpHide();if(why==='backdrop'||why==='key')toast('Menu closed ('+why+')')}
 function fpAdd(x,amt){
   if(!(amt>0)){toast('Enter an amount');return false}
   const e=x.r?recEntry(x.r,fpM,amt,x.r.servings):addScaled(x.f,fpM,amt);
@@ -1245,8 +1245,9 @@ function fpAddSelected(){const x=fpItems().find(i=>i.k===fpSel),inp=$('fpList').
 $('fpQ').addEventListener('input',()=>renderFP());
 $('fpQ').addEventListener('keydown',ev=>{if(ev.key==='Enter'){ev.preventDefault();$('fpQ').blur()}});
 $('fpQ').addEventListener('focus',()=>{if(kpT)kpHide()});
-$('fpX').onclick=closeFP;
-$('fp').addEventListener('click',ev=>{if(ev.target===$('fp')&&!(kpT&&!$('kp').hidden&&ev.clientY>=$('kp').getBoundingClientRect().top))closeFP()});
+$('fpX').onclick=()=>closeFP('tick');
+let fpDown=null;$('fp').addEventListener('pointerdown',ev=>{fpDown=ev.target},true);
+$('fp').addEventListener('click',ev=>{if(ev.target===$('fp')&&fpDown===$('fp')&&!(kpT&&!$('kp').hidden))closeFP('backdrop')});
 $('fpNew').onclick=()=>{const m=fpM,t=$('fpQ').value.trim();closeFP();openNF(m,t,0)};
 $('fpList').addEventListener('click',ev=>{
   const b=ev.target.closest('button');if(!b)return;
@@ -1271,7 +1272,7 @@ function eaApply(){
 function eaDone(){if(!eaState)return;eaApply();clearTimeout(eaT);$('ea').hidden=true;eaState=null;kpHide();render()}
 $('eaIn').addEventListener('input',()=>{eaPv();eaApply()});
 $('eaIn').addEventListener('keydown',ev=>{if(ev.key==='Enter'){ev.preventDefault();eaDone()}});
-document.addEventListener('keydown',ev=>{if(ev.key==='Escape'){if(!$('ea').hidden)eaDone();else if(!$('fp').hidden)closeFP()}});
+document.addEventListener('keydown',ev=>{if(ev.key==='Escape'){if(!$('ea').hidden)eaDone();else if(!$('fp').hidden)closeFP('key')}});
 $('eaSave').onclick=eaDone;
 $('eaDel').onclick=()=>{if(!eaState)return;kpHide();dayList().splice(eaState.i,1);save();$('ea').hidden=true;eaState=null;render();toast('Removed')};
 $('ea').addEventListener('click',ev=>{
