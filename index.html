@@ -1130,10 +1130,10 @@ function kpKey(b){
   el.dispatchEvent(new Event('input',{bubbles:true}));
 }
 /* act on press, not on release, so quick taps are never dropped; click only handles keyboard activation */
-let kpGhost=0;
-$('kp').addEventListener('pointerdown',ev=>{const b=ev.target.closest('button');if(b){ev.preventDefault();kpGhost=Date.now();kpKey(b)}});
+let kpGhost=0,kpGX=0,kpGY=0;
+$('kp').addEventListener('pointerdown',ev=>{const b=ev.target.closest('button');if(b){ev.preventDefault();kpGhost=Date.now();kpGX=ev.clientX;kpGY=ev.clientY;kpKey(b)}});
 /* the click that follows a key press must not fall through to whatever is under the pad */
-document.addEventListener('click',ev=>{if(ev.detail>0&&Date.now()-kpGhost<600){ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation()}},true);
+document.addEventListener('click',ev=>{if(ev.detail>0&&Date.now()-kpGhost<600&&Math.abs(ev.clientX-kpGX)<40&&Math.abs(ev.clientY-kpGY)<40){ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation()}},true);
 $('kp').addEventListener('click',ev=>{if(ev.detail===0)kpKey(ev.target.closest('button'))});
 
 /* swipe left/right to change day */
