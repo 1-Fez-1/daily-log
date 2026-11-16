@@ -306,6 +306,7 @@ body.kp-open #fp{padding-bottom:var(--kp-h,0px)}
 #toast{display:flex;align-items:center;white-space:nowrap}body:has(#fp:not([hidden])) #toast{bottom:auto;top:calc(16px + env(safe-area-inset-top,0px))}
 #toast button{background:none;border:0;color:inherit;font-weight:700;text-decoration:underline;margin-left:12px;padding:4px 2px;min-height:0;font-size:14px}
 body.kp-open input[data-fresh="1"]:focus{background:color-mix(in srgb,var(--ink) 16%,var(--surface,#fff))!important;box-shadow:0 0 0 2px var(--ink) inset;border-radius:8px}
+.stepRow{display:flex;align-items:center;gap:10px}.stepRow input{width:140px;font-size:20px;font-weight:600}
 </style>
 </head>
 <body>
@@ -352,7 +353,7 @@ body.kp-open input[data-fresh="1"]:focus{background:color-mix(in srgb,var(--ink)
       <div class="wbtns"><div class="amtc"><button type="button" class="st" data-d="-10" aria-label="Decrease">&minus;</button><input class="wi" id="wIn2" type="number" min="0" step="1" inputmode="numeric" placeholder="ml" aria-label="Custom water amount in ml"><button type="button" class="st" data-d="10" aria-label="Increase">+</button></div><button class="primary" id="wAdd">Add</button><button id="wUndo">Undo last</button></div>
     </section>
     <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
-      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Each backup is saved as one file named daily-log-backup.json. Save it to the same place each time and tap Replace, so you only ever keep the latest. <span id="lastBk"></span> <span style="opacity:.7">Version 44 · fast keypad</span></p>
+      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Each backup is saved as one file named daily-log-backup.json. Save it to the same place each time and tap Replace, so you only ever keep the latest. <span id="lastBk"></span> <span style="opacity:.7">Version 45 · steps</span></p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
       <div class="row"><select id="bkMode" aria-label="Import mode"><option value="merge">Import: merge with current data</option><option value="replace">Import: replace everything</option></select><button id="bkImport">Import</button></div>
       <textarea id="bk" rows="3" style="width:100%;font:12px monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px" placeholder="Backup text appears here after Export. To restore, choose a file or paste backup text, then press Import." aria-label="Backup text"></textarea>
@@ -377,6 +378,10 @@ body.kp-open input[data-fresh="1"]:focus{background:color-mix(in srgb,var(--ink)
     <section class="card sl" id="bmCard" aria-label="Bowel movement">
       <div class="slh"><h2>BM</h2></div>
       <div class="bmrow"><label class="bmck"><input type="checkbox" id="bmY" aria-label="BM: yes"><span>Yes</span></label><label class="bmck"><input type="checkbox" id="bmN" aria-label="BM: no"><span>No</span></label><input id="bmTx" type="text" maxlength="120" placeholder="Short note (optional)" aria-label="BM note"></div>
+    </section>
+    <section class="card sl" id="stepCard" aria-label="Steps">
+      <div class="slh"><h2>Steps</h2><span class="muted" style="font-size:13px">optional</span></div>
+      <div class="stepRow"><input id="stIn" type="number" min="0" step="1" inputmode="numeric" placeholder="0" aria-label="Steps today"><span class="muted">steps</span></div>
     </section>
     <details class="card sl" id="medCard" aria-label="Medications">
       <summary><span class="medh">Medications</span><span class="medsum" id="medSum"></span></summary>
@@ -501,9 +506,9 @@ body.kp-open input[data-fresh="1"]:focus{background:color-mix(in srgb,var(--ink)
 </div>
 <script>
 const KEY='dailylog.v1',MEALS=['Meal 1','Meal 2','Meal 3','Meal 4','Snacks'],F=['k','p','c','f'],LBL={k:'kcal',p:'P g',c:'C g',f:'F g'};
-let db={goals:{k:2000},split:{p:30,f:25},days:{},weights:{},foods:[],meals:[],m4:{},water:{},waterGoal:2000,recipes:[],sleep:{},notes:{},feel:{},mt:{},bm:{},med:{}};
+let db={goals:{k:2000},split:{p:30,f:25},days:{},weights:{},foods:[],meals:[],m4:{},water:{},waterGoal:2000,recipes:[],sleep:{},notes:{},feel:{},mt:{},bm:{},med:{},steps:{}};
 try{const s=localStorage.getItem(KEY);if(s)db=Object.assign(db,JSON.parse(s))}catch(e){}
-db.mt=db.mt||{};db.bm=db.bm||{};db.med=db.med||{};
+db.mt=db.mt||{};db.bm=db.bm||{};db.med=db.med||{};db.steps=db.steps||{};
 function migrateMeals(){
   (db.meals||[]).forEach(m=>{
     if(db.recipes.some(r=>r.n.toLowerCase()===m.n.toLowerCase()))return;
@@ -1044,7 +1049,7 @@ function renderSleep(){
   let tot=0,n=0,t=d;for(let i=0;i<7;i++,t=prev(t)){const x=sleepMin(db.sleep[t]);if(x!=null){tot+=x;n++}}
   $('slAvg').textContent=n>1?`7-day average: ${fmtDur(Math.round(tot/n))} (${n} nights logged)`:'';
   if(document.activeElement!==$('noteTx'))$('noteTx').value=db.notes[d]||'';
-  renderRem();renderMeds();const bm=db.bm[d]||{};$('bmY').checked=!!bm.y;$('bmN').checked=!!bm.n;if(document.activeElement!==$('bmTx'))$('bmTx').value=bm.t||'';
+  renderRem();renderMeds();if(document.activeElement!==$('stIn'))$('stIn').value=db.steps[d]??'';const bm=db.bm[d]||{};$('bmY').checked=!!bm.y;$('bmN').checked=!!bm.n;if(document.activeElement!==$('bmTx'))$('bmTx').value=bm.t||'';
 }
 function setBM(ev){if(ev&&ev.target===$('bmY')&&$('bmY').checked)$('bmN').checked=false;if(ev&&ev.target===$('bmN')&&$('bmN').checked)$('bmY').checked=false;const d=$('date').value,y=$('bmY').checked,n=$('bmN').checked,t=$('bmTx').value.trim();if(!y&&!n&&!t)delete db.bm[d];else{db.bm[d]={t};if(y)db.bm[d].y=true;if(n)db.bm[d].n=true}save();renderWeek();renderRem()}
 $('bmY').addEventListener('change',setBM);$('bmN').addEventListener('change',setBM);$('bmTx').addEventListener('input',()=>{clearTimeout(bmT);bmT=setTimeout(()=>setBM(),300)});
@@ -1293,6 +1298,7 @@ $('ea').addEventListener('click',ev=>{
 sheet.addEventListener('keydown',ev=>{if(ev.key==='Enter'&&ev.target.matches('tr.it'))openEA(+ev.target.dataset.i)});
 $('copyAll').onclick=ev=>copyFrom(null,ev.target);
 
+$('stIn').onchange=()=>{const v=Math.round(parseFloat($('stIn').value)),d=$('date').value;if(v>0)db.steps[d]=v;else delete db.steps[d];save()};
 $('wIn').onchange=()=>{const v=parseFloat($('wIn').value),d=$('date').value;if(v>0)db.weights[d]=v;else delete db.weights[d];save();charts();renderRem()};
 $('gEdit').onclick=()=>{const o=$('gForm').hidden;$('gForm').hidden=!o;$('gEdit').textContent=o?'Done':'Goals';$('gEdit').setAttribute('aria-expanded',o)};
 $('range').onchange=charts;
@@ -1332,19 +1338,19 @@ $('bkFile').onchange=async()=>{const f=$('bkFile').files[0];if(f){$('bk').value=
 $('bkImport').onclick=()=>{
   let o;try{o=JSON.parse($('bk').value)}catch(e){return bkMsg('That is not valid backup text.')}
   const d=o&&o.app==='daily-log'&&o.data;if(!d||typeof d!=='object')return bkMsg('That does not look like a Daily log backup.');
-  if($('bkMode').value==='replace'){db=Object.assign({goals:{k:2000},split:{p:30,f:25},days:{},weights:{},foods:[],meals:[],m4:{},water:{},waterGoal:2000,recipes:[],sleep:{},notes:{},feel:{},mt:{},bm:{},med:{}},d)}
+  if($('bkMode').value==='replace'){db=Object.assign({goals:{k:2000},split:{p:30,f:25},days:{},weights:{},foods:[],meals:[],m4:{},water:{},waterGoal:2000,recipes:[],sleep:{},notes:{},feel:{},mt:{},bm:{},med:{},steps:{}},d)}
   else{
     if(!Object.keys(db.days).length)['goals','split','mg'].forEach(k=>{if(d[k])db[k]=d[k]});
     Object.keys(d.days||{}).forEach(k=>{if(!(db.days[k]||[]).length)db.days[k]=d.days[k]});
     Object.keys(d.weights||{}).forEach(k=>{if(db.weights[k]==null)db.weights[k]=d.weights[k]});
-    Object.assign(db.m4,d.m4||{},db.m4);
+    Object.assign(db.m4,d.m4||{},db.m4);Object.keys(d.steps||{}).forEach(k=>{if(db.steps[k]==null)db.steps[k]=d.steps[k]});
     Object.keys(d.water||{}).forEach(k=>{if(!(db.water[k]||[]).length)db.water[k]=d.water[k]});
     (d.recipes||[]).forEach(r=>{if(!db.recipes.some(x=>x.n.toLowerCase()===r.n.toLowerCase()))db.recipes.push(r)});
     Object.keys(d.sleep||{}).forEach(k=>{if(!db.sleep[k])db.sleep[k]=d.sleep[k]});Object.keys(d.notes||{}).forEach(k=>{if(!db.notes[k])db.notes[k]=d.notes[k]});Object.keys(d.feel||{}).forEach(k=>{if(!db.feel[k])db.feel[k]=d.feel[k]});Object.keys(d.mt||{}).forEach(k=>{if(!db.mt[k])db.mt[k]=d.mt[k]});Object.keys(d.bm||{}).forEach(k=>{if(!db.bm[k])db.bm[k]=d.bm[k]});Object.keys(d.med||{}).forEach(k=>{if(!db.med[k])db.med[k]=d.med[k]});
     (d.foods||[]).forEach(f=>{if(!db.foods.some(x=>x.n.toLowerCase()===f.n.toLowerCase()))db.foods.push(f)});
     (d.meals||[]).forEach(m=>{if(!db.meals.some(x=>x.n.toLowerCase()===m.n.toLowerCase()))db.meals.push(m)});
   }
-  db.mt=db.mt||{};db.bm=db.bm||{};db.med=db.med||{};migrateMeals();save();render();lastBk();bkMsg('Backup imported.');
+  db.mt=db.mt||{};db.bm=db.bm||{};db.med=db.med||{};db.steps=db.steps||{};migrateMeals();save();render();lastBk();bkMsg('Backup imported.');
 };
 try{if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
