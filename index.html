@@ -103,7 +103,6 @@ button.nr[aria-expanded=true] .nm:before{transform:rotate(90deg)}
 #scan>div,#nf>div,#ea>div{background:var(--surface);border-radius:12px;padding:16px;max-width:460px;width:100%;max-height:100%;overflow:auto}
 #scan video{width:100%;border-radius:8px;background:#000;margin:8px 0}
 .dash{padding:10px 12px}
-@media (min-height:650px){.dash{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;box-shadow:0 2px 10px rgba(0,0,0,.1)}}
 .dk{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;margin-bottom:6px}
 .dk b{font:700 28px/1 Georgia,serif;font-variant-numeric:tabular-nums}
 .dk .pct{margin-left:auto;font-weight:700}
@@ -307,10 +306,14 @@ body.kp-open #fp{padding-bottom:var(--kp-h,0px)}
 #toast button{background:none;border:0;color:inherit;font-weight:700;text-decoration:underline;margin-left:12px;padding:4px 2px;min-height:0;font-size:14px}
 body.kp-open input[data-fresh="1"]:focus{background:color-mix(in srgb,var(--ink) 16%,var(--surface,#fff))!important;box-shadow:0 0 0 2px var(--ink) inset;border-radius:8px}
 .stepRow{display:flex;align-items:center;gap:10px}.stepRow input{width:140px;font-size:20px;font-weight:600}
+#kBar{position:fixed;top:0;left:0;right:0;z-index:30;background:var(--surface);border-bottom:1px solid var(--line);padding:calc(6px + env(safe-area-inset-top,0px)) 16px 0;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+#kBar .kt{display:flex;align-items:baseline;gap:6px;font-size:14px;padding-bottom:6px}#kBar .kt b{font-size:18px}#kBar .kl{margin-left:auto;color:var(--muted);font-weight:600}
+#kBar .kp{height:3px;margin:0 -16px;background:var(--soft)}#kBar .kp i{display:block;height:100%;width:0;background:var(--cal)}#kBar.over .kp i{background:#d64545}
 </style>
 </head>
 <body>
 <main>
+  <div id="kBar" hidden aria-live="off"><div class="kt"><b id="kBv">0</b><span> / <span id="kBg">0</span> kcal</span><span class="kl" id="kBl"></span></div><div class="kp"><i id="kBb"></i></div></div>
   <header class="top">
     <div class="dn"><button id="prevD" aria-label="Previous day">&lsaquo;</button><input type="date" id="date" aria-label="Date"><button id="nextD" aria-label="Next day">&rsaquo;</button></div>
     <button id="graphsBtn" aria-label="Graphs" title="Graphs" aria-pressed="false">Graphs</button>
@@ -353,7 +356,7 @@ body.kp-open input[data-fresh="1"]:focus{background:color-mix(in srgb,var(--ink)
       <div class="wbtns"><div class="amtc"><button type="button" class="st" data-d="-10" aria-label="Decrease">&minus;</button><input class="wi" id="wIn2" type="number" min="0" step="1" inputmode="numeric" placeholder="ml" aria-label="Custom water amount in ml"><button type="button" class="st" data-d="10" aria-label="Increase">+</button></div><button class="primary" id="wAdd">Add</button><button id="wUndo">Undo last</button></div>
     </section>
     <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
-      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Each backup is saved as one file named daily-log-backup.json. Save it to the same place each time and tap Replace, so you only ever keep the latest. <span id="lastBk"></span> <span style="opacity:.7">Version 45 · steps</span></p>
+      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Each backup is saved as one file named daily-log-backup.json. Save it to the same place each time and tap Replace, so you only ever keep the latest. <span id="lastBk"></span> <span style="opacity:.7">Version 46 · calorie bar</span></p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
       <div class="row"><select id="bkMode" aria-label="Import mode"><option value="merge">Import: merge with current data</option><option value="replace">Import: replace everything</option></select><button id="bkImport">Import</button></div>
       <textarea id="bk" rows="3" style="width:100%;font:12px monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px" placeholder="Backup text appears here after Export. To restore, choose a file or paste backup text, then press Import." aria-label="Backup text"></textarea>
@@ -672,8 +675,13 @@ function renderDash(t,g){
   const set=(id,v,goal)=>{const pc=goal?Math.round(v/goal*100):0,bar=$(id+'b'),pb=bar.parentElement;bar.style.width=Math.min(100,pc)+'%';pb.setAttribute('aria-valuenow',Math.min(100,pc));$(id+'p').textContent=pc+'%';};
   set('dK',t.k,g.k);set('dP',t.p,g.p);set('dC',t.c,g.c);set('dF',t.f,g.f);
   $('dKv').textContent=Math.round(t.k);$('dKg').textContent=g.k;const l=Math.round(g.k-t.k);$('dKl').textContent=l>=0?l+' left':(-l)+' over';
+  $('kBv').textContent=Math.round(t.k);$('kBg').textContent=g.k;$('kBl').textContent=l>=0?l+' left':(-l)+' over';$('kBb').style.width=Math.min(100,g.k?Math.round(t.k/g.k*100):0)+'%';$('kBar').classList.toggle('over',l<0);kBarQ();
   ['P','C','F'].forEach(L=>{const k=L.toLowerCase();$('d'+L+'v').textContent=Math.round(t[k])+' / '+g[k]+' g'});
 }
+let kBraf=0;
+function kBarUpd(){kBraf=0;const d=document.querySelector('.dash'),show=!!(d&&d.offsetParent!==null&&d.getBoundingClientRect().bottom<0);$('kBar').hidden=!show}
+const kBarQ=()=>{if(!kBraf)kBraf=requestAnimationFrame(kBarUpd)};
+addEventListener('scroll',kBarQ,{passive:true});addEventListener('resize',kBarQ);
 function copyFrom(m,btn){
   const src=(db.days[prev($('date').value)]||[]).filter(e=>m===null||(e.m??0)===m);
   if(!src.length){toast('Nothing logged yesterday'+(m===null?'':' in '+MEALS[m]));return}
@@ -784,7 +792,7 @@ function jumpTo(ix){
   if(rows[0])rows[0].scrollIntoView({block:'center'});rows.forEach(r=>{r.classList.add('flash');setTimeout(()=>r.classList.remove('flash'),2000)});
 }
 $('nutList').addEventListener('click',ev=>{const c=ev.target.closest('button.cr');if(c){const ix=cgroups[c.dataset.cg];if(ix&&ix.length)jumpTo(ix);return}const b=ev.target.closest('button[data-nk]');if(!b)return;const k=b.dataset.nk;openN.has(k)?openN.delete(k):openN.add(k);renderNut()});
-function setTab(t){document.querySelectorAll('[data-tab]').forEach(el=>el.hidden=el.dataset.tab!==t);document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t));$('graphsBtn').setAttribute('aria-pressed',t==='graphs');window.scrollTo(0,0)}
+function setTab(t){setTimeout(()=>kBarQ(),40);document.querySelectorAll('[data-tab]').forEach(el=>el.hidden=el.dataset.tab!==t);document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===t));$('graphsBtn').setAttribute('aria-pressed',t==='graphs');window.scrollTo(0,0)}
 document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
 $('graphsBtn').onclick=()=>{const on=$('graphsBtn').getAttribute('aria-pressed')==='true';setTab(on?'log':'graphs');if(!on)try{charts()}catch(e){}};
 setTab('log');
@@ -1178,7 +1186,7 @@ function renderRem(){
   el.innerHTML='<span class="rl">Don’t forget:</span>'+miss.map(x=>`<button data-r="${x.k}"${x.m!==undefined?` data-m="${x.m}"`:''}>${esc(x.t)}</button>`).join('')+'<button class="rx" data-r="x" aria-label="Dismiss reminders for this day">×</button>';
 }
 function goTo(el){
-  if(!el)return;const dash=document.querySelector('.dash'),sticky=dash&&getComputedStyle(dash).position==='sticky',off=(sticky?dash.offsetHeight:0)+12;
+  if(!el)return;const dash=document.querySelector('.dash'),off=52;
   scrollTo({top:Math.max(0,el.getBoundingClientRect().top+scrollY-off),behavior:'smooth'});
   el.classList.remove('pulse');void el.offsetWidth;el.classList.add('pulse');setTimeout(()=>el.classList.remove('pulse'),2200);
 }
