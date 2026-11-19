@@ -356,7 +356,9 @@ body.kp-open input[data-fresh="1"]:focus{background:color-mix(in srgb,var(--ink)
       <div class="wbtns"><div class="amtc"><button type="button" class="st" data-d="-10" aria-label="Decrease">&minus;</button><input class="wi" id="wIn2" type="number" min="0" step="1" inputmode="numeric" placeholder="ml" aria-label="Custom water amount in ml"><button type="button" class="st" data-d="10" aria-label="Increase">+</button></div><button class="primary" id="wAdd">Add</button><button id="wUndo">Undo last</button></div>
     </section>
     <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
-      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Each backup is saved as one file named daily-log-backup.json. Save it to the same place each time and tap Replace, so you only ever keep the latest. <span id="lastBk"></span> <span style="opacity:.7">Version 46 · calorie bar</span></p>
+      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Each backup is saved as one file named daily-log-backup.json. Save it to the same place each time and tap Replace, so you only ever keep the latest. <span id="lastBk"></span> <span style="opacity:.7">Version 47 · export for Claude</span></p>
+      <div class="row"><select id="exDays" aria-label="Days to include"><option value="14">Last 14 days</option><option value="30" selected>Last 30 days</option><option value="60">Last 60 days</option><option value="90">Last 90 days</option></select><button id="exCopy" type="button">Copy summary for Claude</button></div>
+      <p class="muted" id="exMsg" style="margin:4px 0 10px;font-size:13px">Copies a readable summary of your days so you can paste it into a chat and ask what might be affecting how you feel.</p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
       <div class="row"><select id="bkMode" aria-label="Import mode"><option value="merge">Import: merge with current data</option><option value="replace">Import: replace everything</option></select><button id="bkImport">Import</button></div>
       <textarea id="bk" rows="3" style="width:100%;font:12px monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px" placeholder="Backup text appears here after Export. To restore, choose a file or paste backup text, then press Import." aria-label="Backup text"></textarea>
@@ -1306,6 +1308,50 @@ $('ea').addEventListener('click',ev=>{
 sheet.addEventListener('keydown',ev=>{if(ev.key==='Enter'&&ev.target.matches('tr.it'))openEA(+ev.target.dataset.i)});
 $('copyAll').onclick=ev=>copyFrom(null,ev.target);
 
+function buildExport(n){
+  const dow=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],end=iso(new Date()),days=[];let t=end;for(let i=0;i<n;i++,t=prev(t))days.unshift(t);
+  const has=d=>(db.days[d]||[]).length||db.feel[d]||db.sleep[d]||db.bm[d]||db.weights[d]||db.steps[d]||db.notes[d]||(db.water[d]||[]).length;
+  const used=days.filter(has),g=goals();
+  const L=[];
+  L.push('Please analyse my daily log below and look for trends that might explain why I feel bad. Compare days I felt better with days I felt worse (food, nutrients, meal timing, sleep, water, BM, steps, medications). Consider next-day effects, say how confident you are, and note what I should track next. Correlations are not proof and this is not medical advice.');
+  L.push('');
+  L.push('DAILY LOG, '+used.length+' logged days between '+days[0]+' and '+days[days.length-1]);
+  L.push('Feel scores are 1-10 (10 = best), rated after each meal. Amounts are as eaten; nutrient values are day totals. Goals: '+g.k+' kcal, P '+g.p+' g, C '+g.c+' g, F '+g.f+' g.');
+  L.push('');
+  used.forEach(d=>{
+    const list=db.days[d]||[],tot=sum(list),dt=new Date(d+'T12:00:00');
+    L.push(d+' ('+dow[dt.getDay()]+')');
+    if(list.length){
+      const mic=NUTS.map(([k,nm,u])=>{let v=0;list.forEach(e=>{v+=(e.u&&e.u[k])||0});return v>0?nm+' '+(v>=10?Math.round(v):Math.round(v*10)/10)+u:''}).filter(Boolean);
+      L.push('  Totals: '+Math.round(tot.k)+' kcal, P '+Math.round(tot.p)+' g, C '+Math.round(tot.c)+' g, F '+Math.round(tot.f)+' g'+(mic.length?'; '+mic.join(', '):''));
+    }
+    const sl=db.sleep[d],sm=sl?sleepMin(sl):null;
+    const bits=[];
+    if(sl&&(sl.bed||sl.wake))bits.push('Sleep '+(sl.bed||'?')+' to '+(sl.wake||'?')+(sm!=null?' ('+fmtDur(sm)+')':''));
+    if(db.weights[d])bits.push('Weight '+db.weights[d]+' kg');
+    if(db.steps[d])bits.push('Steps '+db.steps[d]);
+    const w=waterTotal(d);if(w)bits.push('Water '+Math.round(w)+' ml');
+    const bm=db.bm[d];if(bm)bits.push('BM '+(bm.y?'yes':bm.n?'no':'')+(bm.t?' ('+bm.t+')':''));
+    if(bits.length)L.push('  '+bits.join(' | '));
+    const med=medFor(d);if(med.list.length)L.push('  Medications: '+med.list.map(x=>x.n+(x.d?' '+x.d:'')+(x.q>1?' x'+x.q+'/day':'')).join('; ')+(med.assumed?' (carried forward)':''));
+    if(db.notes[d])L.push('  Notes: '+String(db.notes[d]).replace(/\s+/g,' ').trim());
+    const mt=db.mt[d]||{},fe=db.feel[d]||{};
+    MEALS.forEach((nm,m)=>{
+      const items=list.filter(e=>(e.m??0)===m);if(!items.length&&!fe[m])return;
+      const k=Math.round(sum(items).k);
+      L.push('  '+nm+(mt[m]?' at '+mt[m]:'')+(fe[m]?', feel '+fe[m]+'/10':'')+(items.length?' ('+k+' kcal): '+items.map(e=>baseName(e.n)+' '+amtLabel(e)).join('; '):''));
+    });
+    L.push('');
+  });
+  return L.join('\n');
+}
+$('exCopy').onclick=async()=>{
+  const txt=buildExport(+$('exDays').value),msg=$('exMsg');
+  try{await navigator.clipboard.writeText(txt);msg.textContent='Copied ('+Math.round(txt.length/1000)+'k characters). Paste it into a chat with Claude.';return}catch(e){}
+  try{const ta=document.createElement('textarea');ta.value=txt;ta.setAttribute('readonly','');ta.style.cssText='position:fixed;top:0;left:0;opacity:0';document.body.appendChild(ta);ta.select();ta.setSelectionRange(0,txt.length);const ok=document.execCommand('copy');ta.remove();if(ok){msg.textContent='Copied ('+Math.round(txt.length/1000)+'k characters). Paste it into a chat with Claude.';return}}catch(e){}
+  try{if(navigator.share){await navigator.share({text:txt});msg.textContent='Shared.';return}}catch(e){if(e&&e.name==='AbortError')return}
+  msg.textContent='Could not copy on this device.';
+};
 $('stIn').onchange=()=>{const v=Math.round(parseFloat($('stIn').value)),d=$('date').value;if(v>0)db.steps[d]=v;else delete db.steps[d];save()};
 $('wIn').onchange=()=>{const v=parseFloat($('wIn').value),d=$('date').value;if(v>0)db.weights[d]=v;else delete db.weights[d];save();charts();renderRem()};
 $('gEdit').onclick=()=>{const o=$('gForm').hidden;$('gForm').hidden=!o;$('gEdit').textContent=o?'Done':'Goals';$('gEdit').setAttribute('aria-expanded',o)};
