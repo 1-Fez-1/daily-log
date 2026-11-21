@@ -361,7 +361,7 @@ body.kp-open input[data-fresh="1"]:focus{background:color-mix(in srgb,var(--ink)
       <div class="wbtns"><div class="amtc"><button type="button" class="st" data-d="-10" aria-label="Decrease">&minus;</button><input class="wi" id="wIn2" type="number" min="0" step="1" inputmode="numeric" placeholder="ml" aria-label="Custom water amount in ml"><button type="button" class="st" data-d="10" aria-label="Increase">+</button></div><button class="primary" id="wAdd">Add</button><button id="wUndo">Undo last</button></div>
     </section>
     <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
-      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Each backup is saved as one file named daily-log-backup.json. Save it to the same place each time and tap Replace, so you only ever keep the latest. <span id="lastBk"></span> <span style="opacity:.7">Version 48 · medications reworked</span></p>
+      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Each backup is saved as one file named daily-log-backup.json. Save it to the same place each time and tap Replace, so you only ever keep the latest. <span id="lastBk"></span> <span style="opacity:.7">Version 49 · medications tidied</span></p>
       <div class="row"><select id="exDays" aria-label="Days to include"><option value="14">Last 14 days</option><option value="30" selected>Last 30 days</option><option value="60">Last 60 days</option><option value="90">Last 90 days</option></select><button id="exCopy" type="button">Copy summary for Claude</button></div>
       <p class="muted" id="exMsg" style="margin:4px 0 10px;font-size:13px">Copies a readable summary of your days so you can paste it into a chat and ask what might be affecting how you feel.</p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
@@ -529,7 +529,28 @@ const KEY='dailylog.v1',MEALS=['Meal 1','Meal 2','Meal 3','Meal 4','Snacks'],F=[
 let db={goals:{k:2000},split:{p:30,f:25},days:{},weights:{},foods:[],meals:[],m4:{},water:{},waterGoal:2000,recipes:[],sleep:{},notes:{},feel:{},mt:{},bm:{},med:{},steps:{},medTaken:{}};
 try{const s=localStorage.getItem(KEY);if(s)db=Object.assign(db,JSON.parse(s))}catch(e){}
 db.mt=db.mt||{};db.bm=db.bm||{};db.med=db.med||{};db.steps=db.steps||{};db.medTaken=db.medTaken||{};
-function migrateMeals(){
+/* one-time-safe tidy: removes exact duplicate medication lines within a day and gives unit-less doses the unit used for the same medicine elsewhere */
+function medClean(){
+  const norm=x=>String(x==null?'':x).trim().replace(/\s+/g,' '),parse=d=>{const m=norm(d).match(/^(\d+(?:\.\d+)?)\s*(.*)$/);return m?{n:m[1],u:m[2].trim()}:null};
+  const before=JSON.stringify(db.med||{}),units={};let removed=0,unitAdded=0;
+  Object.keys(db.med||{}).forEach(k=>(db.med[k]||[]).forEach(x=>{const p=parse(x.d);if(p&&p.u){const nm=norm(x.n).toLowerCase();units[nm]=units[nm]||{};units[nm][p.u]=(units[nm][p.u]||0)+1}}));
+  const best=nm=>{const u=units[nm];return u?Object.keys(u).sort((a,b)=>u[b]-u[a])[0]:''};
+  Object.keys(db.med||{}).forEach(k=>{
+    const seen=new Set(),out=[];
+    (db.med[k]||[]).forEach(x=>{
+      const o={n:norm(x.n),d:norm(x.d),q:x.q===undefined?1:x.q};if(!o.n)return;
+      const p=parse(o.d);
+      if(p){let u=p.u;if(!u){u=best(o.n.toLowerCase());if(u)unitAdded++}o.d=p.n+(u?' '+u:'')}
+      const key=o.n.toLowerCase()+'|'+o.d.toLowerCase()+'|'+o.q;
+      if(seen.has(key)){removed++;return}
+      seen.add(key);out.push(o);
+    });
+    db.med[k]=out;
+  });
+  if(removed||unitAdded){try{localStorage.setItem('dailylog.medBackup',before)}catch(e){}window.__medDirty=true;window.__medMsg='Tidied medications: '+(removed?removed+' duplicate'+(removed>1?'s':'')+' removed':'')+(removed&&unitAdded?', ':'')+(unitAdded?unitAdded+' dose'+(unitAdded>1?'s':'')+' given a unit':'')+'.'}
+  return {removed,unitAdded};
+}
+function migrateMeals(){medClean();
   (db.meals||[]).forEach(m=>{
     if(db.recipes.some(r=>r.n.toLowerCase()===m.n.toLowerCase()))return;
     db.recipes.push({n:m.n,servings:1,items:(m.items||[]).map(e=>({n:e.n,a:e.a||1,ru:e.ru&&e.ru[0]!=='/'?e.ru:'',k:e.k,p:e.p,c:e.c,f:e.f,u:e.u,w:e.w}))});
@@ -542,6 +563,7 @@ db.foods.forEach(f=>{if(!f.ra){const r=fref(f);f.ra=r.a;f.ru=r.u;delete f.b}});
 let view='cal';
 const $=id=>document.getElementById(id);
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}};
+if(window.__medDirty)save();
 const iso=t=>new Date(t-t.getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const prev=d=>{const t=new Date(d+'T00:00:00');t.setDate(t.getDate()-1);return iso(t)};
 $('date').value=iso(new Date());
@@ -1447,12 +1469,13 @@ $('bkImport').onclick=()=>{
     (d.foods||[]).forEach(f=>{if(!db.foods.some(x=>x.n.toLowerCase()===f.n.toLowerCase()))db.foods.push(f)});
     (d.meals||[]).forEach(m=>{if(!db.meals.some(x=>x.n.toLowerCase()===m.n.toLowerCase()))db.meals.push(m)});
   }
-  db.mt=db.mt||{};db.bm=db.bm||{};db.med=db.med||{};db.steps=db.steps||{};db.medTaken=db.medTaken||{};migrateMeals();save();render();lastBk();bkMsg('Backup imported.');
+  db.mt=db.mt||{};db.bm=db.bm||{};db.med=db.med||{};db.steps=db.steps||{};db.medTaken=db.medTaken||{};migrateMeals();save();render();lastBk();bkMsg('Backup imported.'+(window.__medMsg?' '+window.__medMsg:''));window.__medMsg='';
 };
 try{if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
 lastBk();
 render();
+if(window.__medMsg){toast(window.__medMsg);window.__medMsg=''}
 </script>
 </body>
 </html>
