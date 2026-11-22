@@ -362,7 +362,7 @@ body.kp-open input[data-fresh="1"]:focus{background:color-mix(in srgb,var(--ink)
       <div class="wbtns"><div class="amtc"><button type="button" class="st" data-d="-10" aria-label="Decrease">&minus;</button><input class="wi" id="wIn2" type="number" min="0" step="1" inputmode="numeric" placeholder="ml" aria-label="Custom water amount in ml"><button type="button" class="st" data-d="10" aria-label="Increase">+</button></div><button class="primary" id="wAdd">Add</button><button id="wUndo">Undo last</button></div>
     </section>
     <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
-      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Each backup is saved as one file named daily-log-backup.json. Save it to the same place each time and tap Replace, so you only ever keep the latest. <span id="lastBk"></span> <span style="opacity:.7">Version 54 · late-night meals stay on their day</span></p>
+      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Each backup is saved as one file named daily-log-backup.json. Save it to the same place each time and tap Replace, so you only ever keep the latest. <span id="lastBk"></span> <span style="opacity:.7">Version 55 · automatic sync and cloud backup</span></p>
       <div class="row"><select id="exDays" aria-label="Days to include"><option value="14">Last 14 days</option><option value="30" selected>Last 30 days</option><option value="60">Last 60 days</option><option value="90">Last 90 days</option></select><button id="exCopy" type="button">Copy summary for Claude</button></div>
       <p class="muted" id="exMsg" style="margin:4px 0 10px;font-size:13px">Copies a readable summary of your days so you can paste it into a chat and ask what might be affecting how you feel.</p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
@@ -376,6 +376,9 @@ body.kp-open input[data-fresh="1"]:focus{background:color-mix(in srgb,var(--ink)
       <div class="row"><input id="ghKey" placeholder="Private key" type="password" autocapitalize="off" autocorrect="off" style="width:100%"></div>
       <div class="row"><button id="ghConnect">Connect</button><button id="ghDay" class="primary">Sync this day</button><button id="ghWeek">Last 7 days</button><button id="ghTwo">Last 14 days</button></div>
       <p class="muted" id="ghMsg" role="status" style="margin:6px 0 0;word-break:break-word"></p>
+      <label class="row" style="gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="ghAuto" checked style="width:auto;min-height:0"> Automatic sync and cloud backup</label>
+      <p class="muted" id="ghAutoMsg" role="status" style="margin:4px 0 8px;font-size:13px"></p>
+      <div class="row"><button id="cbNow">Back up now</button><button id="cbRestore">Restore from cloud</button></div>
     </details>
   </div>
   <datalist id="foodlist"></datalist><datalist id="ingredlist"></datalist>
@@ -570,7 +573,7 @@ Object.values(db.sleep||{}).forEach(s=>{s.bed=r5(s.bed);s.wake=r5(s.wake)});
 db.foods.forEach(f=>{if(!f.ra){const r=fref(f);f.ra=r.a;f.ru=r.u;delete f.b}});
 let view='cal';
 const $=id=>document.getElementById(id);
-const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}};
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}try{window.autoKick&&autoKick()}catch(e){}};
 if(window.__medDirty)save();
 const iso=t=>new Date(t-t.getTimezoneOffset()*6e4).toISOString().slice(0,10);
 const prev=d=>{const t=new Date(d+'T00:00:00');t.setDate(t.getDate()-1);return iso(t)};
@@ -1485,8 +1488,8 @@ try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}
 
 /* Google Health sync (via the sync server) */
 const GHK='dailylog.gh',ghGet=()=>{try{return JSON.parse(localStorage.getItem(GHK))||{}}catch(e){return{}}},ghSet=o=>{try{localStorage.setItem(GHK,JSON.stringify(o))}catch(e){}};
-{const g=ghGet();$('ghUrl').value=g.url||'https://dailylog-sync.owenphez.workers.dev';$('ghKey').value=g.key||'';$('ghSum').textContent=g.last?'synced '+g.last:''}
-const ghCfg=()=>{const o={url:$('ghUrl').value.trim().replace(/\/+$/,''),key:$('ghKey').value.trim(),last:ghGet().last};ghSet(o);return o};
+{const g=ghGet();$('ghAuto').checked=g.auto!==false;$('ghUrl').value=g.url||'https://dailylog-sync.owenphez.workers.dev';$('ghKey').value=g.key||'';$('ghSum').textContent=g.last?'synced '+g.last:''}
+const ghCfg=()=>{const o={...ghGet(),url:$('ghUrl').value.trim().replace(/\/+$/,''),key:$('ghKey').value.trim(),auto:$('ghAuto').checked};ghSet(o);return o};
 const ghMsg=t=>{$('ghMsg').textContent=t};
 const GH_T=[8,12,18,20,15],GH_M=['BREAKFAST','LUNCH','DINNER','DINNER','SNACK'];
 function ghEntries(d){
@@ -1514,6 +1517,66 @@ $('ghDay').onclick=()=>ghSync([$('date').value]);
 const ghDays=n=>{const a=[],b=new Date($('date').value+'T12:00:00');for(let i=0;i<n;i++){const x=new Date(b);x.setDate(b.getDate()-i);a.push(x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'))}return a};
 $('ghWeek').onclick=()=>ghSync(ghDays(7));$('ghTwo').onclick=()=>ghSync(ghDays(14));
 $('ghConnect').onclick=()=>{const c=ghCfg();if(!c.url||!c.key){ghMsg('Enter the server address and private key first.');return}window.open(c.url+'/connect?key='+encodeURIComponent(c.key),'_blank')};
+
+/* Automatic Google Health sync and cloud backup (runs while the app is open) */
+const hsh=t=>{let h=5381;for(let i=0;i<t.length;i++)h=((h<<5)+h+t.charCodeAt(i))|0;return String(h)};
+const ymd=x=>x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');
+const aMsg=t=>{$('ghAutoMsg').textContent=t};
+let aSyncT=0,aBackT=0,aBusy=false,aBackBusy=false;
+const aCfg=()=>{const c=ghGet();return c.auto!==false&&c.url&&c.key?c:null};
+const aHash=()=>{try{return JSON.parse(localStorage.getItem('dailylog.ghHash'))||{}}catch(e){return{}}};
+async function autoSync(){
+  const c=aCfg();if(!c||aBusy)return;aBusy=true;
+  try{
+    const t=new Date(),y=new Date(t);y.setDate(t.getDate()-1);
+    const dates=[...new Set([ymd(t),ymd(y),$('date').value])],H=aHash();let sent=0,bad='';
+    for(const d of dates){
+      const ent=ghEntries(d),h=hsh(JSON.stringify(ent));
+      if(H[d]===h||(H[d]===undefined&&!ent.length))continue;
+      const r=await fetch(c.url+'/sync',{method:'POST',headers:{'X-Key':c.key,'Content-Type':'application/json'},body:JSON.stringify({date:d,entries:ent})}),j=await r.json().catch(()=>({}));
+      if(!r.ok||(j.errors&&j.errors.length)){bad=r.status===401?'Wrong private key.':String(j.error||(j.errors&&j.errors[0]&&j.errors[0].detail)||r.status);if(/Connect/.test(bad))bad='Google sign-in expired. Tap Connect.';break}
+      H[d]=h;sent++;
+    }
+    try{localStorage.setItem('dailylog.ghHash',JSON.stringify(H))}catch(e){}
+    if(bad)aMsg('Sync problem: '+bad.slice(0,120));else if(sent){const o=ghGet();o.last=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});ghSet(o);$('ghSum').textContent='synced '+o.last;aMsg('Google Health synced at '+o.last+'.')}
+  }catch(e){aMsg('Sync waiting: could not reach the server.')}
+  aBusy=false;
+}
+async function autoBackup(force){
+  const c=aCfg()||(force?ghCfg():null);if(!c||!c.url||!c.key||aBackBusy)return;
+  if(!Object.keys(db.days).length&&!db.foods.length)return;
+  const body=JSON.stringify(db),h=hsh(body);
+  if(!force&&localStorage.getItem('dailylog.bkHash')===h)return;
+  aBackBusy=true;
+  try{
+    const r=await fetch(c.url+'/backup',{method:'POST',headers:{'X-Key':c.key,'Content-Type':'application/json'},body,keepalive:body.length<60000}),j=await r.json().catch(()=>({}));
+    if(r.ok){try{localStorage.setItem('dailylog.bkHash',h)}catch(e){}const tm=new Date(j.at||Date.now()).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});aMsg('Cloud backup saved at '+tm+'.');if(force)ghMsg('Backed up to the cloud at '+tm+'.')}
+    else{const m=r.status===401?'Wrong private key.':String(j.error||r.status);aMsg('Backup problem: '+m);if(force)ghMsg('Backup problem: '+m)}
+  }catch(e){aMsg('Backup waiting: could not reach the server.');if(force)ghMsg('Could not reach the server.')}
+  aBackBusy=false;
+}
+window.autoKick=()=>{
+  if(!aCfg())return;
+  clearTimeout(aSyncT);aSyncT=setTimeout(autoSync,15000);
+  clearTimeout(aBackT);aBackT=setTimeout(()=>autoBackup(),90000);
+};
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&aCfg()){clearTimeout(aSyncT);clearTimeout(aBackT);autoSync();autoBackup()}});
+$('ghAuto').onchange=()=>{ghCfg();aMsg($('ghAuto').checked?'Automatic sync and backup on.':'Automatic sync and backup off.');if($('ghAuto').checked)autoKick()};
+$('cbNow').onclick=()=>{ghCfg();if(!$('ghUrl').value||!$('ghKey').value){ghMsg('Enter the server address and private key first.');return}ghMsg('Backing up…');autoBackup(true)};
+$('cbRestore').onclick=async()=>{
+  const c=ghCfg();if(!c.url||!c.key){ghMsg('Enter the server address and private key first.');return}
+  ghMsg('Checking the cloud backup…');
+  try{
+    const r=await fetch(c.url+'/backup',{headers:{'X-Key':c.key}}),j=await r.json();
+    if(!r.ok){ghMsg('Restore problem: '+(j.error||r.status));return}
+    const when=new Date(j.at).toLocaleString([],{dateStyle:'medium',timeStyle:'short'});
+    if(!confirm('Replace everything on this phone with the cloud backup from '+when+'? Your current data is kept as a safety copy first.'))return;
+    JSON.parse(j.data);
+    try{localStorage.setItem('dailylog.preRestore',localStorage.getItem(KEY)||'')}catch(e){}
+    localStorage.setItem(KEY,j.data);localStorage.removeItem('dailylog.bkHash');localStorage.removeItem('dailylog.ghHash');location.reload();
+  }catch(e){ghMsg('Restore problem: '+(e.message||'could not reach the server'))}
+};
+setTimeout(()=>{if(aCfg()){autoSync();autoBackup()}},4000);
 lastBk();
 render();
 if(window.__medMsg){toast(window.__medMsg);window.__medMsg=''}

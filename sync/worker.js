@@ -1,6 +1,6 @@
 // Daily Log -> Google Health sync. Paste into the Worker editor and Deploy.
 // Needs: KV binding STORE; secrets/variables CLIENT_ID, CLIENT_SECRET, APP_KEY.
-const SCOPE='https://www.googleapis.com/auth/googlehealth.nutrition.writeonly';
+const SCOPE='https://www.googleapis.com/auth/googlehealth.nutrition.writeonly https://www.googleapis.com/auth/googlehealth.nutrition.readonly';
 const API='https://health.googleapis.com/v4/users/me/dataTypes/nutrition-log/dataPoints';
 const cors={'Access-Control-Allow-Origin':'*','Access-Control-Allow-Headers':'X-Key, Content-Type','Access-Control-Allow-Methods':'GET, POST, OPTIONS'};
 const json=(o,s=200)=>new Response(JSON.stringify(o),{status:s,headers:{...cors,'Content-Type':'application/json'}});
@@ -45,6 +45,18 @@ export default{async fetch(req,env){
   }
   if(req.headers.get('X-Key')!==env.APP_KEY)return json({error:'Wrong key'},401);
   if(u.pathname==='/status'){return json({connected:!!(await env.STORE.get('refresh')),at:+(await env.STORE.get('connectedAt'))||0})}
+  if(u.pathname==='/backup'){
+    if(req.method==='POST'){
+      const body=await req.text();if(body.length<20||body.length>20000000)return json({error:'Bad backup'},400);
+      const cur=await env.STORE.get('backup'),meta=JSON.parse((await env.STORE.get('backupMeta'))||'{}');
+      if(cur&&Date.now()-(meta.at||0)>20*3600*1000){await env.STORE.put('backup:prev',cur);await env.STORE.put('backupMeta:prev',JSON.stringify(meta))}
+      await env.STORE.put('backup',body);const at=Date.now();await env.STORE.put('backupMeta',JSON.stringify({at,size:body.length}));
+      return json({ok:true,at,size:body.length});
+    }
+    const old=u.searchParams.get('prev')==='1',data=await env.STORE.get(old?'backup:prev':'backup');
+    if(!data)return json({error:'No backup saved yet'},404);
+    return json({at:(JSON.parse((await env.STORE.get(old?'backupMeta:prev':'backupMeta'))||'{}')).at||0,data});
+  }
   if(u.pathname==='/sync'&&req.method==='POST'){
     try{
       const {date,entries}=await req.json(),tok=await accessToken(env),unit=await unitName(env,tok),prev=JSON.parse((await env.STORE.get('day:'+date))||'[]');
