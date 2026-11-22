@@ -20,6 +20,28 @@ async function unitName(env,tok){
   if(!n)throw new Error('Could not find a measurement unit: '+JSON.stringify(j).slice(0,300));
   await env.STORE.put('unit',n);return n;
 }
+async function delNames(tok,names){
+  let ok=0,failed=[];
+  for(let i=0;i<names.length;i+=50){
+    const chunk=names.slice(i,i+50);
+    let r=await fetch(API+':batchDelete',{method:'POST',headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json'},body:JSON.stringify({names:chunk})});
+    if(r.ok){ok+=chunk.length;continue}
+    for(const n of chunk){
+      r=await fetch(API+':batchDelete',{method:'POST',headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json'},body:JSON.stringify({names:[n]})});
+      if(r.ok)ok++;else failed.push(n)
+    }
+  }
+  return {ok,failed};
+}
+async function listAll(tok){
+  const out=[];let pt='';
+  for(let i=0;i<30;i++){
+    const r=await fetch(API+'?page_size=1000'+(pt?'&page_token='+encodeURIComponent(pt):''),{headers:{Authorization:'Bearer '+tok}});
+    const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error('List failed: '+JSON.stringify(j).slice(0,200));
+    (j.dataPoints||[]).forEach(d=>out.push(d));pt=j.nextPageToken||'';if(!pt)break;
+  }
+  return out;
+}
 async function create(tok,body){
   const r=await fetch(API,{method:'POST',headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json'},body:JSON.stringify(body)});
   return {ok:r.ok,status:r.status,j:await r.json().catch(()=>({}))};
@@ -57,12 +79,24 @@ export default{async fetch(req,env){
     if(!data)return json({error:'No backup saved yet'},404);
     return json({at:(JSON.parse((await env.STORE.get(old?'backupMeta:prev':'backupMeta'))||'{}')).at||0,data});
   }
+  if(u.pathname==='/cleanup'&&req.method==='POST'){
+    try{
+      const tok=await accessToken(env),all=await listAll(tok);
+      const mine=all.filter(d=>!d.dataSource||!d.dataSource.platform||d.dataSource.platform==='GOOGLE_WEB_API').map(d=>d.name).filter(Boolean);
+      const res=await delNames(tok,mine);
+      let k=await env.STORE.list({prefix:'day:'});for(const x of k.keys)await env.STORE.delete(x.name);
+      return json({found:all.length,deleted:res.ok,failed:res.failed.length});
+    }catch(err){return json({error:String(err.message||err)},500)}
+  }
   if(u.pathname==='/sync'&&req.method==='POST'){
     try{
-      const {date,entries}=await req.json(),tok=await accessToken(env),unit=await unitName(env,tok),prev=JSON.parse((await env.STORE.get('day:'+date))||'[]');
-      let deleted=0,delErr='';
-      if(prev.length){const r=await fetch(API+':batchDelete',{method:'POST',headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json'},body:JSON.stringify({names:prev})});if(r.ok)deleted=prev.length;else delErr=await r.text()}
-      const names=[],errors=[];
+      const {date,entries}=await req.json(),lk=await env.STORE.get('lock:'+date);
+      if(lk&&Date.now()-(+lk)<45000)return json({error:'Another sync for this day is running. Try again shortly.'},409);
+      await env.STORE.put('lock:'+date,String(Date.now()),{expirationTtl:60});
+      const tok=await accessToken(env),unit=await unitName(env,tok),prev=JSON.parse((await env.STORE.get('day:'+date))||'[]');
+      let deleted=0,delErr='',keep=[];
+      if(prev.length){const d=await delNames(tok,prev);deleted=d.ok;keep=d.failed;if(d.failed.length)delErr=d.failed.length+' old entries could not be removed'}
+      const names=[...keep],errors=[];
       for(const e of entries){
         const off=typeof e.off==='number'?e.off+'s':null,log={interval:Object.assign({startTime:e.start,endTime:e.end},off?{startUtcOffset:off,endUtcOffset:off}:{}),foodDisplayName:e.name,energy:{kcal:e.kcal},totalCarbohydrate:{grams:e.carb},totalFat:{grams:e.fat},nutrients:[{nutrient:'PROTEIN',quantity:{grams:e.protein}}],serving:{amount:1,foodMeasurementUnit:unit}};
         if(e.meal)log.mealType=e.meal;
@@ -71,7 +105,7 @@ export default{async fetch(req,env){
         if(!r.ok&&r.status===400&&off){delete log.interval.startUtcOffset;delete log.interval.endUtcOffset;r=await create(tok,{nutritionLog:log})}
         if(r.ok){const n=(r.j.response&&r.j.response.name)||r.j.name;if(n)names.push(n)}else errors.push({food:e.name,status:r.status,detail:JSON.stringify(r.j).slice(0,300)});
       }
-      await env.STORE.put('day:'+date,JSON.stringify(names));
+      await env.STORE.put('day:'+date,JSON.stringify(names));await env.STORE.delete('lock:'+date);
       return json({date,created:names.length,deleted,errors,delErr:delErr.slice(0,200)});
     }catch(err){return json({error:String(err.message||err)},500)}
   }

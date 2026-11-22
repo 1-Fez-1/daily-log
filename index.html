@@ -370,7 +370,7 @@ body.kp-open input[data-fresh="1"]:focus{background:color-mix(in srgb,var(--ink)
       <div class="wbtns"><div class="amtc"><button type="button" class="st" data-d="-10" aria-label="Decrease">&minus;</button><input class="wi" id="wIn2" type="number" min="0" step="1" inputmode="numeric" placeholder="ml" aria-label="Custom water amount in ml"><button type="button" class="st" data-d="10" aria-label="Increase">+</button></div><button class="primary" id="wAdd">Add</button><button id="wUndo">Undo last</button></div>
     </section>
     <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
-      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Each backup is saved as one file named daily-log-backup.json. Save it to the same place each time and tap Replace, so you only ever keep the latest. <span id="lastBk"></span> <span style="opacity:.7">Version 58 · calendar highlights days with entries</span></p>
+      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Each backup is saved as one file named daily-log-backup.json. Save it to the same place each time and tap Replace, so you only ever keep the latest. <span id="lastBk"></span> <span style="opacity:.7">Version 59 · duplicate fix for Google Health</span></p>
       <div class="row"><select id="exDays" aria-label="Days to include"><option value="14">Last 14 days</option><option value="30" selected>Last 30 days</option><option value="60">Last 60 days</option><option value="90">Last 90 days</option></select><button id="exCopy" type="button">Copy summary for Claude</button></div>
       <p class="muted" id="exMsg" style="margin:4px 0 10px;font-size:13px">Copies a readable summary of your days so you can paste it into a chat and ask what might be affecting how you feel.</p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
@@ -387,6 +387,7 @@ body.kp-open input[data-fresh="1"]:focus{background:color-mix(in srgb,var(--ink)
       <label class="row" style="gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="ghAuto" checked style="width:auto;min-height:0"> Automatic sync and cloud backup</label>
       <p class="muted" id="ghAutoMsg" role="status" style="margin:4px 0 8px;font-size:13px"></p>
       <div class="row"><button id="cbNow">Back up now</button><button id="cbRestore">Restore from cloud</button></div>
+      <div class="row"><button id="ghClean">Fix duplicates in Google Health</button></div>
     </details>
   </div>
   <datalist id="foodlist"></datalist><datalist id="ingredlist"></datalist>
@@ -1516,7 +1517,12 @@ function ghEntries(d){
     return{name:String(e.n||'Food').slice(0,80),kcal:Math.round(e.k||0),protein:Math.round((e.p||0)*10)/10,carb:Math.round((e.c||0)*10)/10,fat:Math.round((e.f||0)*10)/10,meal:GH_M[m]||'',start:st.toISOString(),end:en.toISOString(),off:-st.getTimezoneOffset()*60};
   });
 }
+let ghLock=false;
 async function ghSync(dates){
+  if(ghLock){ghMsg('A sync is already running. Try again in a moment.');return}
+  ghLock=true;try{await ghSync2(dates)}finally{ghLock=false}
+}
+async function ghSync2(dates){
   const c=ghCfg();if(!c.url||!c.key){ghMsg('Enter the server address and private key first.');return}
   let made=0,kc=0,errs=[];ghMsg('Syncing…');
   for(const d of dates){
@@ -1563,7 +1569,7 @@ let aSyncT=0,aBackT=0,aBusy=false,aBackBusy=false;
 const aCfg=()=>{const c=ghGet();return c.auto!==false&&c.url&&c.key?c:null};
 const aHash=()=>{try{return JSON.parse(localStorage.getItem('dailylog.ghHash'))||{}}catch(e){return{}}};
 async function autoSync(){
-  const c=aCfg();if(!c||aBusy)return;aBusy=true;
+  const c=aCfg();if(!c||aBusy||ghLock)return;aBusy=true;ghLock=true;
   try{
     const t=new Date(),y=new Date(t);y.setDate(t.getDate()-1);
     const dates=[...new Set([ymd(t),ymd(y),$('date').value])],H=aHash();let sent=0,bad='';
@@ -1571,13 +1577,13 @@ async function autoSync(){
       const ent=ghEntries(d),h=hsh(JSON.stringify(ent));
       if(H[d]===h||(H[d]===undefined&&!ent.length))continue;
       const r=await fetch(c.url+'/sync',{method:'POST',headers:{'X-Key':c.key,'Content-Type':'application/json'},body:JSON.stringify({date:d,entries:ent})}),j=await r.json().catch(()=>({}));
-      if(!r.ok||(j.errors&&j.errors.length)){bad=r.status===401?'Wrong private key.':String(j.error||(j.errors&&j.errors[0]&&j.errors[0].detail)||r.status);if(/Connect/.test(bad))bad='Google sign-in expired. Tap Connect.';break}
+      if(!r.ok||(j.errors&&j.errors.length)){bad=r.status===401?'Wrong private key.':String(j.error||(j.errors&&j.errors[0]&&j.errors[0].detail)||r.status);if(/Connect/.test(bad))bad='Google sign-in expired. Tap Connect.';if(r.status===409){bad='';setTimeout(autoSync,50000)}break}
       H[d]=h;sent++;
     }
     try{localStorage.setItem('dailylog.ghHash',JSON.stringify(H))}catch(e){}
     if(bad)aMsg('Sync problem: '+bad.slice(0,120));else if(sent){const o=ghGet();o.last=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});ghSet(o);$('ghSum').textContent='synced '+o.last;aMsg('Google Health synced at '+o.last+'.')}
   }catch(e){aMsg('Sync waiting: could not reach the server.')}
-  aBusy=false;
+  aBusy=false;ghLock=false;
 }
 async function autoBackup(force){
   const c=aCfg()||(force?ghCfg():null);if(!c||!c.url||!c.key||aBackBusy)return;
@@ -1612,6 +1618,19 @@ $('cbRestore').onclick=async()=>{
     try{localStorage.setItem('dailylog.preRestore',localStorage.getItem(KEY)||'')}catch(e){}
     localStorage.setItem(KEY,j.data);localStorage.removeItem('dailylog.bkHash');localStorage.removeItem('dailylog.ghHash');location.reload();
   }catch(e){ghMsg('Restore problem: '+(e.message||'could not reach the server'))}
+};
+$('ghClean').onclick=async()=>{
+  const c=ghCfg();if(!c.url||!c.key){ghMsg('Enter the server address and private key first.');return}
+  if(!confirm('This deletes every food entry this app has sent to Google Health, then sends the last 14 days again. Food you logged directly in the Google Health app is not touched. Continue?'))return;
+  if(ghLock){ghMsg('A sync is running. Try again in a moment.');return}
+  ghLock=true;ghMsg('Cleaning up…');
+  try{
+    const r=await fetch(c.url+'/cleanup',{method:'POST',headers:{'X-Key':c.key}}),j=await r.json().catch(()=>({}));
+    if(!r.ok){ghMsg('Cleanup problem: '+String(j.error||r.status).slice(0,200));ghLock=false;return}
+    try{localStorage.removeItem('dailylog.ghHash')}catch(e){}
+    ghMsg('Removed '+j.deleted+' of '+j.found+' entries'+(j.failed?' ('+j.failed+' could not be removed)':'')+'. Sending again…');
+  }catch(e){ghMsg('Could not reach the server.');ghLock=false;return}
+  ghLock=false;await ghSync(ghDays(14));
 };
 setTimeout(()=>{if(aCfg()){autoSync();autoBackup()}},4000);
 lastBk();
