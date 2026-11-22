@@ -64,10 +64,11 @@ export default{async fetch(req,env){
       if(prev.length){const r=await fetch(API+':batchDelete',{method:'POST',headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json'},body:JSON.stringify({names:prev})});if(r.ok)deleted=prev.length;else delErr=await r.text()}
       const names=[],errors=[];
       for(const e of entries){
-        const log={interval:{startTime:e.start,endTime:e.end},foodDisplayName:e.name,energy:{kcal:e.kcal},totalCarbohydrate:{grams:e.carb},totalFat:{grams:e.fat},nutrients:[{nutrient:'PROTEIN',quantity:{grams:e.protein}}],serving:{amount:1,foodMeasurementUnit:unit}};
+        const off=typeof e.off==='number'?e.off+'s':null,log={interval:Object.assign({startTime:e.start,endTime:e.end},off?{startUtcOffset:off,endUtcOffset:off}:{}),foodDisplayName:e.name,energy:{kcal:e.kcal},totalCarbohydrate:{grams:e.carb},totalFat:{grams:e.fat},nutrients:[{nutrient:'PROTEIN',quantity:{grams:e.protein}}],serving:{amount:1,foodMeasurementUnit:unit}};
         if(e.meal)log.mealType=e.meal;
         let r=await create(tok,{nutritionLog:log});
         if(!r.ok&&r.status===400&&log.mealType){delete log.mealType;r=await create(tok,{nutritionLog:log})}
+        if(!r.ok&&r.status===400&&off){delete log.interval.startUtcOffset;delete log.interval.endUtcOffset;r=await create(tok,{nutritionLog:log})}
         if(r.ok){const n=(r.j.response&&r.j.response.name)||r.j.name;if(n)names.push(n)}else errors.push({food:e.name,status:r.status,detail:JSON.stringify(r.j).slice(0,300)});
       }
       await env.STORE.put('day:'+date,JSON.stringify(names));
