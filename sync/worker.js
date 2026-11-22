@@ -1,7 +1,8 @@
 // Daily Log -> Google Health sync. Paste into the Worker editor and Deploy.
 // Needs: KV binding STORE; secrets/variables CLIENT_ID, CLIENT_SECRET, APP_KEY.
-const SCOPE='https://www.googleapis.com/auth/googlehealth.nutrition.writeonly https://www.googleapis.com/auth/googlehealth.nutrition.readonly';
-const API='https://health.googleapis.com/v4/users/me/dataTypes/nutrition-log/dataPoints';
+const SCOPE=['nutrition.writeonly','nutrition.readonly','health_metrics_and_measurements.writeonly','health_metrics_and_measurements.readonly'].map(x=>'https://www.googleapis.com/auth/googlehealth.'+x).join(' ');
+const WAPI='https://health.googleapis.com/v4/users/me/dataTypes/weight/dataPoints';
+const NAPI='https://health.googleapis.com/v4/users/me/dataTypes/nutrition-log/dataPoints',API=NAPI;
 const cors={'Access-Control-Allow-Origin':'*','Access-Control-Allow-Headers':'X-Key, Content-Type','Access-Control-Allow-Methods':'GET, POST, OPTIONS'};
 const json=(o,s=200)=>new Response(JSON.stringify(o),{status:s,headers:{...cors,'Content-Type':'application/json'}});
 const page=t=>new Response('<meta name=viewport content="width=device-width,initial-scale=1"><body style="font:18px system-ui;padding:24px">'+t,{headers:{'Content-Type':'text/html'}});
@@ -20,7 +21,7 @@ async function unitName(env,tok){
   if(!n)throw new Error('Could not find a measurement unit: '+JSON.stringify(j).slice(0,300));
   await env.STORE.put('unit',n);return n;
 }
-async function delNames(tok,names){
+async function delNames(tok,names,API=NAPI){
   let ok=0,failed=[];
   for(let i=0;i<names.length;i+=50){
     const chunk=names.slice(i,i+50);
@@ -33,7 +34,7 @@ async function delNames(tok,names){
   }
   return {ok,failed};
 }
-async function listAll(tok){
+async function listAll(tok,API=NAPI){
   const out=[];let pt='';
   for(let i=0;i<30;i++){
     const r=await fetch(API+'?page_size=1000'+(pt?'&page_token='+encodeURIComponent(pt):''),{headers:{Authorization:'Bearer '+tok}});
@@ -97,7 +98,7 @@ export default{async fetch(req,env){
   }
   if(u.pathname==='/sync'&&req.method==='POST'){
     try{
-      const {date,entries,from,to}=await req.json(),lk=await env.STORE.get('lock:'+date);
+      const {date,entries,from,to,weight}=await req.json(),lk=await env.STORE.get('lock:'+date);
       if(lk&&Date.now()-(+lk)<45000)return json({error:'Another sync for this day is running. Try again shortly.'},409);
       await env.STORE.put('lock:'+date,String(Date.now()),{expirationTtl:60});
       const tok=await accessToken(env),unit=await unitName(env,tok),prev=JSON.parse((await env.STORE.get('day:'+date))||'[]');
@@ -115,8 +116,19 @@ export default{async fetch(req,env){
         if(!r.ok&&r.status===400&&off){delete log.interval.startUtcOffset;delete log.interval.endUtcOffset;r=await create(tok,{nutritionLog:log})}
         if(r.ok){const n=(r.j.response&&r.j.response.name)||r.j.name;if(n)names.push(n)}else errors.push({food:e.name,status:r.status,detail:JSON.stringify(r.j).slice(0,300)});
       }
+      let weightMsg='';
+      if(weight!==undefined){
+        try{
+          const wl=await listAll(tok,WAPI),wm=wl.filter(d=>d.name&&(!d.dataSource||!d.dataSource.platform||d.dataSource.platform==='GOOGLE_WEB_API')&&(()=>{const st=d.weight&&d.weight.sampleTime&&d.weight.sampleTime.physicalTime;return from&&to&&st&&st>=from&&st<to})()).map(d=>d.name);
+          if(wm.length){const d=await delNames(tok,wm,WAPI);if(d.failed.length)weightMsg='Could not replace the old weight entry. '}
+          if(weight&&weight.kg>0){
+            const r=await fetch(WAPI,{method:'POST',headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json'},body:JSON.stringify({weight:{sampleTime:{physicalTime:weight.time,utcOffset:weight.off+'s'},weightGrams:Math.round(weight.kg*1000)}})});
+            if(!r.ok)weightMsg+='Weight: '+r.status+' '+(await r.text()).slice(0,250);
+          }
+        }catch(err){weightMsg='Weight: '+String(err.message||err).slice(0,250)}
+      }
       await env.STORE.put('day:'+date,JSON.stringify(names));await env.STORE.delete('lock:'+date);
-      return json({date,created:names.length,deleted,errors,delErr:delErr.slice(0,200)});
+      return json({date,created:names.length,deleted,errors,delErr:delErr.slice(0,200),weightMsg});
     }catch(err){return json({error:String(err.message||err)},500)}
   }
   return page('Daily Log sync is running.');
