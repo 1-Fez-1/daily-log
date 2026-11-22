@@ -369,25 +369,27 @@ body.kp-open input[data-fresh="1"]:focus{background:color-mix(in srgb,var(--ink)
       <div class="wbtns"><button class="wq" data-w="150">+150</button><button class="wq" data-w="250">+250</button><button class="wq" data-w="500">+500</button><span class="muted">ml</span></div>
       <div class="wbtns"><div class="amtc"><button type="button" class="st" data-d="-10" aria-label="Decrease">&minus;</button><input class="wi" id="wIn2" type="number" min="0" step="1" inputmode="numeric" placeholder="ml" aria-label="Custom water amount in ml"><button type="button" class="st" data-d="10" aria-label="Increase">+</button></div><button class="primary" id="wAdd">Add</button><button id="wUndo">Undo last</button></div>
     </section>
-    <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
-      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Each backup is saved as one file named daily-log-backup.json. Save it to the same place each time and tap Replace, so you only ever keep the latest. <span id="lastBk"></span> <span style="opacity:.7">Version 63 · weight sync</span></p>
+    <details class="card sl" id="ghCard"><summary><span class="medh">Google Health sync &amp; cloud backup</span><span class="medsum" id="ghSum"></span></summary>
+      <p class="muted" style="margin:4px 0 8px;font-size:13px">Sends food and weight to the Google Health app and keeps a cloud copy of your data. Both happen automatically while the app is open.</p>
+      <div class="row"><input id="ghUrl" placeholder="Sync server address" autocapitalize="off" autocorrect="off" style="width:100%"></div>
+      <div class="row"><input id="ghKey" placeholder="Private key" type="password" autocapitalize="off" autocorrect="off" style="width:100%"></div>
+      <div class="row"><button id="ghConnect">Connect</button><button id="ghWeek" class="primary">Last 7 days</button></div>
+      <p class="muted" id="ghMsg" role="status" style="margin:6px 0 0;word-break:break-word;white-space:pre-line"></p>
+      <label class="row" style="gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="ghAuto" checked style="width:auto;min-height:0"> Automatic sync and cloud backup</label>
+      <p class="muted" id="ghAutoMsg" role="status" style="margin:4px 0 8px;font-size:13px"></p>
+      <div class="row"><button id="cbNow">Back up now</button><button id="cbRestore">Restore from cloud</button></div>
+      <details style="margin-top:10px"><summary class="muted" style="font-size:13px">Troubleshooting</summary>
+        <div class="row" style="margin-top:8px"><button id="ghCheck">Check this day in Google Health</button><button id="ghClean">Fix duplicates</button></div>
+      </details>
+    </details>
+    <details class="card" id="bkBox"><summary>Backup file &amp; export (advanced)</summary>
+      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Each backup is saved as one file named daily-log-backup.json. Save it to the same place each time and tap Replace, so you only ever keep the latest. <span id="lastBk"></span> <span style="opacity:.7">Version 64 · tidier sync and backup settings</span></p>
       <div class="row"><select id="exDays" aria-label="Days to include"><option value="14">Last 14 days</option><option value="30" selected>Last 30 days</option><option value="60">Last 60 days</option><option value="90">Last 90 days</option></select><button id="exCopy" type="button">Copy summary for Claude</button></div>
       <p class="muted" id="exMsg" style="margin:4px 0 10px;font-size:13px">Copies a readable summary of your days so you can paste it into a chat and ask what might be affecting how you feel.</p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
       <div class="row"><select id="bkMode" aria-label="Import mode"><option value="merge">Import: merge with current data</option><option value="replace">Import: replace everything</option></select><button id="bkImport">Import</button></div>
       <textarea id="bk" rows="3" style="width:100%;font:12px monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px" placeholder="Backup text appears here after Export. To restore, choose a file or paste backup text, then press Import." aria-label="Backup text"></textarea>
       <p class="muted" id="bkMsg" role="status" style="margin:6px 0 0"></p>
-    </details>
-    <details class="card sl" id="ghCard"><summary><span class="medh">Google Health sync</span><span class="medsum" id="ghSum"></span></summary>
-      <p class="muted" style="margin:4px 0 8px;font-size:13px">Sends your food to the Google Health app. Re-syncing a day replaces what was sent before.</p>
-      <div class="row"><input id="ghUrl" placeholder="Sync server address" autocapitalize="off" autocorrect="off" style="width:100%"></div>
-      <div class="row"><input id="ghKey" placeholder="Private key" type="password" autocapitalize="off" autocorrect="off" style="width:100%"></div>
-      <div class="row"><button id="ghConnect">Connect</button><button id="ghDay" class="primary">Sync this day</button><button id="ghWeek">Last 7 days</button><button id="ghTwo">Last 14 days</button></div>
-      <p class="muted" id="ghMsg" role="status" style="margin:6px 0 0;word-break:break-word;white-space:pre-line"></p>
-      <label class="row" style="gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="ghAuto" checked style="width:auto;min-height:0"> Automatic sync and cloud backup</label>
-      <p class="muted" id="ghAutoMsg" role="status" style="margin:4px 0 8px;font-size:13px"></p>
-      <div class="row"><button id="cbNow">Back up now</button><button id="cbRestore">Restore from cloud</button></div>
-      <div class="row"><button id="ghCheck">Check this day in Google Health</button><button id="ghClean">Fix duplicates</button></div>
     </details>
   </div>
   <datalist id="foodlist"></datalist><datalist id="ingredlist"></datalist>
@@ -1476,7 +1478,7 @@ $('bkExport').onclick=doBackup;
 const daysSince=d=>Math.round((new Date(iso(new Date())+'T00:00:00')-new Date(d+'T00:00:00'))/864e5);
 function renderNudge(){
   let sn=0;try{sn=+localStorage.getItem('dailylog.nudge')||0}catch(e){}
-  const has=Object.values(db.days).some(l=>l&&l.length),n=db.lastBackup?daysSince(db.lastBackup):null,show=has&&(n===null||n>=1)&&Date.now()>sn;
+  const has=Object.values(db.days).some(l=>l&&l.length),n=db.lastBackup?daysSince(db.lastBackup):null,cl=+(localStorage.getItem('dailylog.cloudBk')||0),show=has&&(n===null||n>=1)&&Date.now()-cl>864e5&&Date.now()>sn;
   $('bkNudge').hidden=!show;
   if(show)$('bkNudgeT').textContent=n===null?'No backup yet. Your data lives only on this phone.':(n===1?'Last backup was yesterday.':'Last backup was '+n+' days ago.');
 }
@@ -1537,9 +1539,8 @@ async function ghSync2(dates){
   const o=ghGet();if(!errs.length){o.last=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});ghSet(o);$('ghSum').textContent=' · synced '+o.last}
   ghMsg((errs.length?'Problem: '+errs.slice(0,3).join(' | ')+' ':'')+made+' food entr'+(made===1?'y':'ies')+' sent'+(made?' ('+kc+' kcal).':'.'));
 }
-$('ghDay').onclick=()=>ghSync([$('date').value]);
 const ghDays=n=>{const a=[],b=new Date($('date').value+'T12:00:00');for(let i=0;i<n;i++){const x=new Date(b);x.setDate(b.getDate()-i);a.push(x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'))}return a};
-$('ghWeek').onclick=()=>ghSync(ghDays(7));$('ghTwo').onclick=()=>ghSync(ghDays(14));
+$('ghWeek').onclick=()=>ghSync(ghDays(7));
 $('ghConnect').onclick=()=>{const c=ghCfg();if(!c.url||!c.key){ghMsg('Enter the server address and private key first.');return}window.open(c.url+'/connect?key='+encodeURIComponent(c.key),'_blank')};
 
 
@@ -1595,7 +1596,7 @@ async function autoBackup(force){
   aBackBusy=true;
   try{
     const r=await fetch(c.url+'/backup',{method:'POST',headers:{'X-Key':c.key,'Content-Type':'application/json'},body,keepalive:body.length<60000}),j=await r.json().catch(()=>({}));
-    if(r.ok){try{localStorage.setItem('dailylog.bkHash',h)}catch(e){}const tm=new Date(j.at||Date.now()).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});aMsg('Cloud backup saved at '+tm+'.');if(force)ghMsg('Backed up to the cloud at '+tm+'.')}
+    if(r.ok){try{localStorage.setItem('dailylog.bkHash',h);localStorage.setItem('dailylog.cloudBk',String(Date.now()))}catch(e){}try{renderNudge()}catch(e){}const tm=new Date(j.at||Date.now()).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});aMsg('Cloud backup saved at '+tm+'.');if(force)ghMsg('Backed up to the cloud at '+tm+'.')}
     else{const m=r.status===401?'Wrong private key.':String(j.error||r.status);aMsg('Backup problem: '+m);if(force)ghMsg('Backup problem: '+m)}
   }catch(e){aMsg('Backup waiting: could not reach the server.');if(force)ghMsg('Could not reach the server.')}
   aBackBusy=false;
