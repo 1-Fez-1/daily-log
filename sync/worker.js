@@ -25,10 +25,10 @@ async function delNames(tok,names){
   for(let i=0;i<names.length;i+=50){
     const chunk=names.slice(i,i+50);
     let r=await fetch(API+':batchDelete',{method:'POST',headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json'},body:JSON.stringify({names:chunk})});
-    if(r.ok){ok+=chunk.length;continue}
+    if(r.ok&&!((await r.clone().json().catch(()=>({}))).error)){ok+=chunk.length;continue}
     for(const n of chunk){
       r=await fetch(API+':batchDelete',{method:'POST',headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json'},body:JSON.stringify({names:[n]})});
-      if(r.ok)ok++;else failed.push(n)
+      if(r.ok&&!((await r.clone().json().catch(()=>({}))).error))ok++;else failed.push(n)
     }
   }
   return {ok,failed};
@@ -97,12 +97,15 @@ export default{async fetch(req,env){
   }
   if(u.pathname==='/sync'&&req.method==='POST'){
     try{
-      const {date,entries}=await req.json(),lk=await env.STORE.get('lock:'+date);
+      const {date,entries,from,to}=await req.json(),lk=await env.STORE.get('lock:'+date);
       if(lk&&Date.now()-(+lk)<45000)return json({error:'Another sync for this day is running. Try again shortly.'},409);
       await env.STORE.put('lock:'+date,String(Date.now()),{expirationTtl:60});
       const tok=await accessToken(env),unit=await unitName(env,tok),prev=JSON.parse((await env.STORE.get('day:'+date))||'[]');
-      let deleted=0,delErr='',keep=[];
-      if(prev.length){const d=await delNames(tok,prev);deleted=d.ok;keep=d.failed;if(d.failed.length)delErr=d.failed.length+' old entries could not be removed'}
+      let deleted=0,delErr='',keep=[],left=0;
+      const all=await listAll(tok),inDay=d=>{const st=d.nutritionLog&&d.nutritionLog.interval&&d.nutritionLog.interval.startTime;return from&&to&&st&&st>=from&&st<to};
+      const mine=new Set(all.filter(d=>d.name&&(!d.dataSource||!d.dataSource.platform||d.dataSource.platform==='GOOGLE_WEB_API')&&inDay(d)).map(d=>d.name));
+      prev.forEach(n=>{if(all.some(d=>d.name===n))mine.add(n)});
+      if(mine.size){const d=await delNames(tok,[...mine]);deleted=d.ok;keep=d.failed;left=d.failed.length;if(left)delErr=left+' old entries could not be removed'}
       const names=[...keep],errors=[];
       for(const e of entries){
         const off=typeof e.off==='number'?e.off+'s':null,log={interval:Object.assign({startTime:e.start,endTime:e.end},off?{startUtcOffset:off,endUtcOffset:off}:{}),foodDisplayName:e.name,energy:{kcal:e.kcal},totalCarbohydrate:{grams:e.carb},totalFat:{grams:e.fat},nutrients:[{nutrient:'PROTEIN',quantity:{grams:e.protein}}],serving:{amount:1,foodMeasurementUnit:unit}};
