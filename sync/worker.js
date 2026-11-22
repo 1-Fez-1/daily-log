@@ -11,6 +11,15 @@ async function accessToken(env){
   const j=await r.json();if(!r.ok||!j.access_token)throw new Error('Google sign-in expired or was refused ('+(j.error||r.status)+'). Tap Connect again.');
   return j.access_token;
 }
+async function unitName(env,tok){
+  const c=await env.STORE.get('unit');if(c)return c;
+  const r=await fetch('https://health.googleapis.com/v4/users/me/dataTypes/food-measurement-unit/dataPoints?pageSize=200',{headers:{Authorization:'Bearer '+tok}});
+  const j=await r.json().catch(()=>({})),a=j.dataPoints||j.data_points||[];
+  const pick=a.find(x=>/piece/i.test(JSON.stringify(x)))||a.find(x=>/serving/i.test(JSON.stringify(x)))||a[0];
+  const n=pick&&(pick.name||(pick.foodMeasurementUnit&&pick.foodMeasurementUnit.name));
+  if(!n)throw new Error('Could not find a measurement unit: '+JSON.stringify(j).slice(0,300));
+  await env.STORE.put('unit',n);return n;
+}
 async function create(tok,body){
   const r=await fetch(API,{method:'POST',headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json'},body:JSON.stringify(body)});
   return {ok:r.ok,status:r.status,j:await r.json().catch(()=>({}))};
@@ -38,12 +47,12 @@ export default{async fetch(req,env){
   if(u.pathname==='/status'){return json({connected:!!(await env.STORE.get('refresh')),at:+(await env.STORE.get('connectedAt'))||0})}
   if(u.pathname==='/sync'&&req.method==='POST'){
     try{
-      const {date,entries}=await req.json(),tok=await accessToken(env),prev=JSON.parse((await env.STORE.get('day:'+date))||'[]');
+      const {date,entries}=await req.json(),tok=await accessToken(env),unit=await unitName(env,tok),prev=JSON.parse((await env.STORE.get('day:'+date))||'[]');
       let deleted=0,delErr='';
       if(prev.length){const r=await fetch(API+':batchDelete',{method:'POST',headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json'},body:JSON.stringify({names:prev})});if(r.ok)deleted=prev.length;else delErr=await r.text()}
       const names=[],errors=[];
       for(const e of entries){
-        const log={interval:{startTime:e.start,endTime:e.end},foodDisplayName:e.name,energy:{kcal:e.kcal},totalCarbohydrate:{grams:e.carb},totalFat:{grams:e.fat},nutrients:[{nutrient:'PROTEIN',quantity:{grams:e.protein}}],serving:{amount:1}};
+        const log={interval:{startTime:e.start,endTime:e.end},foodDisplayName:e.name,energy:{kcal:e.kcal},totalCarbohydrate:{grams:e.carb},totalFat:{grams:e.fat},nutrients:[{nutrient:'PROTEIN',quantity:{grams:e.protein}}],serving:{amount:1,foodMeasurementUnit:unit}};
         if(e.meal)log.mealType=e.meal;
         let r=await create(tok,{nutritionLog:log});
         if(!r.ok&&r.status===400&&log.mealType){delete log.mealType;r=await create(tok,{nutritionLog:log})}

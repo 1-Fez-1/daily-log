@@ -362,7 +362,7 @@ body.kp-open input[data-fresh="1"]:focus{background:color-mix(in srgb,var(--ink)
       <div class="wbtns"><div class="amtc"><button type="button" class="st" data-d="-10" aria-label="Decrease">&minus;</button><input class="wi" id="wIn2" type="number" min="0" step="1" inputmode="numeric" placeholder="ml" aria-label="Custom water amount in ml"><button type="button" class="st" data-d="10" aria-label="Increase">+</button></div><button class="primary" id="wAdd">Add</button><button id="wUndo">Undo last</button></div>
     </section>
     <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
-      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Each backup is saved as one file named daily-log-backup.json. Save it to the same place each time and tap Replace, so you only ever keep the latest. <span id="lastBk"></span> <span style="opacity:.7">Version 51 · Google Health sync</span></p>
+      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Each backup is saved as one file named daily-log-backup.json. Save it to the same place each time and tap Replace, so you only ever keep the latest. <span id="lastBk"></span> <span style="opacity:.7">Version 52 · Google Health sync fix</span></p>
       <div class="row"><select id="exDays" aria-label="Days to include"><option value="14">Last 14 days</option><option value="30" selected>Last 30 days</option><option value="60">Last 60 days</option><option value="90">Last 90 days</option></select><button id="exCopy" type="button">Copy summary for Claude</button></div>
       <p class="muted" id="exMsg" style="margin:4px 0 10px;font-size:13px">Copies a readable summary of your days so you can paste it into a chat and ask what might be affecting how you feel.</p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
@@ -374,7 +374,7 @@ body.kp-open input[data-fresh="1"]:focus{background:color-mix(in srgb,var(--ink)
       <p class="muted" style="margin:4px 0 8px;font-size:13px">Sends your food to the Google Health app. Re-syncing a day replaces what was sent before.</p>
       <div class="row"><input id="ghUrl" placeholder="Sync server address" autocapitalize="off" autocorrect="off" style="width:100%"></div>
       <div class="row"><input id="ghKey" placeholder="Private key" type="password" autocapitalize="off" autocorrect="off" style="width:100%"></div>
-      <div class="row"><button id="ghConnect">Connect</button><button id="ghDay" class="primary">Sync this day</button><button id="ghWeek">Last 7 days</button></div>
+      <div class="row"><button id="ghConnect">Connect</button><button id="ghDay" class="primary">Sync this day</button><button id="ghWeek">Last 7 days</button><button id="ghTwo">Last 14 days</button></div>
       <p class="muted" id="ghMsg" role="status" style="margin:6px 0 0;word-break:break-word"></p>
     </details>
   </div>
@@ -1511,7 +1511,8 @@ async function ghSync(dates){
   ghMsg((errs.length?'Problem: '+errs.slice(0,3).join(' | ')+' ':'')+made+' food entr'+(made===1?'y':'ies')+' sent.');
 }
 $('ghDay').onclick=()=>ghSync([$('date').value]);
-$('ghWeek').onclick=()=>{const a=[],b=new Date($('date').value+'T12:00:00');for(let i=0;i<7;i++){const x=new Date(b);x.setDate(b.getDate()-i);a.push(x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'))}ghSync(a)};
+const ghDays=n=>{const a=[],b=new Date($('date').value+'T12:00:00');for(let i=0;i<n;i++){const x=new Date(b);x.setDate(b.getDate()-i);a.push(x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'))}return a};
+$('ghWeek').onclick=()=>ghSync(ghDays(7));$('ghTwo').onclick=()=>ghSync(ghDays(14));
 $('ghConnect').onclick=()=>{const c=ghCfg();if(!c.url||!c.key){ghMsg('Enter the server address and private key first.');return}window.open(c.url+'/connect?key='+encodeURIComponent(c.key),'_blank')};
 lastBk();
 render();
