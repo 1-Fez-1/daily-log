@@ -362,13 +362,20 @@ body.kp-open input[data-fresh="1"]:focus{background:color-mix(in srgb,var(--ink)
       <div class="wbtns"><div class="amtc"><button type="button" class="st" data-d="-10" aria-label="Decrease">&minus;</button><input class="wi" id="wIn2" type="number" min="0" step="1" inputmode="numeric" placeholder="ml" aria-label="Custom water amount in ml"><button type="button" class="st" data-d="10" aria-label="Increase">+</button></div><button class="primary" id="wAdd">Add</button><button id="wUndo">Undo last</button></div>
     </section>
     <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
-      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Each backup is saved as one file named daily-log-backup.json. Save it to the same place each time and tap Replace, so you only ever keep the latest. <span id="lastBk"></span> <span style="opacity:.7">Version 50 · missed doses</span></p>
+      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Each backup is saved as one file named daily-log-backup.json. Save it to the same place each time and tap Replace, so you only ever keep the latest. <span id="lastBk"></span> <span style="opacity:.7">Version 51 · Google Health sync</span></p>
       <div class="row"><select id="exDays" aria-label="Days to include"><option value="14">Last 14 days</option><option value="30" selected>Last 30 days</option><option value="60">Last 60 days</option><option value="90">Last 90 days</option></select><button id="exCopy" type="button">Copy summary for Claude</button></div>
       <p class="muted" id="exMsg" style="margin:4px 0 10px;font-size:13px">Copies a readable summary of your days so you can paste it into a chat and ask what might be affecting how you feel.</p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
       <div class="row"><select id="bkMode" aria-label="Import mode"><option value="merge">Import: merge with current data</option><option value="replace">Import: replace everything</option></select><button id="bkImport">Import</button></div>
       <textarea id="bk" rows="3" style="width:100%;font:12px monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px" placeholder="Backup text appears here after Export. To restore, choose a file or paste backup text, then press Import." aria-label="Backup text"></textarea>
       <p class="muted" id="bkMsg" role="status" style="margin:6px 0 0"></p>
+    </details>
+    <details class="card sl" id="ghCard"><summary><span class="medh">Google Health sync</span><span class="medsum" id="ghSum"></span></summary>
+      <p class="muted" style="margin:4px 0 8px;font-size:13px">Sends your food to the Google Health app. Re-syncing a day replaces what was sent before.</p>
+      <div class="row"><input id="ghUrl" placeholder="Sync server address" autocapitalize="off" autocorrect="off" style="width:100%"></div>
+      <div class="row"><input id="ghKey" placeholder="Private key" type="password" autocapitalize="off" autocorrect="off" style="width:100%"></div>
+      <div class="row"><button id="ghConnect">Connect</button><button id="ghDay" class="primary">Sync this day</button><button id="ghWeek">Last 7 days</button></div>
+      <p class="muted" id="ghMsg" role="status" style="margin:6px 0 0;word-break:break-word"></p>
     </details>
   </div>
   <datalist id="foodlist"></datalist><datalist id="ingredlist"></datalist>
@@ -1475,6 +1482,37 @@ $('bkImport').onclick=()=>{
 };
 try{if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
+
+/* Google Health sync (via the sync server) */
+const GHK='dailylog.gh',ghGet=()=>{try{return JSON.parse(localStorage.getItem(GHK))||{}}catch(e){return{}}},ghSet=o=>{try{localStorage.setItem(GHK,JSON.stringify(o))}catch(e){}};
+{const g=ghGet();$('ghUrl').value=g.url||'https://dailylog-sync.owenphez.workers.dev';$('ghKey').value=g.key||'';$('ghSum').textContent=g.last?'synced '+g.last:''}
+const ghCfg=()=>{const o={url:$('ghUrl').value.trim().replace(/\/+$/,''),key:$('ghKey').value.trim(),last:ghGet().last};ghSet(o);return o};
+const ghMsg=t=>{$('ghMsg').textContent=t};
+const GH_T=[8,12,18,20,15],GH_M=['BREAKFAST','LUNCH','DINNER','DINNER','SNACK'];
+function ghEntries(d){
+  const mt=db.mt[d]||{},cnt={};
+  return (db.days[d]||[]).filter(e=>e.k||e.p||e.c||e.f).map(e=>{
+    const m=e.m??0,t=(mt[m]||'').split(':').map(Number),hh=isNaN(t[0])?GH_T[m]??12:t[0],mm=isNaN(t[1])?0:t[1],[Y,M,D]=d.split('-').map(Number);
+    const k=m+'|'+(cnt[m]=(cnt[m]||0)+1),st=new Date(Y,M-1,D,hh,mm+(cnt[m]-1)),en=new Date(st.getTime()+15*60000);
+    return{name:String(e.n||'Food').slice(0,80),kcal:Math.round(e.k||0),protein:Math.round((e.p||0)*10)/10,carb:Math.round((e.c||0)*10)/10,fat:Math.round((e.f||0)*10)/10,meal:GH_M[m]||'',start:st.toISOString(),end:en.toISOString()};
+  });
+}
+async function ghSync(dates){
+  const c=ghCfg();if(!c.url||!c.key){ghMsg('Enter the server address and private key first.');return}
+  let made=0,errs=[];ghMsg('Syncing…');
+  for(const d of dates){
+    try{
+      const r=await fetch(c.url+'/sync',{method:'POST',headers:{'X-Key':c.key,'Content-Type':'application/json'},body:JSON.stringify({date:d,entries:ghEntries(d)})}),j=await r.json();
+      if(!r.ok){errs.push(d+': '+(j.error||r.status));if(r.status===401)break;continue}
+      made+=j.created;(j.errors||[]).forEach(x=>errs.push(x.food+': '+x.status+' '+x.detail));if(j.delErr)errs.push('delete: '+j.delErr);
+    }catch(e){errs.push('Could not reach the server.');break}
+  }
+  const o=ghGet();if(!errs.length){o.last=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});ghSet(o);$('ghSum').textContent='synced '+o.last}
+  ghMsg((errs.length?'Problem: '+errs.slice(0,3).join(' | ')+' ':'')+made+' food entr'+(made===1?'y':'ies')+' sent.');
+}
+$('ghDay').onclick=()=>ghSync([$('date').value]);
+$('ghWeek').onclick=()=>{const a=[],b=new Date($('date').value+'T12:00:00');for(let i=0;i<7;i++){const x=new Date(b);x.setDate(b.getDate()-i);a.push(x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'))}ghSync(a)};
+$('ghConnect').onclick=()=>{const c=ghCfg();if(!c.url||!c.key){ghMsg('Enter the server address and private key first.');return}window.open(c.url+'/connect?key='+encodeURIComponent(c.key),'_blank')};
 lastBk();
 render();
 if(window.__medMsg){toast(window.__medMsg);window.__medMsg=''}
