@@ -32,6 +32,14 @@ button.primary{background:var(--p);border-color:var(--p);color:#fff;font-weight:
 .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
 .card h2{font:600 16px/1.3 Georgia,serif;margin:0 0 8px}
 .top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+.dwrap{position:relative;display:flex;flex:1 1 auto;min-width:0}.dwrap input{pointer-events:none;flex:1;min-width:0}.dwrap #dateBtn{position:absolute;inset:0;width:100%;background:transparent;border:0;padding:0;min-height:0;opacity:0}
+#cal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;z-index:60}
+#cal>div{background:var(--surface);color:var(--ink);width:100%;max-width:420px;border-radius:20px 20px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.2);padding:16px 14px calc(16px + env(safe-area-inset-bottom,0px))}
+@media (min-width:560px){#cal{align-items:center}#cal>div{border-radius:20px}}
+.calh{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.calh b{font-size:16px}.calh button{width:40px;min-height:40px;padding:0;border:0;background:var(--soft);font-size:20px;border-radius:10px;color:var(--ink)}
+.calg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}#calW span{text-align:center;font-size:11px;color:var(--muted);padding:2px 0}
+.cald{min-height:42px;padding:0;border:1px solid transparent;border-radius:10px;background:none;color:var(--ink);font-size:15px;position:relative}.cald.off{visibility:hidden}
+.cald.has{background:var(--cal);color:#fff;font-weight:600}.cald.today{border-color:var(--muted)}.cald.sel{outline:2px solid var(--ink);outline-offset:1px}.cald:disabled{visibility:hidden}
 .dn{display:flex;gap:4px;align-items:center}.dn input{width:auto}
 .gsum{display:flex;justify-content:space-between;align-items:center;gap:8px}
 #gSum{font-weight:600;font-variant-numeric:tabular-nums}
@@ -321,7 +329,7 @@ body.kp-open input[data-fresh="1"]:focus{background:color-mix(in srgb,var(--ink)
 <main>
   <div id="kBar" hidden aria-live="off"><div class="kt"><b id="kBv">0</b><span> / <span id="kBg">0</span> kcal</span><span class="kl" id="kBl"></span></div><div class="kp"><i id="kBb"></i></div></div>
   <header class="top">
-    <div class="dn"><button id="prevD" aria-label="Previous day">&lsaquo;</button><input type="date" id="date" aria-label="Date"><button id="nextD" aria-label="Next day">&rsaquo;</button></div>
+    <div class="dn"><button id="prevD" aria-label="Previous day">&lsaquo;</button><span class="dwrap"><input type="date" id="date" aria-label="Date"><button type="button" id="dateBtn" aria-label="Pick a date"></button></span><button id="nextD" aria-label="Next day">&rsaquo;</button></div>
     <button id="graphsBtn" aria-label="Graphs" title="Graphs" aria-pressed="false">Graphs</button>
   </header>
   <div id="todayRow" class="todayrow" hidden><button id="todayD">Back to today</button></div>
@@ -362,7 +370,7 @@ body.kp-open input[data-fresh="1"]:focus{background:color-mix(in srgb,var(--ink)
       <div class="wbtns"><div class="amtc"><button type="button" class="st" data-d="-10" aria-label="Decrease">&minus;</button><input class="wi" id="wIn2" type="number" min="0" step="1" inputmode="numeric" placeholder="ml" aria-label="Custom water amount in ml"><button type="button" class="st" data-d="10" aria-label="Increase">+</button></div><button class="primary" id="wAdd">Add</button><button id="wUndo">Undo last</button></div>
     </section>
     <details class="card" id="bkBox"><summary>Backup &amp; restore</summary>
-      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Each backup is saved as one file named daily-log-backup.json. Save it to the same place each time and tap Replace, so you only ever keep the latest. <span id="lastBk"></span> <span style="opacity:.7">Version 57 · Google Health day fix</span></p>
+      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Each backup is saved as one file named daily-log-backup.json. Save it to the same place each time and tap Replace, so you only ever keep the latest. <span id="lastBk"></span> <span style="opacity:.7">Version 58 · calendar highlights days with entries</span></p>
       <div class="row"><select id="exDays" aria-label="Days to include"><option value="14">Last 14 days</option><option value="30" selected>Last 30 days</option><option value="60">Last 60 days</option><option value="90">Last 90 days</option></select><button id="exCopy" type="button">Copy summary for Claude</button></div>
       <p class="muted" id="exMsg" style="margin:4px 0 10px;font-size:13px">Copies a readable summary of your days so you can paste it into a chat and ask what might be affecting how you feel.</p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
@@ -505,6 +513,14 @@ body.kp-open input[data-fresh="1"]:focus{background:color-mix(in srgb,var(--ink)
     <p class="muted" id="eaPv" role="status"></p>
     <p class="muted" style="margin:0 0 4px;font-size:12px">Changes save automatically.</p>
     <div class="row"><button class="primary" id="eaSave">Done</button><button id="eaDel">Remove food</button></div>
+  </div>
+</div>
+<div id="cal" hidden>
+  <div role="dialog" aria-modal="true" aria-label="Pick a date">
+    <div class="calh"><button type="button" id="calP" aria-label="Previous month">&lsaquo;</button><b id="calT"></b><button type="button" id="calN" aria-label="Next month">&rsaquo;</button></div>
+    <div class="calg" id="calW"></div><div class="calg" id="calG"></div>
+    <p class="muted" style="margin:10px 0 0;font-size:12px;text-align:center"><span class="cald has" style="display:inline-block;width:14px;height:14px;min-height:0;vertical-align:-2px;border-radius:5px"></span> has food entries</p>
+    <div class="row" style="margin-top:10px"><button type="button" id="calToday">Today</button><button type="button" id="calX" class="primary">Close</button></div>
   </div>
 </div>
 <div id="ms" hidden>
@@ -1518,6 +1534,27 @@ const ghDays=n=>{const a=[],b=new Date($('date').value+'T12:00:00');for(let i=0;
 $('ghWeek').onclick=()=>ghSync(ghDays(7));$('ghTwo').onclick=()=>ghSync(ghDays(14));
 $('ghConnect').onclick=()=>{const c=ghCfg();if(!c.url||!c.key){ghMsg('Enter the server address and private key first.');return}window.open(c.url+'/connect?key='+encodeURIComponent(c.key),'_blank')};
 
+
+/* Calendar picker: days with food entries are highlighted */
+let calM=null;
+function calDraw(){
+  const y=calM.getFullYear(),m=calM.getMonth(),sel=$('date').value,td=iso(new Date());
+  $('calT').textContent=calM.toLocaleDateString([],{month:'long',year:'numeric'});
+  $('calW').innerHTML=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(x=>'<span>'+x+'</span>').join('');
+  const lead=(new Date(y,m,1).getDay()+6)%7,n=new Date(y,m+1,0).getDate();let h='';
+  for(let i=0;i<lead;i++)h+='<button class="cald off" disabled></button>';
+  for(let d=1;d<=n;d++){const k=y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0'),has=(db.days[k]||[]).length>0;
+    h+='<button type="button" class="cald'+(has?' has':'')+(k===td?' today':'')+(k===sel?' sel':'')+'" data-d="'+k+'" aria-label="'+k+(has?', has entries':'')+'">'+d+'</button>'}
+  $('calG').innerHTML=h;
+}
+function openCal(){const t=new Date($('date').value+'T12:00:00');calM=new Date(t.getFullYear(),t.getMonth(),1);calDraw();$('cal').hidden=false}
+const closeCal=()=>{$('cal').hidden=true};
+$('dateBtn').onclick=openCal;$('calX').onclick=closeCal;
+$('cal').addEventListener('click',e=>{if(e.target===$('cal'))closeCal()});
+$('calP').onclick=()=>{calM=new Date(calM.getFullYear(),calM.getMonth()-1,1);calDraw()};
+$('calN').onclick=()=>{calM=new Date(calM.getFullYear(),calM.getMonth()+1,1);calDraw()};
+$('calToday').onclick=()=>{$('date').value=iso(new Date());render();closeCal()};
+$('calG').addEventListener('click',e=>{const b=e.target.closest('.cald[data-d]');if(!b)return;const old=$('date').value;$('date').value=b.dataset.d;render();daySlide(b.dataset.d<old?-1:1);closeCal()});
 /* Automatic Google Health sync and cloud backup (runs while the app is open) */
 const hsh=t=>{let h=5381;for(let i=0;i<t.length;i++)h=((h<<5)+h+t.charCodeAt(i))|0;return String(h)};
 const ymd=x=>x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');
