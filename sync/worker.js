@@ -79,6 +79,13 @@ export default{async fetch(req,env){
     if(!data)return json({error:'No backup saved yet'},404);
     return json({at:(JSON.parse((await env.STORE.get(old?'backupMeta:prev':'backupMeta'))||'{}')).at||0,data});
   }
+  if(u.pathname==='/inspect'&&req.method==='POST'){
+    try{
+      const {from,to}=await req.json(),tok=await accessToken(env),all=await listAll(tok);
+      const rows=all.map(d=>{const n=d.nutritionLog||{},iv=n.interval||{};return {id:String(d.name||'').split('/').pop(),food:n.foodDisplayName||(n.food?'(food db)':''),kcal:n.energy&&n.energy.kcal,meal:n.mealType||'',start:iv.startTime||'',civil:iv.civilStartTime||null,src:(d.dataSource&&(d.dataSource.platform||''))+(d.dataSource&&d.dataSource.application?'/'+JSON.stringify(d.dataSource.application).slice(0,40):'')}}).filter(x=>x.start>=from&&x.start<to);
+      return json({total:all.length,rows});
+    }catch(err){return json({error:String(err.message||err)},500)}
+  }
   if(u.pathname==='/cleanup'&&req.method==='POST'){
     try{
       const tok=await accessToken(env),all=await listAll(tok);
