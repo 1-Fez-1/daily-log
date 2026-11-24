@@ -32,6 +32,7 @@ button.primary{background:var(--p);border-color:var(--p);color:#fff;font-weight:
 .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
 .card h2{font:600 16px/1.3 Georgia,serif;margin:0 0 8px}
 .top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+.nfo #nfAdd,.nfo .nfamt{display:none}.nfo #nfOnly{background:var(--ink);color:var(--bg)}
 .dwrap{position:relative;display:flex;flex:1 1 auto;min-width:0}.dwrap input{pointer-events:none;flex:1;min-width:0}.dwrap #dateBtn{position:absolute;inset:0;width:100%;background:transparent;border:0;padding:0;min-height:0;opacity:0}
 #cal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;z-index:60}
 #cal>div{background:var(--surface);color:var(--ink);width:100%;max-width:420px;border-radius:20px 20px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.2);padding:16px 14px calc(16px + env(safe-area-inset-bottom,0px))}
@@ -383,7 +384,7 @@ body.kp-open input[data-fresh="1"]:focus{background:color-mix(in srgb,var(--ink)
       </details>
     </details>
     <details class="card" id="bkBox"><summary>Backup file &amp; export (advanced)</summary>
-      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Each backup is saved as one file named daily-log-backup.json. Save it to the same place each time and tap Replace, so you only ever keep the latest. <span id="lastBk"></span> <span style="opacity:.7">Version 69 · scan label in saved foods</span></p>
+      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Each backup is saved as one file named daily-log-backup.json. Save it to the same place each time and tap Replace, so you only ever keep the latest. <span id="lastBk"></span> <span style="opacity:.7">Version 70 · new food menu in saved foods</span></p>
       <div class="row"><select id="exDays" aria-label="Days to include"><option value="14">Last 14 days</option><option value="30" selected>Last 30 days</option><option value="60">Last 60 days</option><option value="90">Last 90 days</option></select><button id="exCopy" type="button">Copy summary for Claude</button></div>
       <p class="muted" id="exMsg" style="margin:4px 0 10px;font-size:13px">Copies a readable summary of your days so you can paste it into a chat and ask what might be affecting how you feel.</p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
@@ -448,6 +449,7 @@ body.kp-open input[data-fresh="1"]:focus{background:color-mix(in srgb,var(--ink)
     <section class="card">
       <h2>Saved foods</h2>
       <div class="row" style="margin:0 0 10px"><button type="button" id="sfNew" class="primary">+ New food</button><button type="button" id="sfScan">&#128247; Scan a label</button></div>
+      <div id="sfForm" hidden>
       <div class="sfadd">
         <input id="sfN" placeholder="Food name" aria-label="Saved food name">
         <div class="refrow" id="sfRef"><span>Label values are for</span><input id="sfRA" type="number" min="0" step="any" inputmode="decimal" value="100" aria-label="Amount the label values are for"><select id="sfRU" aria-label="Unit"><option value="g">g</option><option value="ml">ml</option><option value="">item</option></select></div>
@@ -460,6 +462,7 @@ body.kp-open input[data-fresh="1"]:focus{background:color-mix(in srgb,var(--ink)
       </div>
       <p class="muted" id="sfMsg" role="status" style="margin:8px 0 0"></p>
       <details class="micro"><summary>Water, vitamins &amp; minerals (optional)</summary><div id="sfMicro" class="mgrid"></div></details>
+      </div>
       <input id="sfQ" type="search" placeholder="Search saved foods" aria-label="Search saved foods" hidden style="width:100%;margin:12px 0 0">
       <div id="sfList"></div>
     </section>
@@ -550,7 +553,7 @@ body.kp-open input[data-fresh="1"]:focus{background:color-mix(in srgb,var(--ink)
       <input id="nff" type="number" min="0" inputmode="decimal" placeholder="F g" aria-label="Fat g">
     </div>
     <details class="micro"><summary>Water, vitamins &amp; minerals (optional)</summary><div id="nfMicro" class="mgrid"></div></details>
-    <div class="row"><div style="flex:1 1 140px"><label for="nfAmt">Amount to add now</label><div class="amtc2"><input id="nfAmt" type="number" min="0" step="1" inputmode="decimal"><span id="nfUnit">g</span></div></div><div style="flex:1 1 120px"><label for="nfM">To meal</label><select id="nfM" style="width:100%"><option value="0">Meal 1</option><option value="1">Meal 2</option><option value="2">Meal 3</option><option value="3">Meal 4</option><option value="4">Snacks</option></select></div></div>
+    <div class="row nfamt"><div style="flex:1 1 140px"><label for="nfAmt">Amount to add now</label><div class="amtc2"><input id="nfAmt" type="number" min="0" step="1" inputmode="decimal"><span id="nfUnit">g</span></div></div><div style="flex:1 1 120px"><label for="nfM">To meal</label><select id="nfM" style="width:100%"><option value="0">Meal 1</option><option value="1">Meal 2</option><option value="2">Meal 3</option><option value="3">Meal 4</option><option value="4">Snacks</option></select></div></div>
     <p class="muted" id="nfMsg" role="status"></p>
     <div class="row"><button class="primary" id="nfAdd">Save &amp; add</button><button id="nfOnly">Save only</button><button id="nfCancel">Cancel</button></div>
   </div>
@@ -809,10 +812,10 @@ $('sfSave').onclick=()=>{
   const u=readMicro();if(Object.keys(u).length)e.u=u;{const w=num($('sfW').value);if(w>0)e.w=w}
   const i=db.foods.findIndex(x=>x.n.toLowerCase()===n.toLowerCase());if(i<0)db.foods.push(e);else db.foods[i]=e;
   sfClear();
-  $('sfMsg').textContent='Saved '+n+'.';save();render();$('sfN').focus();
+  $('sfMsg').textContent='';$('sfForm').hidden=true;save();render();toast('Saved '+n);
 };
 function sfClear(){['sfN','sfk','sfp','sfc','sff'].forEach(id=>$(id).value='');$('sfW')&&($('sfW').value='');$('sfEU').value='kcal';$('sfEc').textContent='';clearMicro();$('sfRU').value='g';$('sfRA').value=100;$('sfRA').hidden=false;$('sfSave').textContent='Save food';$('sfMsg').textContent=''}
-$('sfCancel').onclick=()=>{sfClear();document.querySelector('details.micro').open=false;toast('Cancelled')};
+$('sfCancel').onclick=()=>{sfClear();document.querySelector('details.micro').open=false;$('sfForm').hidden=true;toast('Cancelled')};
 document.querySelector('.sfadd').addEventListener('keydown',ev=>{if(ev.key==='Enter')$('sfSave').click()});
 let hold=null;
 const stepIt=b=>{const i=b.parentElement.querySelector('input'),v=(parseFloat(i.value)||0)+(+b.dataset.d);i.value=Math.max(0,Math.round(v*100)/100);i.dispatchEvent(new Event('input',{bubbles:true}))};
@@ -830,7 +833,7 @@ function readMicro(){const u={};NUTS.forEach(([k])=>{const v=num($('sfu_'+k).val
 function clearMicro(){$('sfW').value='';NUTS.forEach(([k])=>$('sfu_'+k).value='')}
 function editFood(i){
   const f=db.foods[i];const rf=fref(f);$('sfN').value=f.n;$('sfRU').value=rf.u;$('sfRA').value=rf.a;$('sfRA').hidden=!rf.u;$('sfk').value=f.k;$('sfEU').value='kcal';$('sfEc').textContent='';$('sfp').value=f.p;$('sfc').value=f.c;$('sff').value=f.f;
-  clearMicro();NUTS.forEach(([k])=>{if(f.u&&f.u[k])$('sfu_'+k).value=f.u[k]});
+  $('sfForm').hidden=false;clearMicro();NUTS.forEach(([k])=>{if(f.u&&f.u[k])$('sfu_'+k).value=f.u[k]});
   $('sfW').value=f.w||'';document.querySelector('details.micro').open=true;$('sfSave').textContent='Update food';$('sfN').focus();
 }
 const openN=new Set();let cgroups={};
@@ -872,7 +875,7 @@ function scStop(){scRun=false;if(scStream){scStream.getTracks().forEach(t=>t.sto
 function scClose(){scStop();$('scan').hidden=true}
 const loadJs=src=>new Promise((ok,no)=>{const e=document.createElement('script');e.src=src;e.onload=ok;e.onerror=()=>no(new Error('load'));document.head.appendChild(e)});
 function setForm(f,note){
-  scClose();setTab('foods');
+  scClose();setTab('foods');$('sfForm').hidden=false;
   $('sfN').value=f.n||'';$('sfk').value=f.k?Math.round(f.k):'';$('sfEU').value='kcal';$('sfEc').textContent='';$('sfp').value=f.p||'';$('sfc').value=f.c||'';$('sff').value=f.f||'';
   clearMicro();let has=false;NUTS.forEach(([k])=>{if(f.u&&f.u[k]){$('sfu_'+k).value=f.u[k];has=true}});
   document.querySelector('details.micro').open=has;$('sfSave').textContent='Save food';$('sfMsg').textContent=note;{const rf=fref(f);$('sfRU').value=rf.u;$('sfRA').value=rf.a;$('sfRA').hidden=!rf.u}$('sfN').focus();
@@ -951,7 +954,7 @@ function finish(text){
   setForm(r,'Read from the label ('+(col?'second':'first')+' column'+(r.ra?', values for '+r.ra+' '+r.ru:', serving size not found: check "Label values are for"')+'). '+(miss.length?'Could not find: '+miss.join(', ')+'. ':'')+'Check every number against the label, add a name, then press Save food.');
 }
 $('sfScan').onclick=()=>{$('scan').hidden=false;scMsg('')};
-$('sfNew').onclick=()=>{$('sfN').scrollIntoView({block:'center',behavior:'smooth'});$('sfN').focus({preventScroll:true})};
+$('sfNew').onclick=()=>{$('sfForm').hidden=true;openNF(0,'',0);$('nf').classList.add('nfo')};
 $('fpScan').onclick=()=>{closeFP();$('scan').hidden=false;scMsg('')};
 $('scClose').onclick=scClose;
 $('scLook').onclick=()=>{const c=$('scCode').value.replace(/\D/g,'');if(c){scStop();lookup(c)}};
@@ -996,6 +999,7 @@ const enHint=pre=>{const v=num($(pre+'k').value);$(pre+'Ec').textContent=$(pre+'
 ['sf','nf'].forEach(pre=>{$(pre+'k').addEventListener('input',()=>enHint(pre));$(pre+'EU').addEventListener('change',()=>enHint(pre))});
 const nfUnit=()=>{const u=$('nfRU').value;$('nfRA').hidden=!u;if(!u)$('nfRA').value=1;$('nfUnit').textContent=u||'items';$('nfAmt').placeholder=String($('nfRA').value||'')};
 function openNF(m,name,amt){
+  $('nf').classList.remove('nfo');
   ['nfk','nfp','nfc','nff'].forEach(i=>$(i).value='');$('nfEU').value='kcal';$('nfEc').textContent='';NUTS.forEach(([k])=>$('nfu_'+k).value='');$('nfW').value='';
   $('nfN').value=name||'';$('nfRU').value='g';$('nfRA').value=100;$('nfAmt').value=amt||'';$('nfM').value=m;$('nfMsg').textContent='';
   document.querySelector('#nf details.micro').open=false;nfUnit();$('nf').hidden=false;($('nfN').value?$('nfk'):$('nfN')).focus();
@@ -1011,7 +1015,7 @@ function nfSave(add){
   const u={};NUTS.forEach(([k])=>{const v=num($('nfu_'+k).value);if(v>0)u[k]=v});if(Object.keys(u).length)e.u=u;{const w=num($('nfW').value);if(w>0)e.w=w}
   const i=db.foods.findIndex(x=>x.n.toLowerCase()===n.toLowerCase());if(i<0)db.foods.push(e);else db.foods[i]=e;
   if(add)addScaled(e,+$('nfM').value,amt);
-  save();$('nf').hidden=true;render();
+  save();$('nf').hidden=true;render();if(!add)toast('Saved '+n);
 }
 $('nfRU').onchange=()=>{if($('nfRU').value&&+$('nfRA').value===1)$('nfRA').value=100;nfUnit()};$('nfRA').oninput=nfUnit;
 $('sfRU').onchange=()=>{const u=$('sfRU').value;$('sfRA').hidden=!u;if(!u)$('sfRA').value=1;else if(+$('sfRA').value===1)$('sfRA').value=100};
