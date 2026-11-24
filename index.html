@@ -384,7 +384,7 @@ body.kp-open input[data-fresh="1"]:focus{background:color-mix(in srgb,var(--ink)
       </details>
     </details>
     <details class="card" id="bkBox"><summary>Backup file &amp; export (advanced)</summary>
-      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Each backup is saved as one file named daily-log-backup.json. Save it to the same place each time and tap Replace, so you only ever keep the latest. <span id="lastBk"></span> <span style="opacity:.7">Version 71 · new food menu closes on tap outside</span></p>
+      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Each backup is saved as one file named daily-log-backup.json. Save it to the same place each time and tap Replace, so you only ever keep the latest. <span id="lastBk"></span> <span style="opacity:.7">Version 72 · add food list by weekly frequency</span></p>
       <div class="row"><select id="exDays" aria-label="Days to include"><option value="14">Last 14 days</option><option value="30" selected>Last 30 days</option><option value="60">Last 60 days</option><option value="90">Last 90 days</option></select><button id="exCopy" type="button">Copy summary for Claude</button></div>
       <p class="muted" id="exMsg" style="margin:4px 0 10px;font-size:13px">Copies a readable summary of your days so you can paste it into a chat and ask what might be affecting how you feel.</p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
@@ -1355,9 +1355,10 @@ $('msDel').onclick=()=>{if(msI<0)return;const x=medFor($('date').value).list[msI
 
 /* food picker: separate menu of all saved foods */
 let fpM=0,fpSel=null,fpMap={};
-function fpBuildMap(){const m={};let o=0;Object.keys(db.days).sort().reverse().forEach(d=>(db.days[d]||[]).slice().reverse().forEach(e=>{const q=e.a?{n:e.n,a:e.a,ru:e.ru}:parseAmt(e);if(!(q.a>0))return;for(const key of new Set([String(e.n).trim().toLowerCase(),baseName(q.n).toLowerCase()]))if(!m[key])m[key]={a:q.a,ru:q.ru||'items',o:o};o++}));return m}
+function fpBuildMap(){const m={};let o=0;const cut=(()=>{const x=new Date();x.setDate(x.getDate()-6);return iso(x)})();Object.keys(db.days).sort().reverse().forEach(d=>(db.days[d]||[]).slice().reverse().forEach(e=>{const q=e.a?{n:e.n,a:e.a,ru:e.ru}:parseAmt(e);if(!(q.a>0))return;for(const key of new Set([String(e.n).trim().toLowerCase(),baseName(q.n).toLowerCase()])){if(!m[key])m[key]={a:q.a,ru:q.ru||'items',o:o,c:0};if(d>=cut)m[key].c++}o++}));return m}
 function fpLast(f){const rf=fref(f),h=fpMap[f.n.toLowerCase()];return h&&h.ru===(rf.u||'items')?h.a:rf.a}
-function fpItems(){const q=$('fpQ').value.trim().toLowerCase();return[...db.foods.map((f,i)=>({k:'f'+i,f,n:f.n})),...db.recipes.map((r,i)=>({k:'r'+i,r,n:r.n}))].filter(x=>!q||x.n.toLowerCase().includes(q)).sort((a,b)=>{const ra=fpRank(a),rb=fpRank(b);return ra===rb?a.n.localeCompare(b.n):ra<rb?-1:1})}
+function fpItems(){const q=$('fpQ').value.trim().toLowerCase();return[...db.foods.map((f,i)=>({k:'f'+i,f,n:f.n})),...db.recipes.map((r,i)=>({k:'r'+i,r,n:r.n}))].filter(x=>!q||x.n.toLowerCase().includes(q)).sort((a,b)=>{const ca=fpFreq(a),cb=fpFreq(b);if(ca!==cb)return cb-ca;const ra=fpRank(a),rb=fpRank(b);return ra===rb?a.n.localeCompare(b.n):ra<rb?-1:1})}
+function fpFreq(x){const h=fpMap[x.n.toLowerCase()]||fpMap[baseName(x.n).toLowerCase()];return h&&h.c||0}
 function fpRank(x){const h=fpMap[x.n.toLowerCase()]||fpMap[baseName(x.n).toLowerCase()];return h&&h.o!==undefined?h.o:1e9}
 function fpPrev(x,a){const r1=v=>Math.round(v*10)/10;if(x.r){const t=recTot(x.r.items),sc=a/x.r.servings;return`${Math.round(t.k*sc)} kcal · P ${r1(t.p*sc)} · C ${r1(t.c*sc)} · F ${r1(t.f*sc)}`}const rf=fref(x.f),sc=rf.a?a/rf.a:a;return`${Math.round(x.f.k*sc)} kcal · P ${r1(x.f.p*sc)} · C ${r1(x.f.c*sc)} · F ${r1(x.f.f*sc)}`}
 function fpAmtOf(x){return x.r?1:fpLast(x.f)}
