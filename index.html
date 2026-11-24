@@ -383,7 +383,7 @@ body.kp-open input[data-fresh="1"]:focus{background:color-mix(in srgb,var(--ink)
       </details>
     </details>
     <details class="card" id="bkBox"><summary>Backup file &amp; export (advanced)</summary>
-      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Each backup is saved as one file named daily-log-backup.json. Save it to the same place each time and tap Replace, so you only ever keep the latest. <span id="lastBk"></span> <span style="opacity:.7">Version 68 · recent foods first</span></p>
+      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Each backup is saved as one file named daily-log-backup.json. Save it to the same place each time and tap Replace, so you only ever keep the latest. <span id="lastBk"></span> <span style="opacity:.7">Version 69 · scan label in saved foods</span></p>
       <div class="row"><select id="exDays" aria-label="Days to include"><option value="14">Last 14 days</option><option value="30" selected>Last 30 days</option><option value="60">Last 60 days</option><option value="90">Last 90 days</option></select><button id="exCopy" type="button">Copy summary for Claude</button></div>
       <p class="muted" id="exMsg" style="margin:4px 0 10px;font-size:13px">Copies a readable summary of your days so you can paste it into a chat and ask what might be affecting how you feel.</p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
@@ -447,6 +447,7 @@ body.kp-open input[data-fresh="1"]:focus{background:color-mix(in srgb,var(--ink)
   <div data-tab="foods">
     <section class="card">
       <h2>Saved foods</h2>
+      <div class="row" style="margin:0 0 10px"><button type="button" id="sfNew" class="primary">+ New food</button><button type="button" id="sfScan">&#128247; Scan a label</button></div>
       <div class="sfadd">
         <input id="sfN" placeholder="Food name" aria-label="Saved food name">
         <div class="refrow" id="sfRef"><span>Label values are for</span><input id="sfRA" type="number" min="0" step="any" inputmode="decimal" value="100" aria-label="Amount the label values are for"><select id="sfRU" aria-label="Unit"><option value="g">g</option><option value="ml">ml</option><option value="">item</option></select></div>
@@ -949,6 +950,8 @@ function finish(text){
   const miss=[['protein',r.p],['carbs',r.c],['fat',r.f]].filter(x=>!x[1]).map(x=>x[0]);
   setForm(r,'Read from the label ('+(col?'second':'first')+' column'+(r.ra?', values for '+r.ra+' '+r.ru:', serving size not found: check "Label values are for"')+'). '+(miss.length?'Could not find: '+miss.join(', ')+'. ':'')+'Check every number against the label, add a name, then press Save food.');
 }
+$('sfScan').onclick=()=>{$('scan').hidden=false;scMsg('')};
+$('sfNew').onclick=()=>{$('sfN').scrollIntoView({block:'center',behavior:'smooth'});$('sfN').focus({preventScroll:true})};
 $('fpScan').onclick=()=>{closeFP();$('scan').hidden=false;scMsg('')};
 $('scClose').onclick=scClose;
 $('scLook').onclick=()=>{const c=$('scCode').value.replace(/\D/g,'');if(c){scStop();lookup(c)}};
