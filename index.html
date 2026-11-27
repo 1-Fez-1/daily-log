@@ -384,7 +384,7 @@ body.kp-open input[data-fresh="1"]:focus{background:color-mix(in srgb,var(--ink)
       </details>
     </details>
     <details class="card" id="bkBox"><summary>Backup file &amp; export (advanced)</summary>
-      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Each backup is saved as one file named daily-log-backup.json. Save it to the same place each time and tap Replace, so you only ever keep the latest. <span id="lastBk"></span> <span style="opacity:.7">Version 72 · add food list by weekly frequency</span></p>
+      <p class="muted" style="margin:8px 0">Data is stored only in this browser. Each backup is saved as one file named daily-log-backup.json. Save it to the same place each time and tap Replace, so you only ever keep the latest. <span id="lastBk"></span> <span style="opacity:.7">Version 73 · sleep and steps removed</span></p>
       <div class="row"><select id="exDays" aria-label="Days to include"><option value="14">Last 14 days</option><option value="30" selected>Last 30 days</option><option value="60">Last 60 days</option><option value="90">Last 90 days</option></select><button id="exCopy" type="button">Copy summary for Claude</button></div>
       <p class="muted" id="exMsg" style="margin:4px 0 10px;font-size:13px">Copies a readable summary of your days so you can paste it into a chat and ask what might be affecting how you feel.</p>
       <div class="row"><button id="bkExport" class="primary">Export backup</button><input type="file" id="bkFile" accept=".json,application/json" aria-label="Backup file"></div>
@@ -400,21 +400,9 @@ body.kp-open input[data-fresh="1"]:focus{background:color-mix(in srgb,var(--ink)
       <div class="slh"><h2>Notes</h2></div>
       <textarea id="noteTx" rows="5" maxlength="2000" placeholder="Mood, energy, training, anything worth remembering" aria-label="Notes"></textarea>
     </section>
-    <section class="card sl" id="sleepCard" aria-label="Sleep">
-      <div class="slh"><h2>Sleep</h2><span id="slDur" aria-live="polite"></span></div>
-      <div class="slrow">
-        <div><span class="tl2">Bedtime (night before)</span><div class="tsel" id="slBed"></div></div>
-        <div><span class="tl2">Wake-up time</span><div class="tsel" id="slWake"></div></div>
-      </div>
-      <p class="muted" id="slAvg" style="margin:8px 0 0"></p>
-    </section>
     <section class="card sl" id="bmCard" aria-label="Bowel movement">
       <div class="slh"><h2>BM</h2></div>
       <div class="bmrow"><label class="bmck"><input type="checkbox" id="bmY" aria-label="BM: yes"><span>Yes</span></label><label class="bmck"><input type="checkbox" id="bmN" aria-label="BM: no"><span>No</span></label><input id="bmTx" type="text" maxlength="120" placeholder="Short note (optional)" aria-label="BM note"></div>
-    </section>
-    <section class="card sl" id="stepCard" aria-label="Steps">
-      <div class="slh"><h2>Steps</h2><span class="muted" style="font-size:13px">optional</span></div>
-      <div class="stepRow"><input id="stIn" type="number" min="0" step="1" inputmode="numeric" placeholder="0" aria-label="Steps today"><span class="muted">steps</span></div>
     </section>
     <details class="card sl" id="medCard" aria-label="Medications">
       <summary><span class="medh">Medications</span><span class="medsum" id="medSum"></span></summary>
@@ -1111,8 +1099,6 @@ function renderWeek(){
   if(!n){body.innerHTML='<p class="muted" style="margin:0">Nothing logged in this period yet.</p>';return}
   const g=goals(),tot=logged.map(d=>sum(db.days[d])),avg=k=>tot.reduce((a,x)=>a+x[k],0)/n;
   const tiles=[['Days logged',n+' / '+N,''],['Calories',Math.round(avg('k'))+' kcal','goal '+g.k],['Protein',Math.round(avg('p'))+' g','goal '+g.p],['Carbs',Math.round(avg('c'))+' g','goal '+g.c],['Fat',Math.round(avg('f'))+' g','goal '+g.f],['Water',Math.round(logged.reduce((a,d)=>a+waterTotal(d),0)/n)+' ml','goal '+(db.waterGoal||2000)]];
-  const nights=days.map(d=>sleepMin(db.sleep[d])).filter(x=>x!=null);
-  if(nights.length)tiles.push(['Sleep',fmtDur(Math.round(nights.reduce((a,b)=>a+b,0)/nights.length)),nights.length+' nights']);
   const bmN=days.filter(d=>db.bm[d]&&db.bm[d].y).length;if(bmN||days.some(d=>db.bm[d]))tiles.push(['BM days',bmN+' / '+N,'']);
   const fv=[];days.forEach(d=>Object.values(db.feel[d]||{}).forEach(v=>fv.push(v)));
   if(fv.length)tiles.push(['Feel after meals',(fv.reduce((a,b)=>a+b,0)/fv.length).toFixed(1)+' / 10',fv.length+' ratings']);
@@ -1135,23 +1121,17 @@ $('wkRange').onchange=()=>{try{localStorage.setItem('dailylog.wk',$('wkRange').v
 function updToday(){$('todayRow').hidden=$('date').value===iso(new Date())}
 $('todayD').onclick=()=>{$('date').value=iso(new Date());render()};
 function renderSleep(){
-  const d=$('date').value,s=db.sleep[d]||{},m=sleepMin(s);
-  setT('slBed',s.bed);setT('slWake',s.wake);$('slDur').textContent=m==null?'':fmtDur(m);
-  let tot=0,n=0,t=d;for(let i=0;i<7;i++,t=prev(t)){const x=sleepMin(db.sleep[t]);if(x!=null){tot+=x;n++}}
-  $('slAvg').textContent=n>1?`7-day average: ${fmtDur(Math.round(tot/n))} (${n} nights logged)`:'';
+  const d=$('date').value;
   if(document.activeElement!==$('noteTx'))$('noteTx').value=db.notes[d]||'';
-  renderRem();renderMeds();if(document.activeElement!==$('stIn'))$('stIn').value=db.steps[d]??'';const bm=db.bm[d]||{};$('bmY').checked=!!bm.y;$('bmN').checked=!!bm.n;if(document.activeElement!==$('bmTx'))$('bmTx').value=bm.t||'';
+  renderRem();renderMeds();const bm=db.bm[d]||{};$('bmY').checked=!!bm.y;$('bmN').checked=!!bm.n;if(document.activeElement!==$('bmTx'))$('bmTx').value=bm.t||'';
 }
 function setBM(ev){if(ev&&ev.target===$('bmY')&&$('bmY').checked)$('bmN').checked=false;if(ev&&ev.target===$('bmN')&&$('bmN').checked)$('bmY').checked=false;const d=$('date').value,y=$('bmY').checked,n=$('bmN').checked,t=$('bmTx').value.trim();if(!y&&!n&&!t)delete db.bm[d];else{db.bm[d]={t};if(y)db.bm[d].y=true;if(n)db.bm[d].n=true}save();renderWeek();renderRem()}
 $('bmY').addEventListener('change',setBM);$('bmN').addEventListener('change',setBM);$('bmTx').addEventListener('input',()=>{clearTimeout(bmT);bmT=setTimeout(()=>setBM(),300)});
 let bmT=null;
 const hOpts='<option value="">--</option>'+[...Array(24).keys()].map(h=>`<option>${String(h).padStart(2,'0')}</option>`).join('');
 const mOpts=[...Array(12).keys()].map(i=>`<option>${String(i*5).padStart(2,'0')}</option>`).join('');
-['slBed','slWake'].forEach(id=>{const n=id==='slBed'?'Bedtime':'Wake-up';$(id).innerHTML=`<select data-p="h" aria-label="${n} hour">${hOpts}</select><span>:</span><select data-p="m" aria-label="${n} minutes">${mOpts}</select>`});
 const getT=id=>{const h=$(id).querySelector('[data-p=h]').value;return h===''?'':h+':'+$(id).querySelector('[data-p=m]').value};
 const setT=(id,v)=>{const h=$(id).querySelector('[data-p=h]'),m=$(id).querySelector('[data-p=m]');if(!v){h.value='';m.value='00';return}const p=r5(v).split(':');h.value=p[0];m.value=p[1]};
-const onSleep=()=>{const d=$('date').value,bed=getT('slBed'),wake=getT('slWake');if(!bed&&!wake)delete db.sleep[d];else db.sleep[d]={bed,wake};save();renderSleep()};
-['slBed','slWake'].forEach(id=>$(id).addEventListener('change',onSleep));
 let noteT=null;
 $('noteTx').addEventListener('input',()=>{
   const d=$('date').value,v=$('noteTx').value;clearTimeout(noteT);
@@ -1254,7 +1234,7 @@ $('kp').addEventListener('click',ev=>{if(ev.detail===0)kpKey(ev.target.closest('
 function remMissing(){
   const d=$('date').value,today=iso(new Date());if(d>today)return[];
   const out=[],list=db.days[d]||[],fe=db.feel[d]||{};
-  {const sl=db.sleep[d]||{};if(!(sl.bed&&sl.wake))out.push({k:'sleep',t:'Sleep'});if(!db.weights[d])out.push({k:'weight',t:'Weight'})}
+  {if(!db.weights[d])out.push({k:'weight',t:'Weight'})}
   const ms=[...new Set(list.map(e=>e.m??0))].sort((a,b)=>a-b).filter(m=>!fe[m]&&!/snack/i.test(MEALS[m]));
   if(ms.length)out.push({k:'feel',t:'How you felt ('+ms.map(m=>MEALS[m]).join(', ')+')',m:ms[0]});
   const bm=db.bm[d]||{};
@@ -1278,7 +1258,7 @@ $('remBar').addEventListener('click',ev=>{
   if(r==='x'){try{localStorage.setItem('dailylog.rem',$('date').value)}catch(e){}renderRem();return}
   if(r==='feel'){const m=+b.dataset.m;openOnly(m);build();totals();setTimeout(()=>goTo(document.querySelector(`tbody[data-m="${m}"] .fl td`)||document.querySelector(`tbody[data-m="${m}"] .fl`)),60);return}
   if(r==='weight'){setTab('log');setTimeout(()=>{goTo(document.querySelector('.logfoot'));try{$('wIn').focus({preventScroll:true})}catch(e){}},60);return}
-  setTab('diary');setTimeout(()=>goTo($(r==='bm'?'bmCard':'sleepCard')),60);
+  setTab('diary');setTimeout(()=>goTo($('bmCard')),60);
 });
 
 /* medications: no entry for a day = same as the most recent earlier entry */
@@ -1464,7 +1444,6 @@ $('exCopy').onclick=async()=>{
   try{if(navigator.share){await navigator.share({text:txt});msg.textContent='Shared.';return}}catch(e){if(e&&e.name==='AbortError')return}
   msg.textContent='Could not copy on this device.';
 };
-$('stIn').onchange=()=>{const v=Math.round(parseFloat($('stIn').value)),d=$('date').value;if(v>0)db.steps[d]=v;else delete db.steps[d];save()};
 $('wIn').onchange=()=>{const v=parseFloat($('wIn').value),d=$('date').value;if(v>0)db.weights[d]=v;else delete db.weights[d];save();charts();renderRem()};
 $('gEdit').onclick=()=>{const o=$('gForm').hidden;$('gForm').hidden=!o;$('gEdit').textContent=o?'Done':'Goals';$('gEdit').setAttribute('aria-expanded',o)};
 $('range').onchange=charts;
